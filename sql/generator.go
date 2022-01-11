@@ -18,7 +18,7 @@ type Generator struct {
 	FieldTypeMap  map[string]string
 	InputSQL      string // sql file path
 	InputTemplate string // template file path
-	OutputRepo    string // repo layer file path
+	OutputRepo    string // repo layer dir path
 	OutputModel   string // model file path
 	OutputEntity  string // entity file path
 }
@@ -240,7 +240,7 @@ func (g *Generator) writeRepoFile(tableName string) {
 	// 2.read code
 	data, err := ioutil.ReadAll(dao)
 	if err != nil {
-		log.Fatal("Write dao file error.", err)
+		log.Fatal("Write Repository file error.", err)
 	}
 	template := string(data)
 	daoCode := strings.ReplaceAll(template, placeHolder, modelStructName(tableName))
