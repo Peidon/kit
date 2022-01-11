@@ -2,36 +2,48 @@ package main
 
 import (
 	"colx/sql"
-	"fmt"
-	"github.com/pingcap/parser"
-	"github.com/pingcap/parser/ast"
+	"flag"
 	_ "github.com/pingcap/parser/test_driver"
+	"log"
+	"os"
+	"strings"
 )
 
-func parse(sql string) (*ast.StmtNode, error) {
-	p := parser.New()
+func main() {
+	inputSQL := flag.String("sql", "", "DDL statement")
+	//inputSQLFile := flag.String("sql-file", "", "sql file path")
+	entityDir := flag.String("entity", "", "entity struct output dir")
+	modelDir := flag.String("model", "", "model struct output dir")
+	repoDir := flag.String("repo", "", "repository file output dir")
+	flag.Parse()
 
-	stmtNodes, _, err := p.Parse(sql, "", "")
-	if err != nil {
-		return nil, err
+	if inputSQL == nil {
+		log.Fatalf("no sql input")
 	}
 
-	return &stmtNodes[0], nil
+	astNode, err := sql.Parse(*inputSQL)
+	if err != nil {
+		log.Fatalf("sql parse error[%v]", err)
+	}
+
+	// init generator
+	gen := &sql.Generator{
+		FieldTypeMap: make(map[string]string),
+		OutputEntity: trimDirPath(entityDir),
+		OutputModel:  trimDirPath(modelDir),
+		OutputRepo:   trimDirPath(repoDir),
+	}
+	(*astNode).Accept(gen)
+
+	err = gen.InitFieldType()
+	if err != nil {
+		log.Fatalf("convert struct field type error[%v]", err)
+	}
+
+	// generate code
+	gen.Do()
 }
 
-func main() {
-	astNode, err := parse("Create Table test_tab (`id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'id'," +
-		"`saas_id` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT 'saas id'," +
-		"`region` varchar(10) NOT NULL DEFAULT '' COMMENT 'region')")
-	if err != nil {
-		fmt.Printf("parse error: %v\n", err.Error())
-		return
-	}
-
-	v := &sql.Generator{
-		FieldTypeMap: make(map[string]string),
-	}
-	(*astNode).Accept(v)
-
-	fmt.Printf("%v\n", *v)
+func trimDirPath(path *string) string {
+	return strings.TrimRight(*path, string(os.PathSeparator))
 }

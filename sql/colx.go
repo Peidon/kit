@@ -27,7 +27,7 @@ func extract(rootNode *ast.StmtNode) []string {
 	return v.colNames
 }
 
-func parse(sql string) (*ast.StmtNode, error) {
+func Parse(sql string) (*ast.StmtNode, error) {
 	p := parser.New()
 
 	stmtNodes, _, err := p.Parse(sql, "", "")

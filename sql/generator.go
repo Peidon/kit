@@ -16,7 +16,6 @@ type Generator struct {
 	TableName     string
 	FieldNames    []string
 	FieldTypeMap  map[string]string
-	InputSQL      string // sql file path
 	InputTemplate string // template file path
 	OutputRepo    string // repo layer dir path
 	OutputModel   string // model file path
@@ -46,17 +45,17 @@ func (g *Generator) Leave(in ast.Node) (ast.Node, bool) {
 	return in, true
 }
 
-func (g *Generator) initFieldTypeMap() error {
+func (g *Generator) InitFieldType() error {
 	if len(g.FieldTypeMap) == 0 {
 		return errors.New("no field type map")
 	}
 	for k, v := range g.FieldTypeMap {
-		g.FieldTypeMap[k] = getStructFieldType(v)
+		g.FieldTypeMap[k] = dbToStructType(v)
 	}
 	return nil
 }
 
-func getStructFieldType(define string) string {
+func dbToStructType(define string) string {
 	i := strings.Index(define, "(")
 	if i == -1 {
 		i = len(define)
@@ -225,8 +224,9 @@ const (
 	placeHolder   = "XXX"
 )
 
-func (g *Generator) writeRepoFile(tableName string) {
-	if len(g.InputTemplate) == 0 {
+func (g *Generator) writeRepoFile() {
+	tableName := g.OutputRepo
+	if len(g.InputTemplate) == 0 || len(g.OutputRepo) == 0 {
 		return
 	}
 	// 1.open file
@@ -258,4 +258,10 @@ func (g *Generator) writeRepoFile(tableName string) {
 		log.Fatal("Write Repository File error.", zap.Error(err))
 	}
 	log.Printf("Wrote %d characters Successfully.", wrote)
+}
+
+func (g *Generator) Do() {
+	g.writeEntityFile()
+	g.writeModelStruct()
+	g.writeRepoFile()
 }
