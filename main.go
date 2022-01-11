@@ -1,6 +1,7 @@
 package main
 
 import (
+	"colx/sql"
 	"fmt"
 	"github.com/pingcap/parser"
 	"github.com/pingcap/parser/ast"
@@ -27,5 +28,10 @@ func main() {
 		return
 	}
 
-	fmt.Printf("%v\n", *astNode)
+	v := &sql.Generator{
+		FieldTypeMap: make(map[string]string),
+	}
+	(*astNode).Accept(v)
+
+	fmt.Printf("%v\n", *v)
 }
