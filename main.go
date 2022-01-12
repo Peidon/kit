@@ -1,20 +1,21 @@
 package main
 
 import (
-	"colx/sql"
 	"flag"
 	_ "github.com/pingcap/parser/test_driver"
+	"kit/sql"
 	"log"
 	"os"
 	"strings"
 )
 
 func main() {
-	inputSQL := flag.String("sql", "", "DDL statement")
+	inputSQL := flag.String("d", "", "DDL statement")
 	//inputSQLFile := flag.String("sql-file", "", "sql file path")
-	entityDir := flag.String("entity", "", "entity struct output dir")
-	modelDir := flag.String("model", "", "model struct output dir")
-	repoDir := flag.String("repo", "", "repository file output dir")
+	templateFile := flag.String("t", "", "repository template file")
+	entityDir := flag.String("entity-output", "", "entity struct output dir")
+	modelDir := flag.String("model-output", "", "model struct output dir")
+	repoDir := flag.String("repo-output", "", "repository file output dir")
 	flag.Parse()
 
 	if inputSQL == nil {
@@ -28,11 +29,13 @@ func main() {
 
 	// init generator
 	gen := &sql.Generator{
-		FieldTypeMap: make(map[string]string),
-		OutputEntity: trimDirPath(entityDir),
-		OutputModel:  trimDirPath(modelDir),
-		OutputRepo:   trimDirPath(repoDir),
+		FieldTypeMap:  make(map[string]string),
+		OutputEntity:  trimDirPath(entityDir),
+		OutputModel:   trimDirPath(modelDir),
+		OutputRepo:    trimDirPath(repoDir),
+		InputTemplate: *templateFile,
 	}
+
 	(*astNode).Accept(gen)
 
 	err = gen.InitFieldType()
