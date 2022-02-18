@@ -18,33 +18,32 @@ func main() {
 	repoDir := flag.String("repo-output", "", "repository file output dir")
 	flag.Parse()
 
-	if inputSQL == nil {
-		log.Fatalf("no sql input")
+	if inputSQL != nil {
+		astNode, err := sql.Parse(*inputSQL)
+		if err != nil {
+			log.Fatalf("sql parse error[%v]", err)
+		}
+
+		// init generator
+		gen := &sql.Generator{
+			FieldTypeMap:  make(map[string]string),
+			OutputEntity:  trimDirPath(entityDir),
+			OutputModel:   trimDirPath(modelDir),
+			OutputRepo:    trimDirPath(repoDir),
+			InputTemplate: *templateFile,
+		}
+
+		(*astNode).Accept(gen)
+
+		err = gen.InitFieldType()
+		if err != nil {
+			log.Fatalf("convert struct field type error[%v]", err)
+		}
+
+		// generate code
+		gen.Do()
 	}
 
-	astNode, err := sql.Parse(*inputSQL)
-	if err != nil {
-		log.Fatalf("sql parse error[%v]", err)
-	}
-
-	// init generator
-	gen := &sql.Generator{
-		FieldTypeMap:  make(map[string]string),
-		OutputEntity:  trimDirPath(entityDir),
-		OutputModel:   trimDirPath(modelDir),
-		OutputRepo:    trimDirPath(repoDir),
-		InputTemplate: *templateFile,
-	}
-
-	(*astNode).Accept(gen)
-
-	err = gen.InitFieldType()
-	if err != nil {
-		log.Fatalf("convert struct field type error[%v]", err)
-	}
-
-	// generate code
-	gen.Do()
 }
 
 func trimDirPath(path *string) string {
