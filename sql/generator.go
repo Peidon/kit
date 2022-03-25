@@ -7,19 +7,21 @@ import (
 	"github.com/pingcap/parser/ast"
 	"go.uber.org/zap"
 	"io/ioutil"
+	"kit/slice"
 	"log"
 	"os"
 	"strings"
 )
 
 type Generator struct {
-	TableName     string
-	FieldNames    []string
-	FieldTypeMap  map[string]string
-	InputTemplate string // template file path
-	OutputRepo    string // repo layer dir path
-	OutputModel   string // model file path
-	OutputEntity  string // entity file path
+	TableName    string
+	FieldNames   []string
+	FieldTypeMap map[string]string
+	DDLFile      string // ddl file path
+	RepoTemplate string // template file path
+	OutputRepo   string // repo layer dir path
+	OutputModel  string // model file path
+	OutputEntity string // entity file path
 }
 
 func (g *Generator) Enter(in ast.Node) (ast.Node, bool) {
@@ -29,7 +31,9 @@ func (g *Generator) Enter(in ast.Node) (ast.Node, bool) {
 	}
 
 	if name, ok := in.(*ast.ColumnName); ok {
-		g.FieldNames = append(g.FieldNames, name.Name.O)
+		if !slice.Contains(g.FieldNames, name.Name.O) {
+			g.FieldNames = append(g.FieldNames, name.Name.O)
+		}
 	}
 
 	if columnDef, ok := in.(*ast.ColumnDef); ok {
@@ -87,7 +91,8 @@ func (g *Generator) writeEntityFile() {
 	targetFile := fmt.Sprintf("%s/%s.go", g.OutputEntity, tableName)
 	fileInfo, err := os.Stat(targetFile)
 	if !os.IsNotExist(err) {
-		log.Fatalf("%s Entity File exists.", fileInfo.Name())
+		log.Printf("%s Entity File exists.\n", fileInfo.Name())
+		return
 	}
 	// create file and write code
 	file := createFile(targetFile)
@@ -119,7 +124,7 @@ func (g *Generator) writeEntityFile() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.Printf("AUTO Generate SUCCESS ! Wrote %d bytes.\n", bytesWritten)
+	log.Printf("AUTO Generate entity SUCCESS ! Wrote %d bytes.\n", bytesWritten)
 }
 
 func (g *Generator) writeModelStruct() {
@@ -132,7 +137,8 @@ func (g *Generator) writeModelStruct() {
 	targetFile := fmt.Sprintf("%s/%s.go", g.OutputModel, fileName)
 	_, err := os.Stat(targetFile)
 	if !os.IsNotExist(err) {
-		log.Fatal("Model File exists.")
+		log.Println("Model File exists.")
+		return
 	}
 	// create file and write code
 	file := createFile(targetFile)
@@ -214,7 +220,7 @@ func createFile(filePath string) *os.File {
 		0666,
 	)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("create %s %v", filePath, err)
 	}
 	return file
 }
@@ -225,12 +231,11 @@ const (
 )
 
 func (g *Generator) writeRepoFile() {
-	tableName := g.OutputRepo
-	if len(g.InputTemplate) == 0 || len(g.OutputRepo) == 0 {
+	if len(g.RepoTemplate) == 0 || len(g.OutputRepo) == 0 {
 		return
 	}
 	// 1.open file
-	dao, err := os.Open(g.InputTemplate)
+	dao, err := os.Open(g.RepoTemplate)
 	defer func() {
 		err = dao.Close()
 		if err != nil {
@@ -243,25 +248,61 @@ func (g *Generator) writeRepoFile() {
 		log.Fatal("Write Repository file error.", err)
 	}
 	template := string(data)
-	daoCode := strings.ReplaceAll(template, placeHolder, modelStructName(tableName))
+	daoCode := strings.ReplaceAll(template, placeHolder, modelStructName(g.TableName))
 
 	// 3.if dao file exists, not create
-	targetFile := fmt.Sprintf("%s/%s.go", g.OutputRepo, tableName)
+	targetFile := fmt.Sprintf("%s/%s.go", g.OutputRepo, g.TableName)
 	_, err = os.Stat(targetFile)
 	if !os.IsNotExist(err) {
-		log.Fatal("Repository File exists.")
+		log.Println("Repository File exists.")
+		return
 	}
 	// 4.create and write code
+	log.Printf("create repo %s file\n", targetFile)
 	daoFile := createFile(targetFile)
 	wrote, err := daoFile.WriteString(daoCode)
 	if err != nil {
 		log.Fatal("Write Repository File error.", zap.Error(err))
 	}
-	log.Printf("Wrote %d characters Successfully.", wrote)
+	log.Printf("Wrote %d characters into repo file Successfully.", wrote)
 }
 
 func (g *Generator) Do() {
+	sql := readSQL(g.DDLFile)
+	if len(sql) == 0 {
+		log.Fatalln("sql is null")
+		return
+	}
+
+	astNode, err := Parse(string(sql))
+	if err != nil {
+		log.Fatalf("sql parse error[%v]", err)
+	}
+	(*astNode).Accept(g)
+
+	err = g.InitFieldType()
+	if err != nil {
+		log.Fatalf("convert struct field type error[%v]", err)
+	}
+
 	g.writeEntityFile()
 	g.writeModelStruct()
 	g.writeRepoFile()
+}
+
+func readSQL(filePath string) []byte {
+	// 1.open file
+	ddl, err := os.Open(filePath)
+	defer func() {
+		err = ddl.Close()
+		if err != nil {
+			log.Fatal("File close Failed.", err)
+		}
+	}()
+	// 2.read code
+	data, er := ioutil.ReadAll(ddl)
+	if er != nil {
+		log.Fatal("Read SQL file error.", er)
+	}
+	return data
 }

@@ -4,40 +4,29 @@ import (
 	"flag"
 	_ "github.com/pingcap/parser/test_driver"
 	"kit/sql"
-	"log"
 	"os"
 	"strings"
 )
 
 func main() {
-	inputSQL := flag.String("d", "", "DDL statement")
+	ddl := flag.String("ddl-file", "", "ddl file path")
 	//inputSQLFile := flag.String("sql-file", "", "sql file path")
-	templateFile := flag.String("t", "", "repository template file")
+	templateFile := flag.String("repo-tpl", "", "repository template file")
 	entityDir := flag.String("entity-output", "", "entity struct output dir")
 	modelDir := flag.String("model-output", "", "model struct output dir")
 	repoDir := flag.String("repo-output", "", "repository file output dir")
 	flag.Parse()
 
-	if inputSQL != nil {
-		astNode, err := sql.Parse(*inputSQL)
-		if err != nil {
-			log.Fatalf("sql parse error[%v]", err)
-		}
+	if ddl != nil && len(*ddl) != 0 {
 
 		// init generator
 		gen := &sql.Generator{
-			FieldTypeMap:  make(map[string]string),
-			OutputEntity:  trimDirPath(entityDir),
-			OutputModel:   trimDirPath(modelDir),
-			OutputRepo:    trimDirPath(repoDir),
-			InputTemplate: *templateFile,
-		}
-
-		(*astNode).Accept(gen)
-
-		err = gen.InitFieldType()
-		if err != nil {
-			log.Fatalf("convert struct field type error[%v]", err)
+			FieldTypeMap: make(map[string]string),
+			OutputEntity: trimDirPath(entityDir),
+			OutputModel:  trimDirPath(modelDir),
+			OutputRepo:   trimDirPath(repoDir),
+			RepoTemplate: *templateFile,
+			DDLFile:      *ddl,
 		}
 
 		// generate code
