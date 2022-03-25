@@ -7,5 +7,25 @@ some useful tools
 1. go install
 2. kit --help
 
-example:  
-<code>kit -d "Create Table test_tab (id bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'id',saas_id bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT 'saas id',region varchar(10) NOT NULL DEFAULT '' COMMENT 'region')" -entity-output /Users/peidongxu/kit/tmp
+Usage of generating code depending on ddl:
+```cmd
+  -ddl-file string
+        ddl file path, is Required
+  -entity-output string
+        entity struct output dir
+  -model-output string
+        model struct output dir
+  -repo-output string
+        repository file output dir
+  -repo-tpl string
+        repository template file
+```
+
+example command:  
+```cmd
+kit -ddl-file /Users/peidongxu/kit/tmp/sql \  
+    -entity-output /Users/peidongxu/home/kit/entity \  
+    -model-output /Users/peidongxu/home/kit/model/tm \  
+    -repo-tpl /Users/peidongxu/kit/tmp/tpl \  
+    -repo-output /Users/peidongxu/home/
+```
