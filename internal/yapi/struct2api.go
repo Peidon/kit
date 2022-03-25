@@ -37,7 +37,7 @@ const (
             "mock": {
               "mock": "1"
             },
-            "description": "1，用来标注是级联数据，需要请求下一级，2为intent，不需要请求下一级"
+            "description": "intent"
           }
         },
         "required": [

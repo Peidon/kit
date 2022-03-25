@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 	_ "github.com/pingcap/parser/test_driver"
-	"kit/sql"
+	"kit/internal/sql"
 	"os"
 	"strings"
 )

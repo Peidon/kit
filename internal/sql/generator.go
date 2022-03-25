@@ -7,7 +7,8 @@ import (
 	"github.com/pingcap/parser/ast"
 	"go.uber.org/zap"
 	"io/ioutil"
-	"kit/slice"
+	"kit/internal/author"
+	"kit/pkg/slice"
 	"log"
 	"os"
 	"strings"
@@ -95,13 +96,13 @@ func (g *Generator) writeEntityFile() {
 		return
 	}
 	// create file and write code
-	file := createFile(targetFile)
-	defer closeFile(file)
-	entityName := camelCaseName(tableName)
+	file := author.CreateFile(targetFile)
+	defer author.CloseFile(file)
+	entityName := author.CamelCaseName(tableName)
 	fmt.Print(entityName)
 
 	buffer := bytes.Buffer{}
-	buffer.WriteString(fmt.Sprintf("package %s\n", packageName(g.OutputEntity)))
+	buffer.WriteString(fmt.Sprintf("package %s\n", author.PackageName(g.OutputEntity)))
 	buffer.WriteString(fmt.Sprintf("type %s struct {\n", entityName))
 	var tail string
 	for _, field := range g.FieldNames {
@@ -110,7 +111,7 @@ func (g *Generator) writeEntityFile() {
 		} else {
 			tail = fmt.Sprintf("gorm:\"column:%s\"", field)
 		}
-		buffer.WriteString(structFieldName(field))
+		buffer.WriteString(author.StructFieldName(field))
 		buffer.WriteString(" ")
 		buffer.WriteString(g.FieldTypeMap[field])
 		buffer.WriteString(fmt.Sprintf(" `%s`\n", tail))
@@ -132,7 +133,7 @@ func (g *Generator) writeModelStruct() {
 	if len(g.OutputModel) == 0 || len(tableName) == 0 {
 		return
 	}
-	fileName := modelFileName(tableName)
+	fileName := author.ModelFileName(tableName)
 	// if model file exists, not create
 	targetFile := fmt.Sprintf("%s/%s.go", g.OutputModel, fileName)
 	_, err := os.Stat(targetFile)
@@ -141,17 +142,17 @@ func (g *Generator) writeModelStruct() {
 		return
 	}
 	// create file and write code
-	file := createFile(targetFile)
-	defer closeFile(file)
+	file := author.CreateFile(targetFile)
+	defer author.CloseFile(file)
 
 	buffer := bytes.Buffer{}
-	buffer.WriteString(fmt.Sprintf("package %s\n", packageName(g.OutputModel)))
-	buffer.WriteString(fmt.Sprintf("type %sModel struct {\n", modelStructName(tableName)))
+	buffer.WriteString(fmt.Sprintf("package %s\n", author.PackageName(g.OutputModel)))
+	buffer.WriteString(fmt.Sprintf("type %sModel struct {\n", author.ModelStructName(tableName)))
 
 	var tail string
 	for _, field := range g.FieldNames {
 		tail = fmt.Sprintf("json:\"%s\"", field)
-		buffer.WriteString(structFieldName(field))
+		buffer.WriteString(author.StructFieldName(field))
 		buffer.WriteString(" ")
 		buffer.WriteString(g.FieldTypeMap[field])
 		buffer.WriteString(fmt.Sprintf(" `%s`\n", tail))
@@ -165,70 +166,6 @@ func (g *Generator) writeModelStruct() {
 	}
 	log.Printf("Wrote %d bytes into model file.\n", bytesWritten)
 }
-
-func modelStructName(tableName string) string {
-	j := strings.LastIndex(tableName, underscoreStr)
-	if j != -1 {
-		tableName = tableName[:j]
-	}
-	return camelCaseName(tableName)
-}
-
-func packageName(filePath string) string {
-	end := strings.LastIndex(filePath, string(os.PathSeparator))
-	return filePath[end+1:]
-
-}
-
-func camelCaseName(tableName string) string {
-	words := strings.Split(tableName, underscoreStr)
-	var entityName string
-	for i := range words {
-		entityName += strings.Title(words[i])
-	}
-	return entityName
-}
-
-func modelFileName(tableName string) string {
-	j := strings.LastIndex(tableName, underscoreStr)
-	if j != -1 {
-		return tableName[:j]
-	}
-	return tableName
-}
-
-func structFieldName(fieldName string) string {
-	words := strings.Split(fieldName, underscoreStr)
-	var field string
-	for i := range words {
-		field += strings.Title(words[i])
-	}
-	return field
-}
-
-func closeFile(file *os.File) {
-	err := file.Close()
-	if err != nil {
-		log.Fatal("File close Failed.", err)
-	}
-}
-
-func createFile(filePath string) *os.File {
-	file, err := os.OpenFile(
-		filePath,
-		os.O_RDWR|os.O_TRUNC|os.O_CREATE,
-		0666,
-	)
-	if err != nil {
-		log.Fatalf("create %s %v", filePath, err)
-	}
-	return file
-}
-
-const (
-	underscoreStr = "_"
-	placeHolder   = "XXX"
-)
 
 func (g *Generator) writeRepoFile() {
 	if len(g.RepoTemplate) == 0 || len(g.OutputRepo) == 0 {
@@ -248,7 +185,7 @@ func (g *Generator) writeRepoFile() {
 		log.Fatal("Write Repository file error.", err)
 	}
 	template := string(data)
-	daoCode := strings.ReplaceAll(template, placeHolder, modelStructName(g.TableName))
+	daoCode := strings.ReplaceAll(template, placeHolder, author.ModelStructName(g.TableName))
 
 	// 3.if dao file exists, not create
 	targetFile := fmt.Sprintf("%s/%s.go", g.OutputRepo, g.TableName)
@@ -259,7 +196,7 @@ func (g *Generator) writeRepoFile() {
 	}
 	// 4.create and write code
 	log.Printf("create repo %s file\n", targetFile)
-	daoFile := createFile(targetFile)
+	daoFile := author.CreateFile(targetFile)
 	wrote, err := daoFile.WriteString(daoCode)
 	if err != nil {
 		log.Fatal("Write Repository File error.", zap.Error(err))
