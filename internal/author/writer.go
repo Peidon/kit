@@ -60,7 +60,7 @@ func CreateFile(filePath string) *os.File {
 		0666,
 	)
 	if err != nil {
-		log.Fatalf("create %s %v", filePath, err)
+		log.Fatalf("create %s error %v", filePath, err)
 	}
 	return file
 }

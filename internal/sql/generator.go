@@ -91,7 +91,7 @@ func (g *Generator) writeEntityFile() {
 	// if file exists, not create
 	targetFile := fmt.Sprintf("%s/%s.go", g.OutputEntity, tableName)
 	fileInfo, err := os.Stat(targetFile)
-	if !os.IsNotExist(err) {
+	if os.IsExist(err) {
 		log.Printf("%s Entity File exists.\n", fileInfo.Name())
 		return
 	}
@@ -137,7 +137,7 @@ func (g *Generator) writeModelStruct() {
 	// if model file exists, not create
 	targetFile := fmt.Sprintf("%s/%s.go", g.OutputModel, fileName)
 	_, err := os.Stat(targetFile)
-	if !os.IsNotExist(err) {
+	if os.IsExist(err) {
 		log.Println("Model File exists.")
 		return
 	}
@@ -185,19 +185,21 @@ func (g *Generator) writeRepoFile() {
 		log.Fatal("Write Repository file error.", err)
 	}
 	template := string(data)
+	buffer := bytes.Buffer{}
+	buffer.WriteString(fmt.Sprintf("package %s\n", author.PackageName(g.OutputRepo)))
 	daoCode := strings.ReplaceAll(template, placeHolder, author.ModelStructName(g.TableName))
+	buffer.WriteString(daoCode)
 
 	// 3.if dao file exists, not create
 	targetFile := fmt.Sprintf("%s/%s.go", g.OutputRepo, g.TableName)
 	_, err = os.Stat(targetFile)
-	if !os.IsNotExist(err) {
+	if os.IsExist(err) {
 		log.Println("Repository File exists.")
 		return
 	}
 	// 4.create and write code
-	log.Printf("create repo %s file\n", targetFile)
 	daoFile := author.CreateFile(targetFile)
-	wrote, err := daoFile.WriteString(daoCode)
+	wrote, err := daoFile.WriteString(buffer.String())
 	if err != nil {
 		log.Fatal("Write Repository File error.", zap.Error(err))
 	}
