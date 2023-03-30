@@ -1,11 +1,3 @@
-/*
- * @Copyright @ Shopee
- * @Author: Peidong Xu
- * @Email: peidong.xu@shopee.com
- * @Date: 2023/2/27 4:46 下午
- * @Version: kit
- */
-
 package main
 
 import (

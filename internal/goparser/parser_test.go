@@ -1,11 +1,3 @@
-/*
- * @Copyright @ Shopee
- * @Author: Peidong Xu
- * @Email: peidong.xu@shopee.com
- * @Date: 2023/3/29 7:07 下午
- * @Version: kit
- */
-
 package parser
 
 import (
