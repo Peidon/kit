@@ -6,23 +6,29 @@ import (
 )
 
 const (
-	sourceCode = `
-func Add(a,b int) int {
-	return a+b
-}
-`
+	sourceFile = "tests/function.test"
 )
 
 func TestNewGoParser(t *testing.T) {
 
+	inputStream, err := antlr.NewFileStream(sourceFile)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
 	el := new(antlr.ConsoleErrorListener)
-	input := antlr.NewInputStream(sourceCode)
-	lexer := NewGoLexer(input)
+	lexer := NewGoLexer(inputStream)
 	lexer.AddErrorListener(el)
 
 	tokenStream := antlr.NewCommonTokenStream(lexer, antlr.TokenDefaultChannel)
+
 	p := NewGoParser(tokenStream)
-	p.AddErrorListener(el)
+
+	p.BuildParseTrees = true
+
+	visitor := new(BaseGoParserVisitor)
+	p.SourceFile().Accept(visitor)
 
 	t.Log("Parser = ", p)
 }
