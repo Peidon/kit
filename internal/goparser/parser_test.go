@@ -27,8 +27,6 @@ func TestNewGoParser(t *testing.T) {
 
 	p.BuildParseTrees = true
 
-	visitor := new(BaseGoParserVisitor)
-	p.SourceFile().Accept(visitor)
-
-	t.Log("Parser = ", p)
+	executor := new(GolangExecutor)
+	p.SourceFile().Accept(executor)
 }
