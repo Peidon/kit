@@ -29,3 +29,11 @@ kit -ddl-file /Users/peidongxu/kit/tmp/sql \
     -repo-tpl /Users/peidongxu/kit/tmp/tpl \  
     -repo-output /Users/peidongxu/home/
 ```
+
+## parser
+
+### ast
+Generate regular
+
+### udf
+Execute script
