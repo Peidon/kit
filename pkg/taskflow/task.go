@@ -10,6 +10,7 @@ package taskflow
 
 import (
 	"context"
+	"errors"
 	"time"
 )
 
@@ -18,10 +19,19 @@ type Task interface {
 }
 
 type MockAPI struct {
+	request  map[string]struct{}
 	response int
 }
 
-func (api *MockAPI) Execute(ctx context.Context, input map[string]interface{}) (interface{}, error) {
+func (api *MockAPI) Execute(_ context.Context, input map[string]interface{}) (interface{}, error) {
+
+	for k := range api.request {
+		if v, ok := input[k]; !ok || v == nil {
+			return nil, errors.New("missing param [" + k + "]")
+		}
+	}
+
+	// mock time cost
 	time.Sleep(500 * time.Millisecond)
 	return api.response, nil
 }
@@ -32,7 +42,7 @@ type CalculateTask struct {
 	op    string
 }
 
-func (c *CalculateTask) Execute(ctx context.Context, input map[string]interface{}) (interface{}, error) {
+func (c *CalculateTask) Execute(_ context.Context, input map[string]interface{}) (interface{}, error) {
 	left := input[c.left]
 
 	right := input[c.right]

@@ -11,12 +11,10 @@ package taskflow
 import (
 	"context"
 	"errors"
-	"fmt"
-	"sync"
 )
 
 type Runner interface {
-	Run(context.Context) error
+	Run(context.Context) Error
 }
 
 type FlowRunner struct {
@@ -30,7 +28,6 @@ type FlowRunner struct {
 
 	// record each node execute output
 	// transfer in the whole flow
-	mut    *sync.Mutex
 	params map[NodeKey]interface{}
 
 	Keys  map[NodeKey]int
@@ -39,23 +36,21 @@ type FlowRunner struct {
 	errs Error
 }
 
-func (flow *FlowRunner) Build(nodes []*Node) {
-	if flow.Keys == nil {
-		flow.Keys = map[NodeKey]int{}
-	}
-	if flow.nodeChan == nil {
-		flow.nodeChan = make(chan *Node, len(nodes))
-	}
-	if flow.params == nil {
-		flow.params = map[NodeKey]interface{}{}
-	}
+func BuildFlow(nodes []*Node) *FlowRunner {
 
-	flow.Nodes = nodes
+	flow := &FlowRunner{
+		Keys:     map[NodeKey]int{},
+		params:   map[NodeKey]interface{}{},
+		nodeChan: make(chan *Node, len(nodes)),
+
+		Nodes: nodes,
+	}
 	for i, n := range nodes {
 		flow.Keys[n.key] = i
 		n.flow = flow
 	}
 	flow.markReady()
+	return flow
 }
 
 func (flow *FlowRunner) Run(ctx context.Context) Error {
@@ -173,7 +168,11 @@ type Error struct {
 }
 
 func (err Error) Error() string {
-	return fmt.Sprintf("%v", err.errs)
+	msg := ""
+	for _, m := range err.errs {
+		msg = " | " + string(m.key) + m.err.Error()
+	}
+	return msg
 }
 
 func (err Error) Empty() bool {

@@ -7,6 +7,8 @@ github.com/antlr/antlr4/runtime/Go/antlr
 github.com/cespare/xxhash
 # github.com/cznic/mathutil v0.0.0-20181122101859-297441e03548
 github.com/cznic/mathutil
+# github.com/davecgh/go-spew v1.1.1
+github.com/davecgh/go-spew/spew
 # github.com/dgraph-io/ristretto v0.0.1
 ## explicit
 github.com/dgraph-io/ristretto
@@ -57,6 +59,8 @@ github.com/pingcap/tidb/util/stringutil
 # github.com/pingcap/tipb v0.0.0-20200522051215-f31a15d98fce
 github.com/pingcap/tipb/go-tipb
 github.com/pingcap/tipb/sharedbytes
+# github.com/pmezard/go-difflib v1.0.0
+github.com/pmezard/go-difflib/difflib
 # github.com/remyoudompheng/bigfft v0.0.0-20190728182440-6a916e37a237
 github.com/remyoudompheng/bigfft
 # github.com/shirou/gopsutil v2.19.10+incompatible
@@ -64,6 +68,9 @@ github.com/shirou/gopsutil/internal/common
 github.com/shirou/gopsutil/mem
 # github.com/sirupsen/logrus v1.6.0
 github.com/sirupsen/logrus
+# github.com/stretchr/testify v1.5.1
+## explicit
+github.com/stretchr/testify/assert
 # go.uber.org/atomic v1.6.0
 go.uber.org/atomic
 # go.uber.org/multierr v1.5.0
@@ -94,3 +101,5 @@ golang.org/x/text/runes
 golang.org/x/text/transform
 # gopkg.in/natefinch/lumberjack.v2 v2.0.0
 gopkg.in/natefinch/lumberjack.v2
+# gopkg.in/yaml.v2 v2.2.8
+gopkg.in/yaml.v2
