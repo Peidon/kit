@@ -3,10 +3,6 @@
 grammar valuate;
 
 // Keywords
-NOT :   'not';
-OR :    'or';
-AND :   'and';
-IN :    'in';
 TRUE :  'true';
 FALSE : 'false';
 
@@ -92,10 +88,13 @@ expressionList
 operand
     : basicLit
     | operandName
+    | LP expression RP
     ;
 
 basicLit
     : NIL_LIT
+    | TRUE
+    | FALSE
     | integer
     | STRING
     | FLOAT_NUMBER
@@ -117,6 +116,7 @@ index
 
 integer
     : DECIMAL_LIT
+    | '0'
     ;
 
 /*
@@ -126,13 +126,6 @@ STRING
  : STRING_LITERAL
  | SHORT_BYTES
  | LONG_BYTES
- ;
-
-NEWLINE
- : ( {this.atStartOfInput()}?   SPACES
-   | ( '\r'? '\n' | '\r' | '\f' ) SPACES?
-   )
-   {this.onNewLine();}
  ;
 
 
@@ -146,27 +139,7 @@ BYTES_LITERAL
  : ( [bB] | ( [bB] [rR] ) | ( [rR] [bB] ) ) ( SHORT_BYTES | LONG_BYTES )
  ;
 
-DECIMAL_LIT            : [1-9] [0-9]*;
-/// decimalinteger ::=  nonzerodigit digit* | "0"+
-DECIMAL_INTEGER
- : NON_ZERO_DIGIT DIGIT*
- | '0'+
- ;
-
-/// octinteger     ::=  "0" ("o" | "O") octdigit+
-OCT_INTEGER
- : '0' [oO] OCT_DIGIT+
- ;
-
-/// hexinteger     ::=  "0" ("x" | "X") hexdigit+
-HEX_INTEGER
- : '0' [xX] HEX_DIGIT+
- ;
-
-/// bininteger     ::=  "0" ("b" | "B") bindigit+
-BIN_INTEGER
- : '0' [bB] BIN_DIGIT+
- ;
+DECIMAL_LIT            : NON_ZERO_DIGIT DIGIT*;
 
 /// floatnumber   ::=  pointfloat | exponentfloat
 FLOAT_NUMBER
@@ -178,42 +151,11 @@ FLOAT_NUMBER
 /*
  * fragments
  */
-
  // variate literal : _abc ab_c  ab.c
  fragment LETTER
      : [a-zA-Z]
      | '_'
      ;
-
-/// shortstring     ::=  "'" shortstringitem* "'" | '"' shortstringitem* '"'
-/// shortstringitem ::=  shortstringchar | stringescapeseq
-/// shortstringchar ::=  <any source character except "\" or newline or the quote>
-fragment SHORT_STRING
- : '\'' ( STRING_ESCAPE_SEQ | ~[\\\r\n\f'] )* '\''
- | '"' ( STRING_ESCAPE_SEQ | ~[\\\r\n\f"] )* '"'
- ;
-/// longstring      ::=  "'''" longstringitem* "'''" | '"""' longstringitem* '"""'
-fragment LONG_STRING
- : '\'\'\'' LONG_STRING_ITEM*? '\'\'\''
- | '"""' LONG_STRING_ITEM*? '"""'
- ;
-
-/// longstringitem  ::=  longstringchar | stringescapeseq
-fragment LONG_STRING_ITEM
- : LONG_STRING_CHAR
- | STRING_ESCAPE_SEQ
- ;
-
-/// longstringchar  ::=  <any source character except "\">
-fragment LONG_STRING_CHAR
- : ~'\\'
- ;
-
-/// stringescapeseq ::=  "\" <any source character>
-fragment STRING_ESCAPE_SEQ
- : '\\' .
- | '\\' NEWLINE
- ;
 
 /// nonzerodigit   ::=  "1"..."9"
 fragment NON_ZERO_DIGIT
@@ -317,9 +259,6 @@ fragment SPACES
  : [ \t]+
  ;
 
-fragment COMMENT
- : '#' ~[\r\n\f]*
- ;
 
 fragment LINE_JOINING
  : '\\' SPACES? ( '\r'? '\n' | '\r' | '\f')
