@@ -3,6 +3,7 @@ module kit
 go 1.14
 
 require (
+	github.com/Peidon/govaluate v0.0.0-20171022003610-9aa49832a739
 	github.com/antlr/antlr4/runtime/Go/antlr v1.4.10
 	github.com/dgraph-io/ristretto v0.0.1
 	github.com/pingcap/parser v0.0.0-20200623164729-3a18f1e5dceb
