@@ -8,8 +8,8 @@ import "github.com/antlr/antlr4/runtime/Go/antlr"
 type valuateVisitor interface {
 	antlr.ParseTreeVisitor
 
-	// Visit a parse tree produced by valuateParser#evaluate.
-	VisitEvaluate(ctx *EvaluateContext) interface{}
+	// Visit a parse tree produced by valuateParser#plan.
+	VisitPlan(ctx *PlanContext) interface{}
 
 	// Visit a parse tree produced by valuateParser#expression.
 	VisitExpression(ctx *ExpressionContext) interface{}

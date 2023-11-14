@@ -8,7 +8,7 @@ type BasevaluateVisitor struct {
 	*antlr.BaseParseTreeVisitor
 }
 
-func (v *BasevaluateVisitor) VisitEvaluate(ctx *EvaluateContext) interface{} {
+func (v *BasevaluateVisitor) VisitPlan(ctx *PlanContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 

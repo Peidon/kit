@@ -34,24 +34,24 @@ func valuateParserInit() {
 	staticData := &valuateParserStaticData
 	staticData.literalNames = []string{
 		"", "'%'", "'!'", "'0'", "'true'", "'false'", "'nil'", "'('", "')'",
-		"'{'", "'}'", "'['", "']'", "','", "':'", "'.'", "'||'", "'&&'", "'=='",
-		"'!='", "'<'", "'<='", "'>'", "'>='", "'/'", "'+'", "'-'", "'*'",
+		"'{'", "'}'", "'['", "']'", "','", "'.'", "'||'", "'&&'", "'=='", "'!='",
+		"'<'", "'<='", "'>'", "'>='", "'/'", "'+'", "'-'", "'*'",
 	}
 	staticData.symbolicNames = []string{
 		"", "", "", "", "TRUE", "FALSE", "NIL_LIT", "LP", "RP", "L_CURLY", "R_CURLY",
-		"L_BRACKET", "R_BRACKET", "COMMA", "COLON", "DOT", "LOGICAL_OR", "LOGICAL_AND",
+		"L_BRACKET", "R_BRACKET", "COMMA", "DOT", "LOGICAL_OR", "LOGICAL_AND",
 		"EQUALS", "NOT_EQUALS", "LESS", "LESS_OR_EQUALS", "GREATER", "GREATER_OR_EQUALS",
 		"DIV", "PLUS", "MINUS", "STAR", "SKIP_", "WHITESPACE", "IDENTIFIER",
 		"VAR_ID", "STRING", "STRING_LITERAL", "BYTES_LITERAL", "DECIMAL_LIT",
 		"FLOAT_NUMBER",
 	}
 	staticData.ruleNames = []string{
-		"evaluate", "expression", "primaryExpr", "unaryExpr", "arguments", "expressionList",
+		"plan", "expression", "primaryExpr", "unaryExpr", "arguments", "expressionList",
 		"operand", "basicLit", "operandName", "qualifiedIdent", "index", "integer",
 	}
 	staticData.predictionContextCache = antlr.NewPredictionContextCache()
 	staticData.serializedATN = []int32{
-		4, 1, 36, 116, 2, 0, 7, 0, 2, 1, 7, 1, 2, 2, 7, 2, 2, 3, 7, 3, 2, 4, 7,
+		4, 1, 35, 116, 2, 0, 7, 0, 2, 1, 7, 1, 2, 2, 7, 2, 2, 3, 7, 3, 2, 4, 7,
 		4, 2, 5, 7, 5, 2, 6, 7, 6, 2, 7, 7, 7, 2, 8, 7, 8, 2, 9, 7, 9, 2, 10, 7,
 		10, 2, 11, 7, 11, 1, 0, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 3, 1, 31, 8, 1, 1,
 		1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
@@ -62,8 +62,8 @@ func valuateParserInit() {
 		6, 1, 6, 1, 6, 1, 6, 3, 6, 91, 8, 6, 1, 7, 1, 7, 1, 7, 1, 7, 1, 7, 1, 7,
 		1, 7, 3, 7, 100, 8, 7, 1, 8, 1, 8, 3, 8, 104, 8, 8, 1, 9, 1, 9, 1, 9, 1,
 		9, 1, 10, 1, 10, 1, 10, 1, 10, 1, 11, 1, 11, 1, 11, 0, 2, 2, 4, 12, 0,
-		2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 0, 5, 3, 0, 1, 1, 24, 24, 27, 27,
-		1, 0, 25, 26, 1, 0, 18, 23, 2, 0, 2, 2, 26, 26, 2, 0, 3, 3, 35, 35, 123,
+		2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 0, 5, 3, 0, 1, 1, 23, 23, 26, 26,
+		1, 0, 24, 25, 1, 0, 17, 22, 2, 0, 2, 2, 25, 25, 2, 0, 3, 3, 34, 34, 123,
 		0, 24, 1, 0, 0, 0, 2, 30, 1, 0, 0, 0, 4, 52, 1, 0, 0, 0, 6, 67, 1, 0, 0,
 		0, 8, 70, 1, 0, 0, 0, 10, 76, 1, 0, 0, 0, 12, 90, 1, 0, 0, 0, 14, 99, 1,
 		0, 0, 0, 16, 103, 1, 0, 0, 0, 18, 105, 1, 0, 0, 0, 20, 109, 1, 0, 0, 0,
@@ -72,13 +72,13 @@ func valuateParserInit() {
 		27, 1, 0, 0, 0, 30, 29, 1, 0, 0, 0, 31, 49, 1, 0, 0, 0, 32, 33, 10, 5,
 		0, 0, 33, 34, 7, 0, 0, 0, 34, 48, 3, 2, 1, 6, 35, 36, 10, 4, 0, 0, 36,
 		37, 7, 1, 0, 0, 37, 48, 3, 2, 1, 5, 38, 39, 10, 3, 0, 0, 39, 40, 7, 2,
-		0, 0, 40, 48, 3, 2, 1, 4, 41, 42, 10, 2, 0, 0, 42, 43, 5, 17, 0, 0, 43,
-		48, 3, 2, 1, 3, 44, 45, 10, 1, 0, 0, 45, 46, 5, 16, 0, 0, 46, 48, 3, 2,
+		0, 0, 40, 48, 3, 2, 1, 4, 41, 42, 10, 2, 0, 0, 42, 43, 5, 16, 0, 0, 43,
+		48, 3, 2, 1, 3, 44, 45, 10, 1, 0, 0, 45, 46, 5, 15, 0, 0, 46, 48, 3, 2,
 		1, 2, 47, 32, 1, 0, 0, 0, 47, 35, 1, 0, 0, 0, 47, 38, 1, 0, 0, 0, 47, 41,
 		1, 0, 0, 0, 47, 44, 1, 0, 0, 0, 48, 51, 1, 0, 0, 0, 49, 47, 1, 0, 0, 0,
 		49, 50, 1, 0, 0, 0, 50, 3, 1, 0, 0, 0, 51, 49, 1, 0, 0, 0, 52, 53, 6, 2,
 		-1, 0, 53, 54, 3, 12, 6, 0, 54, 64, 1, 0, 0, 0, 55, 60, 10, 1, 0, 0, 56,
-		57, 5, 15, 0, 0, 57, 61, 5, 30, 0, 0, 58, 61, 3, 20, 10, 0, 59, 61, 3,
+		57, 5, 14, 0, 0, 57, 61, 5, 29, 0, 0, 58, 61, 3, 20, 10, 0, 59, 61, 3,
 		8, 4, 0, 60, 56, 1, 0, 0, 0, 60, 58, 1, 0, 0, 0, 60, 59, 1, 0, 0, 0, 61,
 		63, 1, 0, 0, 0, 62, 55, 1, 0, 0, 0, 63, 66, 1, 0, 0, 0, 64, 62, 1, 0, 0,
 		0, 64, 65, 1, 0, 0, 0, 65, 5, 1, 0, 0, 0, 66, 64, 1, 0, 0, 0, 67, 68, 7,
@@ -91,12 +91,12 @@ func valuateParserInit() {
 		87, 88, 3, 2, 1, 0, 88, 89, 5, 8, 0, 0, 89, 91, 1, 0, 0, 0, 90, 84, 1,
 		0, 0, 0, 90, 85, 1, 0, 0, 0, 90, 86, 1, 0, 0, 0, 91, 13, 1, 0, 0, 0, 92,
 		100, 5, 6, 0, 0, 93, 100, 5, 4, 0, 0, 94, 100, 5, 5, 0, 0, 95, 100, 3,
-		22, 11, 0, 96, 100, 5, 32, 0, 0, 97, 100, 5, 36, 0, 0, 98, 100, 5, 31,
+		22, 11, 0, 96, 100, 5, 31, 0, 0, 97, 100, 5, 35, 0, 0, 98, 100, 5, 30,
 		0, 0, 99, 92, 1, 0, 0, 0, 99, 93, 1, 0, 0, 0, 99, 94, 1, 0, 0, 0, 99, 95,
 		1, 0, 0, 0, 99, 96, 1, 0, 0, 0, 99, 97, 1, 0, 0, 0, 99, 98, 1, 0, 0, 0,
-		100, 15, 1, 0, 0, 0, 101, 104, 5, 30, 0, 0, 102, 104, 3, 18, 9, 0, 103,
+		100, 15, 1, 0, 0, 0, 101, 104, 5, 29, 0, 0, 102, 104, 3, 18, 9, 0, 103,
 		101, 1, 0, 0, 0, 103, 102, 1, 0, 0, 0, 104, 17, 1, 0, 0, 0, 105, 106, 5,
-		30, 0, 0, 106, 107, 5, 13, 0, 0, 107, 108, 5, 30, 0, 0, 108, 19, 1, 0,
+		29, 0, 0, 106, 107, 5, 13, 0, 0, 107, 108, 5, 29, 0, 0, 108, 19, 1, 0,
 		0, 0, 109, 110, 5, 11, 0, 0, 110, 111, 3, 2, 1, 0, 111, 112, 5, 12, 0,
 		0, 112, 21, 1, 0, 0, 0, 113, 114, 7, 4, 0, 0, 114, 23, 1, 0, 0, 0, 10,
 		30, 47, 49, 60, 64, 72, 81, 90, 99, 103,
@@ -151,34 +151,33 @@ const (
 	valuateParserL_BRACKET         = 11
 	valuateParserR_BRACKET         = 12
 	valuateParserCOMMA             = 13
-	valuateParserCOLON             = 14
-	valuateParserDOT               = 15
-	valuateParserLOGICAL_OR        = 16
-	valuateParserLOGICAL_AND       = 17
-	valuateParserEQUALS            = 18
-	valuateParserNOT_EQUALS        = 19
-	valuateParserLESS              = 20
-	valuateParserLESS_OR_EQUALS    = 21
-	valuateParserGREATER           = 22
-	valuateParserGREATER_OR_EQUALS = 23
-	valuateParserDIV               = 24
-	valuateParserPLUS              = 25
-	valuateParserMINUS             = 26
-	valuateParserSTAR              = 27
-	valuateParserSKIP_             = 28
-	valuateParserWHITESPACE        = 29
-	valuateParserIDENTIFIER        = 30
-	valuateParserVAR_ID            = 31
-	valuateParserSTRING            = 32
-	valuateParserSTRING_LITERAL    = 33
-	valuateParserBYTES_LITERAL     = 34
-	valuateParserDECIMAL_LIT       = 35
-	valuateParserFLOAT_NUMBER      = 36
+	valuateParserDOT               = 14
+	valuateParserLOGICAL_OR        = 15
+	valuateParserLOGICAL_AND       = 16
+	valuateParserEQUALS            = 17
+	valuateParserNOT_EQUALS        = 18
+	valuateParserLESS              = 19
+	valuateParserLESS_OR_EQUALS    = 20
+	valuateParserGREATER           = 21
+	valuateParserGREATER_OR_EQUALS = 22
+	valuateParserDIV               = 23
+	valuateParserPLUS              = 24
+	valuateParserMINUS             = 25
+	valuateParserSTAR              = 26
+	valuateParserSKIP_             = 27
+	valuateParserWHITESPACE        = 28
+	valuateParserIDENTIFIER        = 29
+	valuateParserVAR_ID            = 30
+	valuateParserSTRING            = 31
+	valuateParserSTRING_LITERAL    = 32
+	valuateParserBYTES_LITERAL     = 33
+	valuateParserDECIMAL_LIT       = 34
+	valuateParserFLOAT_NUMBER      = 35
 )
 
 // valuateParser rules.
 const (
-	valuateParserRULE_evaluate       = 0
+	valuateParserRULE_plan           = 0
 	valuateParserRULE_expression     = 1
 	valuateParserRULE_primaryExpr    = 2
 	valuateParserRULE_unaryExpr      = 3
@@ -192,45 +191,45 @@ const (
 	valuateParserRULE_integer        = 11
 )
 
-// IEvaluateContext is an interface to support dynamic dispatch.
-type IEvaluateContext interface {
+// IPlanContext is an interface to support dynamic dispatch.
+type IPlanContext interface {
 	antlr.ParserRuleContext
 
 	// GetParser returns the parser.
 	GetParser() antlr.Parser
 
-	// IsEvaluateContext differentiates from other interfaces.
-	IsEvaluateContext()
+	// IsPlanContext differentiates from other interfaces.
+	IsPlanContext()
 }
 
-type EvaluateContext struct {
+type PlanContext struct {
 	*antlr.BaseParserRuleContext
 	parser antlr.Parser
 }
 
-func NewEmptyEvaluateContext() *EvaluateContext {
-	var p = new(EvaluateContext)
+func NewEmptyPlanContext() *PlanContext {
+	var p = new(PlanContext)
 	p.BaseParserRuleContext = antlr.NewBaseParserRuleContext(nil, -1)
-	p.RuleIndex = valuateParserRULE_evaluate
+	p.RuleIndex = valuateParserRULE_plan
 	return p
 }
 
-func (*EvaluateContext) IsEvaluateContext() {}
+func (*PlanContext) IsPlanContext() {}
 
-func NewEvaluateContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *EvaluateContext {
-	var p = new(EvaluateContext)
+func NewPlanContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *PlanContext {
+	var p = new(PlanContext)
 
 	p.BaseParserRuleContext = antlr.NewBaseParserRuleContext(parent, invokingState)
 
 	p.parser = parser
-	p.RuleIndex = valuateParserRULE_evaluate
+	p.RuleIndex = valuateParserRULE_plan
 
 	return p
 }
 
-func (s *EvaluateContext) GetParser() antlr.Parser { return s.parser }
+func (s *PlanContext) GetParser() antlr.Parser { return s.parser }
 
-func (s *EvaluateContext) Expression() IExpressionContext {
+func (s *PlanContext) Expression() IExpressionContext {
 	var t antlr.RuleContext
 	for _, ctx := range s.GetChildren() {
 		if _, ok := ctx.(IExpressionContext); ok {
@@ -246,34 +245,34 @@ func (s *EvaluateContext) Expression() IExpressionContext {
 	return t.(IExpressionContext)
 }
 
-func (s *EvaluateContext) EOF() antlr.TerminalNode {
+func (s *PlanContext) EOF() antlr.TerminalNode {
 	return s.GetToken(valuateParserEOF, 0)
 }
 
-func (s *EvaluateContext) GetRuleContext() antlr.RuleContext {
+func (s *PlanContext) GetRuleContext() antlr.RuleContext {
 	return s
 }
 
-func (s *EvaluateContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string {
+func (s *PlanContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string {
 	return antlr.TreesStringTree(s, ruleNames, recog)
 }
 
-func (s *EvaluateContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
+func (s *PlanContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
 	switch t := visitor.(type) {
 	case valuateVisitor:
-		return t.VisitEvaluate(s)
+		return t.VisitPlan(s)
 
 	default:
 		return t.VisitChildren(s)
 	}
 }
 
-func (p *valuateParser) Evaluate() (localctx IEvaluateContext) {
+func (p *valuateParser) Plan() (localctx IPlanContext) {
 	this := p
 	_ = this
 
-	localctx = NewEvaluateContext(p, p.GetParserRuleContext(), p.GetState())
-	p.EnterRule(localctx, 0, valuateParserRULE_evaluate)
+	localctx = NewPlanContext(p, p.GetParserRuleContext(), p.GetState())
+	p.EnterRule(localctx, 0, valuateParserRULE_plan)
 
 	defer func() {
 		p.ExitRule()
@@ -1125,7 +1124,7 @@ func (p *valuateParser) Arguments() (localctx IArgumentsContext) {
 	p.GetErrorHandler().Sync(p)
 	_la = p.GetTokenStream().LA(1)
 
-	if (((_la)&-(0x1f+1)) == 0 && ((1<<uint(_la))&((1<<valuateParserT__1)|(1<<valuateParserT__2)|(1<<valuateParserTRUE)|(1<<valuateParserFALSE)|(1<<valuateParserNIL_LIT)|(1<<valuateParserLP)|(1<<valuateParserMINUS)|(1<<valuateParserIDENTIFIER)|(1<<valuateParserVAR_ID))) != 0) || (((_la-32)&-(0x1f+1)) == 0 && ((1<<uint((_la-32)))&((1<<(valuateParserSTRING-32))|(1<<(valuateParserDECIMAL_LIT-32))|(1<<(valuateParserFLOAT_NUMBER-32)))) != 0) {
+	if (((_la)&-(0x1f+1)) == 0 && ((1<<uint(_la))&((1<<valuateParserT__1)|(1<<valuateParserT__2)|(1<<valuateParserTRUE)|(1<<valuateParserFALSE)|(1<<valuateParserNIL_LIT)|(1<<valuateParserLP)|(1<<valuateParserMINUS)|(1<<valuateParserIDENTIFIER)|(1<<valuateParserVAR_ID)|(1<<valuateParserSTRING))) != 0) || _la == valuateParserDECIMAL_LIT || _la == valuateParserFLOAT_NUMBER {
 		{
 			p.SetState(71)
 			p.ExpressionList()

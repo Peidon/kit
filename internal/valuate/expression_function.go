@@ -8,4 +8,4 @@
 
 package valuate
 
-type ExpressionFunction func(arguments ...interface{}) (interface{}, error)
+type ExpressionFunction func(arguments ...Any) (Any, error)

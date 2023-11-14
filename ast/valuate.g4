@@ -16,7 +16,6 @@ R_CURLY                : '}';
 L_BRACKET              : '[';
 R_BRACKET              : ']';
 COMMA                  : ',';
-COLON                  : ':';
 DOT                    : '.';
 
 // Logical
@@ -46,6 +45,7 @@ WHITESPACE
 
 IDENTIFIER : LETTER (LETTER | DIGIT)* ;
 
+// variate literal : _abc ab_c ab.c
 VAR_ID
     : L_CURLY IDENTIFIER (DOT IDENTIFIER)* R_CURLY
     | IDENTIFIER
@@ -54,7 +54,7 @@ VAR_ID
 /*
  *  parser Rules
  */
-evaluate: expression EOF;
+plan: expression EOF;
 
 expression
     : primaryExpr
@@ -151,11 +151,10 @@ FLOAT_NUMBER
 /*
  * fragments
  */
- // variate literal : _abc ab_c  ab.c
- fragment LETTER
-     : [a-zA-Z]
-     | '_'
-     ;
+fragment LETTER
+ : [a-zA-Z]
+ | '_'
+ ;
 
 /// nonzerodigit   ::=  "1"..."9"
 fragment NON_ZERO_DIGIT

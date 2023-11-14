@@ -29,6 +29,15 @@ func TestAccessors(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
+
+	var (
+		a = float32(1.0)
+		b = int64(8)
+	)
+
+	c := float64(a) + float64(b)
+
+	t.Log(c)
 	t.Log(result)
 }
 
