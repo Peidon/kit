@@ -30,15 +30,8 @@ func TestAccessors(t *testing.T) {
 		t.Error(err)
 	}
 
-	var (
-		a = float32(1.0)
-		b = int64(8)
-	)
-
-	c := float64(a) + float64(b)
-
-	t.Log(c)
 	t.Log(result)
+
 }
 
 type Abc struct {
@@ -49,4 +42,9 @@ type Abc struct {
 
 func (abc Abc) Echo(hello string) string {
 	return hello
+}
+
+func TestDiv(t *testing.T) {
+	res, err := modulusStage(nil, 2, 3)
+	t.Log(res, err)
 }

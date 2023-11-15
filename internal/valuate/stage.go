@@ -15,14 +15,16 @@ import (
 type evaluationStage struct {
 	symbol OperatorSymbol
 
-	children []evaluationStage
+	// 这里基于ANTLR4语法树后序遍历
+	// 否则不能这么设计, 因为不确定顺序则不能确定符号左右的值
+	// Operator 中的arguments 同理
+	depends []evaluationStage
 
 	// the operation that will be used to evaluate this stage (such as adding [left] to [right] and return the result)
 	operator evaluationOperator
 
-	// ensures that both left and right values are appropriate for this stage. Returns an error if they aren't operable.
-	leftTypeCheck  stageTypeCheck
-	rightTypeCheck stageTypeCheck
+	// operator type
+	opType OperatorType
 
 	// if specified, will override whatever is used in "leftTypeCheck" and "rightTypeCheck".
 	// primarily used for specific operators that don't care which side a given type is on, but still requires one side to be of a given type
@@ -33,23 +35,29 @@ type evaluationStage struct {
 	typeErrorFormat string
 }
 
+// type checking depends on Stage Operator
+type stageCombinedTypeCheck func(arguments ...Any) bool
+
+// Operator in Stage
 type evaluationOperator func(parameters Parameters, arguments ...Any) (Any, error)
 
-type stageTypeCheck func(value Any) bool
-type stageCombinedTypeCheck func(left Any, right Any) bool
-
+// equalStage symbol ==
+// @param arguments left right
 func equalStage(_ Parameters, arguments ...Any) (Any, error) {
 	l := arguments[left]
 	r := arguments[right]
 	return boolInterface(reflect.DeepEqual(l, r)), nil
 }
 
+// notEqualStage symbol !=
+// @param arguments left right
 func notEqualStage(_ Parameters, arguments ...Any) (Any, error) {
 	l := arguments[left]
 	r := arguments[right]
 	return boolInterface(!reflect.DeepEqual(l, r)), nil
 }
 
+// modify op '+'
 func addStage(_ Parameters, arguments ...Any) (Any, error) {
 	l := arguments[left]
 	r := arguments[right]
@@ -64,7 +72,61 @@ func addStage(_ Parameters, arguments ...Any) (Any, error) {
 	return nil, ArgumentTypeError
 }
 
-func subtractStage(_ Parameters, arguments ...Any) (interface{}, error) {
+// modify op '/'
+func divideStage(_ Parameters, arguments ...Any) (Any, error) {
+	l := arguments[left]
+	r := arguments[right]
+
+	if !isNumber(l) || !isNumber(r) {
+		return nil, ArgumentTypeError
+	}
+
+	lv := toFloat64(l)
+	rv := toFloat64(r)
+
+	if rv == 0.0 {
+		return nil, DivideZeroError
+	}
+
+	return lv / rv, nil
+}
+
+// modify op '*'
+func multipleStage(_ Parameters, arguments ...Any) (Any, error) {
+	l := arguments[left]
+	r := arguments[right]
+
+	if !isNumber(l) || !isNumber(r) {
+		return nil, ArgumentTypeError
+	}
+
+	lv := toFloat64(l)
+	rv := toFloat64(r)
+
+	return lv * rv, nil
+}
+
+// modify op '%'
+func modulusStage(_ Parameters, arguments ...Any) (Any, error) {
+	l := arguments[left]
+	r := arguments[right]
+
+	if !isInt(l) || !isInt(r) {
+		return nil, ArgumentTypeError
+	}
+
+	lv := toInt64(l)
+	rv := toInt64(r)
+
+	if rv == 0 {
+		return nil, DivideZeroError
+	}
+
+	return lv % rv, nil
+}
+
+// modify op '-'
+func subtractStage(_ Parameters, arguments ...Any) (Any, error) {
 	l := arguments[left]
 	r := arguments[right]
 
@@ -94,6 +156,46 @@ func isString(value interface{}) bool {
 	return false
 }
 
+func toInt64(v interface{}) int64 {
+	v = indirect(v)
+
+	switch s := v.(type) {
+	case int64:
+		return s
+	case int32:
+		return int64(s)
+	case int16:
+		return int64(s)
+	case int8:
+		return int64(s)
+	case int:
+		return int64(s)
+	}
+	return 0
+}
+
+func toFloat64(v interface{}) float64 {
+	v = indirect(v)
+
+	switch s := v.(type) {
+	case int64:
+		return float64(s)
+	case int32:
+		return float64(s)
+	case int16:
+		return float64(s)
+	case int8:
+		return float64(s)
+	case int:
+		return float64(s)
+	case float32:
+		return float64(s)
+	case float64:
+		return s
+	}
+	return 0.0
+}
+
 func isBool(value interface{}) bool {
 	switch value.(type) {
 	case bool:
@@ -106,6 +208,14 @@ func isNumber(value interface{}) bool {
 	switch value.(type) {
 	case float64, float32:
 		return true
+	case int64, int32, int16, int8, int:
+		return true
+	}
+	return false
+}
+
+func isInt(value interface{}) bool {
+	switch value.(type) {
 	case int64, int32, int16, int8, int:
 		return true
 	}
@@ -134,4 +244,18 @@ func boolInterface(b bool) Any {
 		return _true
 	}
 	return _false
+}
+
+func indirect(a interface{}) interface{} {
+	if a == nil {
+		return nil
+	}
+	if t := reflect.TypeOf(a); t.Kind() != reflect.Ptr {
+		return a
+	}
+	v := reflect.ValueOf(a)
+	for v.Kind() == reflect.Ptr && !v.IsNil() {
+		v = v.Elem()
+	}
+	return v.Interface()
 }

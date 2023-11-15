@@ -33,15 +33,15 @@ var valuateParserStaticData struct {
 func valuateParserInit() {
 	staticData := &valuateParserStaticData
 	staticData.literalNames = []string{
-		"", "'%'", "'!'", "'0'", "'true'", "'false'", "'nil'", "'('", "')'",
-		"'{'", "'}'", "'['", "']'", "','", "'.'", "'||'", "'&&'", "'=='", "'!='",
-		"'<'", "'<='", "'>'", "'>='", "'/'", "'+'", "'-'", "'*'",
+		"", "'!'", "'0'", "'true'", "'false'", "'nil'", "'('", "')'", "'{'",
+		"'}'", "'['", "']'", "','", "'.'", "'||'", "'&&'", "'=='", "'!='", "'<'",
+		"'<='", "'>'", "'>='", "'/'", "'+'", "'-'", "'*'", "'%'",
 	}
 	staticData.symbolicNames = []string{
-		"", "", "", "", "TRUE", "FALSE", "NIL_LIT", "LP", "RP", "L_CURLY", "R_CURLY",
+		"", "", "", "TRUE", "FALSE", "NIL_LIT", "LP", "RP", "L_CURLY", "R_CURLY",
 		"L_BRACKET", "R_BRACKET", "COMMA", "DOT", "LOGICAL_OR", "LOGICAL_AND",
 		"EQUALS", "NOT_EQUALS", "LESS", "LESS_OR_EQUALS", "GREATER", "GREATER_OR_EQUALS",
-		"DIV", "PLUS", "MINUS", "STAR", "SKIP_", "WHITESPACE", "IDENTIFIER",
+		"DIV", "PLUS", "MINUS", "STAR", "MODULUS", "SKIP_", "WHITESPACE", "IDENTIFIER",
 		"VAR_ID", "STRING", "STRING_LITERAL", "BYTES_LITERAL", "DECIMAL_LIT",
 		"FLOAT_NUMBER",
 	}
@@ -62,44 +62,44 @@ func valuateParserInit() {
 		6, 1, 6, 1, 6, 1, 6, 3, 6, 91, 8, 6, 1, 7, 1, 7, 1, 7, 1, 7, 1, 7, 1, 7,
 		1, 7, 3, 7, 100, 8, 7, 1, 8, 1, 8, 3, 8, 104, 8, 8, 1, 9, 1, 9, 1, 9, 1,
 		9, 1, 10, 1, 10, 1, 10, 1, 10, 1, 11, 1, 11, 1, 11, 0, 2, 2, 4, 12, 0,
-		2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 0, 5, 3, 0, 1, 1, 23, 23, 26, 26,
-		1, 0, 24, 25, 1, 0, 17, 22, 2, 0, 2, 2, 25, 25, 2, 0, 3, 3, 34, 34, 123,
-		0, 24, 1, 0, 0, 0, 2, 30, 1, 0, 0, 0, 4, 52, 1, 0, 0, 0, 6, 67, 1, 0, 0,
-		0, 8, 70, 1, 0, 0, 0, 10, 76, 1, 0, 0, 0, 12, 90, 1, 0, 0, 0, 14, 99, 1,
-		0, 0, 0, 16, 103, 1, 0, 0, 0, 18, 105, 1, 0, 0, 0, 20, 109, 1, 0, 0, 0,
-		22, 113, 1, 0, 0, 0, 24, 25, 3, 2, 1, 0, 25, 26, 5, 0, 0, 1, 26, 1, 1,
-		0, 0, 0, 27, 28, 6, 1, -1, 0, 28, 31, 3, 4, 2, 0, 29, 31, 3, 6, 3, 0, 30,
-		27, 1, 0, 0, 0, 30, 29, 1, 0, 0, 0, 31, 49, 1, 0, 0, 0, 32, 33, 10, 5,
-		0, 0, 33, 34, 7, 0, 0, 0, 34, 48, 3, 2, 1, 6, 35, 36, 10, 4, 0, 0, 36,
-		37, 7, 1, 0, 0, 37, 48, 3, 2, 1, 5, 38, 39, 10, 3, 0, 0, 39, 40, 7, 2,
-		0, 0, 40, 48, 3, 2, 1, 4, 41, 42, 10, 2, 0, 0, 42, 43, 5, 16, 0, 0, 43,
-		48, 3, 2, 1, 3, 44, 45, 10, 1, 0, 0, 45, 46, 5, 15, 0, 0, 46, 48, 3, 2,
-		1, 2, 47, 32, 1, 0, 0, 0, 47, 35, 1, 0, 0, 0, 47, 38, 1, 0, 0, 0, 47, 41,
-		1, 0, 0, 0, 47, 44, 1, 0, 0, 0, 48, 51, 1, 0, 0, 0, 49, 47, 1, 0, 0, 0,
-		49, 50, 1, 0, 0, 0, 50, 3, 1, 0, 0, 0, 51, 49, 1, 0, 0, 0, 52, 53, 6, 2,
-		-1, 0, 53, 54, 3, 12, 6, 0, 54, 64, 1, 0, 0, 0, 55, 60, 10, 1, 0, 0, 56,
-		57, 5, 14, 0, 0, 57, 61, 5, 29, 0, 0, 58, 61, 3, 20, 10, 0, 59, 61, 3,
-		8, 4, 0, 60, 56, 1, 0, 0, 0, 60, 58, 1, 0, 0, 0, 60, 59, 1, 0, 0, 0, 61,
-		63, 1, 0, 0, 0, 62, 55, 1, 0, 0, 0, 63, 66, 1, 0, 0, 0, 64, 62, 1, 0, 0,
-		0, 64, 65, 1, 0, 0, 0, 65, 5, 1, 0, 0, 0, 66, 64, 1, 0, 0, 0, 67, 68, 7,
-		3, 0, 0, 68, 69, 3, 2, 1, 0, 69, 7, 1, 0, 0, 0, 70, 72, 5, 7, 0, 0, 71,
-		73, 3, 10, 5, 0, 72, 71, 1, 0, 0, 0, 72, 73, 1, 0, 0, 0, 73, 74, 1, 0,
-		0, 0, 74, 75, 5, 8, 0, 0, 75, 9, 1, 0, 0, 0, 76, 81, 3, 2, 1, 0, 77, 78,
-		5, 13, 0, 0, 78, 80, 3, 2, 1, 0, 79, 77, 1, 0, 0, 0, 80, 83, 1, 0, 0, 0,
-		81, 79, 1, 0, 0, 0, 81, 82, 1, 0, 0, 0, 82, 11, 1, 0, 0, 0, 83, 81, 1,
-		0, 0, 0, 84, 91, 3, 14, 7, 0, 85, 91, 3, 16, 8, 0, 86, 87, 5, 7, 0, 0,
-		87, 88, 3, 2, 1, 0, 88, 89, 5, 8, 0, 0, 89, 91, 1, 0, 0, 0, 90, 84, 1,
-		0, 0, 0, 90, 85, 1, 0, 0, 0, 90, 86, 1, 0, 0, 0, 91, 13, 1, 0, 0, 0, 92,
-		100, 5, 6, 0, 0, 93, 100, 5, 4, 0, 0, 94, 100, 5, 5, 0, 0, 95, 100, 3,
-		22, 11, 0, 96, 100, 5, 31, 0, 0, 97, 100, 5, 35, 0, 0, 98, 100, 5, 30,
-		0, 0, 99, 92, 1, 0, 0, 0, 99, 93, 1, 0, 0, 0, 99, 94, 1, 0, 0, 0, 99, 95,
-		1, 0, 0, 0, 99, 96, 1, 0, 0, 0, 99, 97, 1, 0, 0, 0, 99, 98, 1, 0, 0, 0,
-		100, 15, 1, 0, 0, 0, 101, 104, 5, 29, 0, 0, 102, 104, 3, 18, 9, 0, 103,
-		101, 1, 0, 0, 0, 103, 102, 1, 0, 0, 0, 104, 17, 1, 0, 0, 0, 105, 106, 5,
-		29, 0, 0, 106, 107, 5, 13, 0, 0, 107, 108, 5, 29, 0, 0, 108, 19, 1, 0,
-		0, 0, 109, 110, 5, 11, 0, 0, 110, 111, 3, 2, 1, 0, 111, 112, 5, 12, 0,
-		0, 112, 21, 1, 0, 0, 0, 113, 114, 7, 4, 0, 0, 114, 23, 1, 0, 0, 0, 10,
-		30, 47, 49, 60, 64, 72, 81, 90, 99, 103,
+		2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 0, 5, 2, 0, 22, 22, 25, 26, 1,
+		0, 23, 24, 1, 0, 16, 21, 2, 0, 1, 1, 24, 24, 2, 0, 2, 2, 34, 34, 123, 0,
+		24, 1, 0, 0, 0, 2, 30, 1, 0, 0, 0, 4, 52, 1, 0, 0, 0, 6, 67, 1, 0, 0, 0,
+		8, 70, 1, 0, 0, 0, 10, 76, 1, 0, 0, 0, 12, 90, 1, 0, 0, 0, 14, 99, 1, 0,
+		0, 0, 16, 103, 1, 0, 0, 0, 18, 105, 1, 0, 0, 0, 20, 109, 1, 0, 0, 0, 22,
+		113, 1, 0, 0, 0, 24, 25, 3, 2, 1, 0, 25, 26, 5, 0, 0, 1, 26, 1, 1, 0, 0,
+		0, 27, 28, 6, 1, -1, 0, 28, 31, 3, 4, 2, 0, 29, 31, 3, 6, 3, 0, 30, 27,
+		1, 0, 0, 0, 30, 29, 1, 0, 0, 0, 31, 49, 1, 0, 0, 0, 32, 33, 10, 5, 0, 0,
+		33, 34, 7, 0, 0, 0, 34, 48, 3, 2, 1, 6, 35, 36, 10, 4, 0, 0, 36, 37, 7,
+		1, 0, 0, 37, 48, 3, 2, 1, 5, 38, 39, 10, 3, 0, 0, 39, 40, 7, 2, 0, 0, 40,
+		48, 3, 2, 1, 4, 41, 42, 10, 2, 0, 0, 42, 43, 5, 15, 0, 0, 43, 48, 3, 2,
+		1, 3, 44, 45, 10, 1, 0, 0, 45, 46, 5, 14, 0, 0, 46, 48, 3, 2, 1, 2, 47,
+		32, 1, 0, 0, 0, 47, 35, 1, 0, 0, 0, 47, 38, 1, 0, 0, 0, 47, 41, 1, 0, 0,
+		0, 47, 44, 1, 0, 0, 0, 48, 51, 1, 0, 0, 0, 49, 47, 1, 0, 0, 0, 49, 50,
+		1, 0, 0, 0, 50, 3, 1, 0, 0, 0, 51, 49, 1, 0, 0, 0, 52, 53, 6, 2, -1, 0,
+		53, 54, 3, 12, 6, 0, 54, 64, 1, 0, 0, 0, 55, 60, 10, 1, 0, 0, 56, 57, 5,
+		13, 0, 0, 57, 61, 5, 29, 0, 0, 58, 61, 3, 20, 10, 0, 59, 61, 3, 8, 4, 0,
+		60, 56, 1, 0, 0, 0, 60, 58, 1, 0, 0, 0, 60, 59, 1, 0, 0, 0, 61, 63, 1,
+		0, 0, 0, 62, 55, 1, 0, 0, 0, 63, 66, 1, 0, 0, 0, 64, 62, 1, 0, 0, 0, 64,
+		65, 1, 0, 0, 0, 65, 5, 1, 0, 0, 0, 66, 64, 1, 0, 0, 0, 67, 68, 7, 3, 0,
+		0, 68, 69, 3, 2, 1, 0, 69, 7, 1, 0, 0, 0, 70, 72, 5, 6, 0, 0, 71, 73, 3,
+		10, 5, 0, 72, 71, 1, 0, 0, 0, 72, 73, 1, 0, 0, 0, 73, 74, 1, 0, 0, 0, 74,
+		75, 5, 7, 0, 0, 75, 9, 1, 0, 0, 0, 76, 81, 3, 2, 1, 0, 77, 78, 5, 12, 0,
+		0, 78, 80, 3, 2, 1, 0, 79, 77, 1, 0, 0, 0, 80, 83, 1, 0, 0, 0, 81, 79,
+		1, 0, 0, 0, 81, 82, 1, 0, 0, 0, 82, 11, 1, 0, 0, 0, 83, 81, 1, 0, 0, 0,
+		84, 91, 3, 14, 7, 0, 85, 91, 3, 16, 8, 0, 86, 87, 5, 6, 0, 0, 87, 88, 3,
+		2, 1, 0, 88, 89, 5, 7, 0, 0, 89, 91, 1, 0, 0, 0, 90, 84, 1, 0, 0, 0, 90,
+		85, 1, 0, 0, 0, 90, 86, 1, 0, 0, 0, 91, 13, 1, 0, 0, 0, 92, 100, 5, 5,
+		0, 0, 93, 100, 5, 3, 0, 0, 94, 100, 5, 4, 0, 0, 95, 100, 3, 22, 11, 0,
+		96, 100, 5, 31, 0, 0, 97, 100, 5, 35, 0, 0, 98, 100, 5, 30, 0, 0, 99, 92,
+		1, 0, 0, 0, 99, 93, 1, 0, 0, 0, 99, 94, 1, 0, 0, 0, 99, 95, 1, 0, 0, 0,
+		99, 96, 1, 0, 0, 0, 99, 97, 1, 0, 0, 0, 99, 98, 1, 0, 0, 0, 100, 15, 1,
+		0, 0, 0, 101, 104, 5, 29, 0, 0, 102, 104, 3, 18, 9, 0, 103, 101, 1, 0,
+		0, 0, 103, 102, 1, 0, 0, 0, 104, 17, 1, 0, 0, 0, 105, 106, 5, 29, 0, 0,
+		106, 107, 5, 12, 0, 0, 107, 108, 5, 29, 0, 0, 108, 19, 1, 0, 0, 0, 109,
+		110, 5, 10, 0, 0, 110, 111, 3, 2, 1, 0, 111, 112, 5, 11, 0, 0, 112, 21,
+		1, 0, 0, 0, 113, 114, 7, 4, 0, 0, 114, 23, 1, 0, 0, 0, 10, 30, 47, 49,
+		60, 64, 72, 81, 90, 99, 103,
 	}
 	deserializer := antlr.NewATNDeserializer(nil)
 	staticData.atn = deserializer.Deserialize(staticData.serializedATN)
@@ -140,30 +140,30 @@ const (
 	valuateParserEOF               = antlr.TokenEOF
 	valuateParserT__0              = 1
 	valuateParserT__1              = 2
-	valuateParserT__2              = 3
-	valuateParserTRUE              = 4
-	valuateParserFALSE             = 5
-	valuateParserNIL_LIT           = 6
-	valuateParserLP                = 7
-	valuateParserRP                = 8
-	valuateParserL_CURLY           = 9
-	valuateParserR_CURLY           = 10
-	valuateParserL_BRACKET         = 11
-	valuateParserR_BRACKET         = 12
-	valuateParserCOMMA             = 13
-	valuateParserDOT               = 14
-	valuateParserLOGICAL_OR        = 15
-	valuateParserLOGICAL_AND       = 16
-	valuateParserEQUALS            = 17
-	valuateParserNOT_EQUALS        = 18
-	valuateParserLESS              = 19
-	valuateParserLESS_OR_EQUALS    = 20
-	valuateParserGREATER           = 21
-	valuateParserGREATER_OR_EQUALS = 22
-	valuateParserDIV               = 23
-	valuateParserPLUS              = 24
-	valuateParserMINUS             = 25
-	valuateParserSTAR              = 26
+	valuateParserTRUE              = 3
+	valuateParserFALSE             = 4
+	valuateParserNIL_LIT           = 5
+	valuateParserLP                = 6
+	valuateParserRP                = 7
+	valuateParserL_CURLY           = 8
+	valuateParserR_CURLY           = 9
+	valuateParserL_BRACKET         = 10
+	valuateParserR_BRACKET         = 11
+	valuateParserCOMMA             = 12
+	valuateParserDOT               = 13
+	valuateParserLOGICAL_OR        = 14
+	valuateParserLOGICAL_AND       = 15
+	valuateParserEQUALS            = 16
+	valuateParserNOT_EQUALS        = 17
+	valuateParserLESS              = 18
+	valuateParserLESS_OR_EQUALS    = 19
+	valuateParserGREATER           = 20
+	valuateParserGREATER_OR_EQUALS = 21
+	valuateParserDIV               = 22
+	valuateParserPLUS              = 23
+	valuateParserMINUS             = 24
+	valuateParserSTAR              = 25
+	valuateParserMODULUS           = 26
 	valuateParserSKIP_             = 27
 	valuateParserWHITESPACE        = 28
 	valuateParserIDENTIFIER        = 29
@@ -422,6 +422,10 @@ func (s *ExpressionContext) DIV() antlr.TerminalNode {
 	return s.GetToken(valuateParserDIV, 0)
 }
 
+func (s *ExpressionContext) MODULUS() antlr.TerminalNode {
+	return s.GetToken(valuateParserMODULUS, 0)
+}
+
 func (s *ExpressionContext) PLUS() antlr.TerminalNode {
 	return s.GetToken(valuateParserPLUS, 0)
 }
@@ -520,13 +524,13 @@ func (p *valuateParser) expression(_p int) (localctx IExpressionContext) {
 	p.GetErrorHandler().Sync(p)
 
 	switch p.GetTokenStream().LA(1) {
-	case valuateParserT__2, valuateParserTRUE, valuateParserFALSE, valuateParserNIL_LIT, valuateParserLP, valuateParserIDENTIFIER, valuateParserVAR_ID, valuateParserSTRING, valuateParserDECIMAL_LIT, valuateParserFLOAT_NUMBER:
+	case valuateParserT__1, valuateParserTRUE, valuateParserFALSE, valuateParserNIL_LIT, valuateParserLP, valuateParserIDENTIFIER, valuateParserVAR_ID, valuateParserSTRING, valuateParserDECIMAL_LIT, valuateParserFLOAT_NUMBER:
 		{
 			p.SetState(28)
 			p.primaryExpr(0)
 		}
 
-	case valuateParserT__1, valuateParserMINUS:
+	case valuateParserT__0, valuateParserMINUS:
 		{
 			p.SetState(29)
 			p.UnaryExpr()
@@ -561,7 +565,7 @@ func (p *valuateParser) expression(_p int) (localctx IExpressionContext) {
 					p.SetState(33)
 					_la = p.GetTokenStream().LA(1)
 
-					if !(((_la)&-(0x1f+1)) == 0 && ((1<<uint(_la))&((1<<valuateParserT__0)|(1<<valuateParserDIV)|(1<<valuateParserSTAR))) != 0) {
+					if !(((_la)&-(0x1f+1)) == 0 && ((1<<uint(_la))&((1<<valuateParserDIV)|(1<<valuateParserSTAR)|(1<<valuateParserMODULUS))) != 0) {
 						p.GetErrorHandler().RecoverInline(p)
 					} else {
 						p.GetErrorHandler().ReportMatch(p)
@@ -996,7 +1000,7 @@ func (p *valuateParser) UnaryExpr() (localctx IUnaryExprContext) {
 		p.SetState(67)
 		_la = p.GetTokenStream().LA(1)
 
-		if !(_la == valuateParserT__1 || _la == valuateParserMINUS) {
+		if !(_la == valuateParserT__0 || _la == valuateParserMINUS) {
 			p.GetErrorHandler().RecoverInline(p)
 		} else {
 			p.GetErrorHandler().ReportMatch(p)
@@ -1124,7 +1128,7 @@ func (p *valuateParser) Arguments() (localctx IArgumentsContext) {
 	p.GetErrorHandler().Sync(p)
 	_la = p.GetTokenStream().LA(1)
 
-	if (((_la)&-(0x1f+1)) == 0 && ((1<<uint(_la))&((1<<valuateParserT__1)|(1<<valuateParserT__2)|(1<<valuateParserTRUE)|(1<<valuateParserFALSE)|(1<<valuateParserNIL_LIT)|(1<<valuateParserLP)|(1<<valuateParserMINUS)|(1<<valuateParserIDENTIFIER)|(1<<valuateParserVAR_ID)|(1<<valuateParserSTRING))) != 0) || _la == valuateParserDECIMAL_LIT || _la == valuateParserFLOAT_NUMBER {
+	if (((_la)&-(0x1f+1)) == 0 && ((1<<uint(_la))&((1<<valuateParserT__0)|(1<<valuateParserT__1)|(1<<valuateParserTRUE)|(1<<valuateParserFALSE)|(1<<valuateParserNIL_LIT)|(1<<valuateParserLP)|(1<<valuateParserMINUS)|(1<<valuateParserIDENTIFIER)|(1<<valuateParserVAR_ID)|(1<<valuateParserSTRING))) != 0) || _la == valuateParserDECIMAL_LIT || _la == valuateParserFLOAT_NUMBER {
 		{
 			p.SetState(71)
 			p.ExpressionList()
@@ -1434,7 +1438,7 @@ func (p *valuateParser) Operand() (localctx IOperandContext) {
 	p.GetErrorHandler().Sync(p)
 
 	switch p.GetTokenStream().LA(1) {
-	case valuateParserT__2, valuateParserTRUE, valuateParserFALSE, valuateParserNIL_LIT, valuateParserVAR_ID, valuateParserSTRING, valuateParserDECIMAL_LIT, valuateParserFLOAT_NUMBER:
+	case valuateParserT__1, valuateParserTRUE, valuateParserFALSE, valuateParserNIL_LIT, valuateParserVAR_ID, valuateParserSTRING, valuateParserDECIMAL_LIT, valuateParserFLOAT_NUMBER:
 		p.EnterOuterAlt(localctx, 1)
 		{
 			p.SetState(84)
@@ -1614,7 +1618,7 @@ func (p *valuateParser) BasicLit() (localctx IBasicLitContext) {
 			p.Match(valuateParserFALSE)
 		}
 
-	case valuateParserT__2, valuateParserDECIMAL_LIT:
+	case valuateParserT__1, valuateParserDECIMAL_LIT:
 		p.EnterOuterAlt(localctx, 4)
 		{
 			p.SetState(95)
@@ -2087,7 +2091,7 @@ func (p *valuateParser) Integer() (localctx IIntegerContext) {
 		p.SetState(113)
 		_la = p.GetTokenStream().LA(1)
 
-		if !(_la == valuateParserT__2 || _la == valuateParserDECIMAL_LIT) {
+		if !(_la == valuateParserT__1 || _la == valuateParserDECIMAL_LIT) {
 			p.GetErrorHandler().RecoverInline(p)
 		} else {
 			p.GetErrorHandler().ReportMatch(p)

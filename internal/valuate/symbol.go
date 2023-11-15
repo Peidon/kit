@@ -45,12 +45,19 @@ Operator Argument Index
 type OperatorArgument int
 
 const (
-	// 二元操作
+	// binary arguments index
 	left OperatorArgument = iota
 	right
 
-	// 一元操作
-	unary = 0
+	// unary arguments index
+	unaryIndex = 0
+)
+
+type OperatorType int
+
+const (
+	unary OperatorType = iota + 1
+	binary
 )
 
 type Any = interface{}

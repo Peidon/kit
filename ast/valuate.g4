@@ -35,6 +35,7 @@ DIV                    : '/';
 PLUS                   : '+';
 MINUS                  : '-';
 STAR                   : '*';
+MODULUS                : '%';
 
 SKIP_
  : ( SPACES | LINE_JOINING ) -> skip

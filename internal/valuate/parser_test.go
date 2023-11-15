@@ -9,31 +9,50 @@
 package valuate
 
 import (
-	"github.com/antlr/antlr4/runtime/Go/antlr"
-	parser "kit/internal/valuate/ast"
-	"log"
-	"os"
 	"testing"
 )
 
 func TestAST(t *testing.T) {
 	testsData := []string{
-		"a+b",
+		"a+b-c",
 		"{a.b}",
+		"abc(x)",
+		"",
 	}
-
-	listener := &errorListener{
-		logg: log.New(os.Stdout, "test", log.LstdFlags),
-	}
-
 	for _, td := range testsData {
-		input := antlr.NewInputStream(td)
-		lexer := parser.NewvaluateLexer(input)
-		lexer.AddErrorListener(listener)
+		eval, err := NewExpression(td)
+		t.Log(eval)
+		if err != nil {
+			//t.Error(err)
+			//return
+		}
+	}
+}
 
-		tokenStream := antlr.NewCommonTokenStream(lexer, antlr.TokenDefaultChannel)
-		p := parser.NewvaluateParser(tokenStream)
-		p.AddErrorListener(listener)
-		p.Plan()
+func TestEvaluableExpression_Evaluate(t *testing.T) {
+	testData := []struct {
+		input string
+		want  interface{}
+	}{
+		{
+			input: "1+2.0",
+			want:  interface{}(3.0),
+		},
+	}
+
+	for _, td := range testData {
+		expr, err := NewExpression(td.input)
+		if err != nil {
+			t.Error(err)
+			return
+		}
+		got, er := expr.Evaluate(nil)
+		if er != nil {
+			t.Error(er)
+			return
+		}
+		if got != td.want {
+			t.Error("got: ", got, "\nwant: ", td.want)
+		}
 	}
 }
