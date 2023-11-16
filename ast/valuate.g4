@@ -96,7 +96,7 @@ basicLit
     : NIL_LIT
     | TRUE
     | FALSE
-    | integer
+    | INT
     | STRING
     | FLOAT_NUMBER
     | VAR_ID
@@ -115,14 +115,10 @@ index
     : L_BRACKET expression R_BRACKET
     ;
 
-integer
-    : DECIMAL_LIT
-    | '0'
-    ;
-
 /*
  * lexer rules
  */
+
 STRING
  : STRING_LITERAL
  | SHORT_BYTES
@@ -138,6 +134,11 @@ STRING_LITERAL
 /// bytesprefix    ::=  "b" | "B" | "br" | "Br" | "bR" | "BR" | "rb" | "rB" | "Rb" | "RB"
 BYTES_LITERAL
  : ( [bB] | ( [bB] [rR] ) | ( [rR] [bB] ) ) ( SHORT_BYTES | LONG_BYTES )
+ ;
+
+INT
+ : DECIMAL_LIT
+ | '0'
  ;
 
 DECIMAL_LIT            : NON_ZERO_DIGIT DIGIT*;

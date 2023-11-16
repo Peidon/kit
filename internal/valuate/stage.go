@@ -9,7 +9,9 @@
 package valuate
 
 import (
+	"errors"
 	"reflect"
+	"strconv"
 )
 
 type evaluationStage struct {
@@ -30,93 +32,105 @@ type evaluationStage struct {
 	// primarily used for specific operators that don't care which side a given type is on, but still requires one side to be of a given type
 	// (like string concat)
 	typeCheck stageCombinedTypeCheck
-
-	// regardless of which type check is used, this string format will be used as the error message for type errors
-	typeErrorFormat string
 }
 
 // type checking depends on Stage Operator
 type stageCombinedTypeCheck func(arguments ...Any) error
 
+// number operators check
+func numberTypeCheck(arguments ...Any) error {
+	for _, arg := range arguments {
+		if !isNumber(arg) {
+			return ArgumentTypeError
+		}
+	}
+	return nil
+}
+
+// evaluationOperator
 // Operator in Stage
 type evaluationOperator func(parameters Parameters, arguments ...Any) (Any, error)
+
+func makeLiteralStage(literal string, tp TokenSymbol) evaluationOperator {
+	return func(parameters Parameters, arguments ...Any) (Any, error) {
+		switch tp {
+		case NIL:
+			return nil, nil
+		case Bool:
+			return strconv.ParseBool(literal)
+		case Int:
+			return strconv.ParseInt(literal, 10, 64)
+		case Float:
+			return strconv.ParseFloat(literal, 64)
+		case String:
+			return strconv.Unquote(literal)
+		}
+
+		return nil, errors.New("make literal '" + literal + "' stage error, token type=" + string(tp))
+	}
+}
 
 // equalStage symbol ==
 // @param arguments left right
 func equalStage(_ Parameters, arguments ...Any) (Any, error) {
-	l := arguments[left]
-	r := arguments[right]
+	l, r := arguments[left], arguments[right]
 	return boolInterface(reflect.DeepEqual(l, r)), nil
 }
 
 // notEqualStage symbol !=
 // @param arguments left right
 func notEqualStage(_ Parameters, arguments ...Any) (Any, error) {
-	l := arguments[left]
-	r := arguments[right]
+	l, r := arguments[left], arguments[right]
 	return boolInterface(!reflect.DeepEqual(l, r)), nil
 }
 
 // modify op '+'
 func addStage(_ Parameters, arguments ...Any) (Any, error) {
-	l := arguments[left]
-	r := arguments[right]
+	l, r := arguments[left], arguments[right]
 
-	if isString(l) && isString(r) {
-		return addString(l.(string), r.(string))
+	if isFloat(l) || isFloat(r) {
+		return toFloat64(l) + toFloat64(r), nil
 	}
-
-	if isNumber(l) && isNumber(r) {
-		return addNumber(l, r)
-	}
-	return nil, ArgumentTypeError
+	return toInt(l) + toInt(r), nil
 }
 
 // modify op '/'
 func divideStage(_ Parameters, arguments ...Any) (Any, error) {
-	l := arguments[left]
-	r := arguments[right]
+	l, r := arguments[left], arguments[right]
 
-	if !isNumber(l) || !isNumber(r) {
-		return nil, ArgumentTypeError
+	if isInt(l) && isInt(r) {
+		return toInt(l) / toInt(r), nil
 	}
 
-	lv := toFloat64(l)
 	rv := toFloat64(r)
-
 	if rv == 0.0 {
 		return nil, DivideZeroError
 	}
 
-	return lv / rv, nil
+	return toFloat64(l) / rv, nil
 }
 
 // modify op '*'
 func multipleStage(_ Parameters, arguments ...Any) (Any, error) {
-	l := arguments[left]
-	r := arguments[right]
+	l, r := arguments[left], arguments[right]
 
-	if !isNumber(l) || !isNumber(r) {
-		return nil, ArgumentTypeError
+	if isInt(l) && isInt(r) {
+		return toInt(l) * toInt(r), nil
 	}
 
-	lv := toFloat64(l)
-	rv := toFloat64(r)
-
-	return lv * rv, nil
+	return toFloat64(l) * toFloat64(r), nil
 }
 
 // modify op '%'
 func modulusStage(_ Parameters, arguments ...Any) (Any, error) {
-	l := arguments[left]
-	r := arguments[right]
+	l, r := arguments[left], arguments[right]
 
 	if !isInt(l) || !isInt(r) {
 		return nil, ArgumentTypeError
 	}
 
-	lv := toInt64(l)
-	rv := toInt64(r)
+	lv := toInt(l)
+	rv := toInt(r)
 
 	if rv == 0 {
 		return nil, DivideZeroError
@@ -127,8 +141,7 @@ func modulusStage(_ Parameters, arguments ...Any) (Any, error) {
 
 // modify op '-'
 func subtractStage(_ Parameters, arguments ...Any) (Any, error) {
-	l := arguments[left]
-	r := arguments[right]
+	l, r := arguments[left], arguments[right]
 
 	if isFloat(l) || isFloat(r) {
 		return l.(float64) - r.(float64), nil
@@ -136,42 +149,22 @@ func subtractStage(_ Parameters, arguments ...Any) (Any, error) {
 	return l.(int64) - r.(int64), nil
 }
 
-func addNumber(left Any, right Any) (Any, error) {
-	if isFloat(left) || isFloat(right) {
-		return left.(float64) + right.(float64), nil
-	}
-
-	return left.(int64) + right.(int64), nil
-}
-
-func addString(left, right string) (string, error) {
-	return left + right, nil
-}
-
-func isString(value interface{}) bool {
-	switch value.(type) {
-	case string:
-		return true
-	}
-	return false
-}
-
-func toInt64(v interface{}) int64 {
+func toInt(v interface{}) int {
 	v = indirect(v)
 
 	switch s := v.(type) {
 	case int64:
-		return s
+		return int(s)
 	case int32:
-		return int64(s)
+		return int(s)
 	case int16:
-		return int64(s)
+		return int(s)
 	case int8:
-		return int64(s)
+		return int(s)
 	case int:
-		return int64(s)
+		return s
 	}
-	return 0
+	return -1
 }
 
 func toFloat64(v interface{}) float64 {
@@ -193,7 +186,7 @@ func toFloat64(v interface{}) float64 {
 	case float64:
 		return s
 	}
-	return 0.0
+	return -1
 }
 
 func isBool(value interface{}) bool {
@@ -217,6 +210,14 @@ func isNumber(value interface{}) bool {
 func isInt(value interface{}) bool {
 	switch value.(type) {
 	case int64, int32, int16, int8, int:
+		return true
+	}
+	return false
+}
+
+func isString(value interface{}) bool {
+	switch value.(type) {
+	case string:
 		return true
 	}
 	return false

@@ -62,3 +62,13 @@ const (
 )
 
 type Any = interface{}
+
+type TokenSymbol string
+
+const (
+	NIL    TokenSymbol = "nil"
+	Bool               = "bool"
+	String             = "str"
+	Int                = "int"
+	Float              = "float"
+)

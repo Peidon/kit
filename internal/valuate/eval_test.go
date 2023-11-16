@@ -16,8 +16,28 @@ func TestEvaluableExpression_Evaluate(t *testing.T) {
 		want  interface{}
 	}{
 		{
-			input: "1+2.0",
-			want:  interface{}(3.0),
+			input: "1+2.1",
+			want:  3.1,
+		},
+		{
+			input: "nil",
+			want:  nil,
+		},
+		{
+			input: "3 * 3",
+			want:  9,
+		},
+		{
+			input: "4 / 2.0",
+			want:  2.0,
+		},
+		{
+			input: "5 / 2",
+			want:  2,
+		},
+		{
+			input: "5 % 2",
+			want:  1,
 		},
 	}
 

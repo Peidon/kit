@@ -51,7 +51,3 @@ func (v *BasevaluateVisitor) VisitQualifiedIdent(ctx *QualifiedIdentContext) int
 func (v *BasevaluateVisitor) VisitIndex(ctx *IndexContext) interface{} {
 	return v.VisitChildren(ctx)
 }
-
-func (v *BasevaluateVisitor) VisitInteger(ctx *IntegerContext) interface{} {
-	return v.VisitChildren(ctx)
-}

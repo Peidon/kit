@@ -40,7 +40,4 @@ type valuateVisitor interface {
 
 	// Visit a parse tree produced by valuateParser#index.
 	VisitIndex(ctx *IndexContext) interface{}
-
-	// Visit a parse tree produced by valuateParser#integer.
-	VisitInteger(ctx *IntegerContext) interface{}
 }

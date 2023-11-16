@@ -17,7 +17,8 @@ func TestAST(t *testing.T) {
 		"a+b-c",
 		"{a.b}",
 		"abc(x)",
-		"",
+		"1+2.0",
+		"acb.b.a",
 	}
 	for _, td := range testsData {
 		eval, err := NewExpression(td)
