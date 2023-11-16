@@ -20,7 +20,7 @@ type EvaluableExpression struct {
 	stage     *evaluationStage
 	functions map[string]ExpressionFunction
 
-	Error *ExprError
+	errorTrack *StageError
 }
 
 func NewExpression(input string) (ee *EvaluableExpression, err error) {
@@ -28,22 +28,17 @@ func NewExpression(input string) (ee *EvaluableExpression, err error) {
 	// lexer
 	stream := antlr.NewInputStream(input)
 	lexer := parser.NewvaluateLexer(stream)
-	lexer.AddErrorListener(DefaultListener)
 
 	// parser
 	tokenStream := antlr.NewCommonTokenStream(lexer, antlr.TokenDefaultChannel)
 	p := parser.NewvaluateParser(tokenStream)
-	p.AddErrorListener(DefaultListener)
 	plan := p.Plan()
 
 	// new Evaluable
 	ee = &EvaluableExpression{
-		text:  input,
-		Error: &ExprError{},
+		text:       input,
+		errorTrack: &StageError{},
 	}
-
-	// load functions
-	// todo
 
 	// plan stages
 	stageInf := plan.Accept(ee)
@@ -51,7 +46,7 @@ func NewExpression(input string) (ee *EvaluableExpression, err error) {
 		ee.stage = &stage
 	}
 	if ee.stage == nil {
-		err = ee.Error
+		err = ee.errorTrack
 	}
 
 	return
@@ -80,7 +75,7 @@ func (eval *EvaluableExpression) VisitExpression(ctx *parser.ExpressionContext) 
 	for _, expr := range ctx.AllExpression() {
 		stageInf := expr.Accept(eval)
 		if stageInf == nil {
-			eval.Error.tokens = append(eval.Error.tokens, expr.GetText())
+			eval.errorTrack.tokens = append(eval.errorTrack.tokens, expr.GetText())
 			return nil
 		}
 
@@ -185,7 +180,47 @@ func (eval *EvaluableExpression) VisitInteger(ctx *parser.IntegerContext) interf
 
 func (eval *EvaluableExpression) Evaluate(parameters map[string]interface{}) (interface{}, error) {
 	if parameters == nil {
-
+		return eval.Eval(nil)
 	}
-	return nil, nil
+
+	return eval.Eval(MapParameters(parameters))
+}
+
+func (eval *EvaluableExpression) Eval(parameters Parameters) (interface{}, error) {
+	if eval.stage == nil {
+		return nil, NoNeedEvaluate
+	}
+
+	if parameters == nil {
+		parameters = DUMMY_PARAMETERS
+	}
+
+	return eval.evaluateStage(eval.stage, parameters)
+}
+
+func (eval *EvaluableExpression) evaluateStage(stage *evaluationStage, parameters Parameters) (interface{}, error) {
+
+	if stage.opType == unary && len(stage.depends) < int(unary) {
+		return nil, ArgumentsError
+	}
+	if stage.opType == binary && len(stage.depends) < int(binary) {
+		return nil, ArgumentsError
+	}
+
+	args := make([]Any, 0)
+	for _, dep := range stage.depends {
+		arg, err := eval.evaluateStage(&dep, parameters)
+		if err != nil {
+			return nil, err
+		}
+		args = append(args, arg)
+	}
+
+	if stage.typeCheck != nil {
+		if err := stage.typeCheck(args...); err != nil {
+			return nil, err
+		}
+	}
+
+	return stage.operator(parameters, args...)
 }

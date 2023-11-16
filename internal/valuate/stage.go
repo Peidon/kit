@@ -36,7 +36,7 @@ type evaluationStage struct {
 }
 
 // type checking depends on Stage Operator
-type stageCombinedTypeCheck func(arguments ...Any) bool
+type stageCombinedTypeCheck func(arguments ...Any) error
 
 // Operator in Stage
 type evaluationOperator func(parameters Parameters, arguments ...Any) (Any, error)

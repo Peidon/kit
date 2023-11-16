@@ -50,13 +50,14 @@ const (
 	right
 
 	// unary arguments index
-	unaryIndex = 0
+	unaryIndex OperatorArgument = 0
 )
 
 type OperatorType int
 
 const (
-	unary OperatorType = iota + 1
+	noop OperatorType = iota
+	unary
 	binary
 )
 

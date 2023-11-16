@@ -27,3 +27,5 @@ func (p MapParameters) Get(name string) (Any, error) {
 
 	return value, nil
 }
+
+var DUMMY_PARAMETERS = MapParameters(map[string]interface{}{})
