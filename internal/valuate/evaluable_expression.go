@@ -243,7 +243,7 @@ func (eval *EvaluableExpression) Eval(parameters Parameters) (interface{}, error
 	}
 
 	if parameters == nil {
-		parameters = DUMMY_PARAMETERS
+		parameters = DummyParameters
 	}
 
 	return eval.evaluateStage(eval.stage, parameters)

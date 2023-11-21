@@ -6,7 +6,7 @@
  * @Version: kit
  */
 
-package valuate
+package udf
 
 import (
 	"github.com/Peidon/govaluate"
@@ -42,9 +42,4 @@ type Abc struct {
 
 func (abc Abc) Echo(hello string) string {
 	return hello
-}
-
-func TestDiv(t *testing.T) {
-	res, err := modulusStage(nil, 2, 3)
-	t.Log(res, err)
 }

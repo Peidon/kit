@@ -46,7 +46,7 @@ WHITESPACE
 
 IDENTIFIER : LETTER (LETTER | DIGIT)* ;
 
-// variate literal : _abc ab_c ab.c
+// variate literal : _abc ab_c {ab.c}
 VAR_ID
     : L_CURLY IDENTIFIER (DOT IDENTIFIER)* R_CURLY
     | IDENTIFIER

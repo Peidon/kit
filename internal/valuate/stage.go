@@ -28,9 +28,7 @@ type evaluationStage struct {
 	// operator type
 	opType OperatorType
 
-	// if specified, will override whatever is used in "leftTypeCheck" and "rightTypeCheck".
-	// primarily used for specific operators that don't care which side a given type is on, but still requires one side to be of a given type
-	// (like string concat)
+	// ensures values type are appropriate for this stage
 	typeCheck stageCombinedTypeCheck
 }
 
@@ -70,6 +68,18 @@ func makeLiteralStage(literal string, tp TokenSymbol) evaluationOperator {
 	}
 }
 
+func makeParameterStage(parameterName string) evaluationOperator {
+
+	return func(parameters Parameters, arguments ...Any) (interface{}, error) {
+		value, err := parameters.Get(parameterName)
+		if err != nil {
+			return nil, err
+		}
+
+		return value, nil
+	}
+}
+
 // equalStage symbol ==
 // @param arguments left right
 func equalStage(_ Parameters, arguments ...Any) (Any, error) {
@@ -99,7 +109,11 @@ func divideStage(_ Parameters, arguments ...Any) (Any, error) {
 	l, r := arguments[left], arguments[right]
 
 	if isInt(l) && isInt(r) {
-		return toInt(l) / toInt(r), nil
+		rv := toInt(r)
+		if rv == 0 {
+			return nil, DivideZeroError
+		}
+		return toInt(l) / rv, nil
 	}
 
 	rv := toFloat64(r)

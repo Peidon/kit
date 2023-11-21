@@ -9,3 +9,19 @@
 package valuate
 
 type ExpressionFunction func(arguments ...Any) (Any, error)
+
+type Value struct {
+	Type      ValueType
+	Integer   int64
+	string    string
+	Interface interface{}
+}
+
+type ValueType int
+
+const (
+	Unknown ValueType = iota
+	IntegerType
+	StringType
+	BoolType
+)
