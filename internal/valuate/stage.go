@@ -158,9 +158,9 @@ func subtractStage(_ Parameters, arguments ...Any) (Any, error) {
 	l, r := arguments[left], arguments[right]
 
 	if isFloat(l) || isFloat(r) {
-		return l.(float64) - r.(float64), nil
+		return toFloat64(l) - toFloat64(r), nil
 	}
-	return l.(int64) - r.(int64), nil
+	return toInt(l) - toInt(r), nil
 }
 
 func toInt(v interface{}) int {

@@ -208,20 +208,30 @@ func (eval *EvaluableExpression) VisitBasicLit(ctx *parser.BasicLitContext) inte
 		}
 	}
 
-	if varID := ctx.VAR_ID(); varID != nil {
-
+	if varID := ctx.Variate(); varID != nil {
+		return varID.Accept(eval)
 	}
 
 	return nil
 }
 
-func (eval *EvaluableExpression) VisitOperandName(ctx *parser.OperandNameContext) interface{} {
-	println("visit Operand Name")
-	return nil
-}
-
-func (eval *EvaluableExpression) VisitQualifiedIdent(ctx *parser.QualifiedIdentContext) interface{} {
-	println("visit qualified identify")
+func (eval *EvaluableExpression) VisitVariate(ctx *parser.VariateContext) interface{} {
+	if q := ctx.QUALIFIED(); q != nil {
+		k := q.GetText()
+		op := makeParameterStage(k)
+		return evaluationStage{
+			symbol:   LITERAL,
+			operator: op,
+		}
+	}
+	if i := ctx.IDENTIFIER(); i != nil {
+		k := i.GetText()
+		op := makeParameterStage(k)
+		return evaluationStage{
+			symbol:   LITERAL,
+			operator: op,
+		}
+	}
 	return nil
 }
 

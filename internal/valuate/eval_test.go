@@ -12,8 +12,9 @@ import "testing"
 
 func TestEvaluableExpression_Evaluate(t *testing.T) {
 	testData := []struct {
-		input string
-		want  interface{}
+		input  string
+		want   interface{}
+		params MapParameters
 	}{
 		{
 			input: "1+2.1",
@@ -39,6 +40,16 @@ func TestEvaluableExpression_Evaluate(t *testing.T) {
 			input: "5 % 2",
 			want:  1,
 		},
+		{
+			input:  "abc - 2",
+			want:   1,
+			params: MapParameters(map[string]Any{"abc": 3}),
+		},
+		{
+			input:  "{ab.c} - 2.0",
+			want:   1.0,
+			params: MapParameters(map[string]Any{"ab.c": 3}),
+		},
 	}
 
 	for _, td := range testData {
@@ -47,7 +58,7 @@ func TestEvaluableExpression_Evaluate(t *testing.T) {
 			t.Error(err)
 			return
 		}
-		got, er := expr.Evaluate(nil)
+		got, er := expr.Evaluate(td.params)
 		if er != nil {
 			t.Error(er)
 			return

@@ -46,10 +46,9 @@ WHITESPACE
 
 IDENTIFIER : LETTER (LETTER | DIGIT)* ;
 
-// variate literal : _abc ab_c {ab.c}
-VAR_ID
-    : L_CURLY IDENTIFIER (DOT IDENTIFIER)* R_CURLY
-    | IDENTIFIER
+
+QUALIFIED
+    : IDENTIFIER (DOT IDENTIFIER)*
     ;
 
 /*
@@ -88,7 +87,7 @@ expressionList
 
 operand
     : basicLit
-    | operandName
+    | IDENTIFIER
     | LP expression RP
     ;
 
@@ -99,16 +98,13 @@ basicLit
     | INT
     | STRING
     | FLOAT_NUMBER
-    | VAR_ID
+    | variate
     ;
 
-operandName
-    : IDENTIFIER
-    | qualifiedIdent
-    ;
-
-qualifiedIdent
-    : IDENTIFIER COMMA IDENTIFIER
+// variate literal : _abc ab_c {ab.c}
+variate
+    : L_CURLY QUALIFIED R_CURLY
+    | IDENTIFIER
     ;
 
 index

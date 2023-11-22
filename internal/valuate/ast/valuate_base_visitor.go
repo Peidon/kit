@@ -40,11 +40,7 @@ func (v *BasevaluateVisitor) VisitBasicLit(ctx *BasicLitContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
-func (v *BasevaluateVisitor) VisitOperandName(ctx *OperandNameContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
-func (v *BasevaluateVisitor) VisitQualifiedIdent(ctx *QualifiedIdentContext) interface{} {
+func (v *BasevaluateVisitor) VisitVariate(ctx *VariateContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
