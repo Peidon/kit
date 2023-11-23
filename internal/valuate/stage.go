@@ -17,9 +17,7 @@ import (
 type evaluationStage struct {
 	symbol OperatorSymbol
 
-	// 这里基于ANTLR4语法树后序遍历
-	// 否则不能这么设计, 因为不确定顺序则不能确定符号左右的值
-	// Operator 中的arguments 同理
+	// sub stages
 	depends []evaluationStage
 
 	// the operation that will be used to evaluate this stage (such as adding [left] to [right] and return the result)

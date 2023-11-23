@@ -79,6 +79,11 @@ func TestEvaluableExpression_Evaluate(t *testing.T) {
 			params: MapParameters(map[string]Any{"abc": 3}),
 		},
 		{
+			input:    "abc && 2",
+			params:   MapParameters(map[string]Any{"abc": 3}),
+			hasError: true,
+		},
+		{
 			input:  "abc > 2 && {c} == true",
 			want:   true,
 			params: MapParameters(map[string]Any{"abc": 3, "c": true}),
