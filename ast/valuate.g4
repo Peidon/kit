@@ -46,11 +46,6 @@ WHITESPACE
 
 IDENTIFIER : LETTER (LETTER | DIGIT)* ;
 
-
-QUALIFIED
-    : IDENTIFIER (DOT IDENTIFIER)*
-    ;
-
 /*
  *  parser Rules
  */
@@ -68,6 +63,7 @@ expression
 
 primaryExpr
     : operand
+    | variate
     | primaryExpr ( DOT IDENTIFIER
                   | index
                   | arguments)
@@ -87,7 +83,6 @@ expressionList
 
 operand
     : basicLit
-    | IDENTIFIER
     | LP expression RP
     ;
 
@@ -98,13 +93,12 @@ basicLit
     | INT
     | STRING
     | FLOAT_NUMBER
-    | variate
     ;
 
 // variate literal : _abc ab_c {ab.c}
 variate
-    : L_CURLY QUALIFIED R_CURLY
-    | IDENTIFIER
+    : IDENTIFIER
+    | L_CURLY IDENTIFIER (DOT IDENTIFIER)* R_CURLY
     ;
 
 index

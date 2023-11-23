@@ -37,3 +37,9 @@ func GetString(v Value) string {
 func GetBool(v Value) bool {
 	return v.Integer == 1
 }
+
+type Comparable interface {
+	Equal(other Comparable) bool
+	Greater(other Comparable) bool
+	LessThan(other Comparable) bool
+}

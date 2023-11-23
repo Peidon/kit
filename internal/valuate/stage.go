@@ -45,6 +45,35 @@ func numberTypeCheck(arguments ...Any) error {
 	return nil
 }
 
+// bool type check
+func boolTypeCheck(arguments ...Any) error {
+	for _, arg := range arguments {
+		if !isBool(arg) {
+			return ArgumentTypeError
+		}
+	}
+	return nil
+}
+
+// isComparable
+func isComparable(obj Any) bool {
+	switch obj.(type) {
+	case Comparable:
+		return true
+	}
+	return false
+}
+
+// comparable operators check
+func comparableCheck(arguments ...Any) error {
+	for _, arg := range arguments {
+		if !isNumber(arg) && !isString(arg) && !isBool(arg) && !isComparable(arg) {
+			return ArgumentTypeError
+		}
+	}
+	return nil
+}
+
 // evaluationOperator
 // Operator in Stage
 type evaluationOperator func(parameters Parameters, arguments ...Any) (Any, error)
@@ -84,6 +113,20 @@ func makeParameterStage(parameterName string) evaluationOperator {
 // @param arguments left right
 func equalStage(_ Parameters, arguments ...Any) (Any, error) {
 	l, r := arguments[left], arguments[right]
+	if isNumber(l) && isNumber(r) {
+		return toFloat64(l) == toFloat64(r), nil
+	}
+	if isString(l) && isString(r) {
+		return l.(string) == r.(string), nil
+	}
+	if isBool(l) && isBool(r) {
+		return l.(bool) == r.(bool), nil
+	}
+	if isComparable(l) && isComparable(r) {
+		a := l.(Comparable)
+		b := r.(Comparable)
+		return a.Equal(b), nil
+	}
 	return boolInterface(reflect.DeepEqual(l, r)), nil
 }
 
@@ -91,7 +134,99 @@ func equalStage(_ Parameters, arguments ...Any) (Any, error) {
 // @param arguments left right
 func notEqualStage(_ Parameters, arguments ...Any) (Any, error) {
 	l, r := arguments[left], arguments[right]
+	if isNumber(l) && isNumber(r) {
+		return toFloat64(l) != toFloat64(r), nil
+	}
+	if isString(l) && isString(r) {
+		return l.(string) != r.(string), nil
+	}
+	if isBool(l) && isBool(r) {
+		return l.(bool) != r.(bool), nil
+	}
+	if isComparable(l) && isComparable(r) {
+		a := l.(Comparable)
+		b := r.(Comparable)
+		return !a.Equal(b), nil
+	}
 	return boolInterface(!reflect.DeepEqual(l, r)), nil
+}
+
+// gtStage symbol '>'
+// greater than
+func gtStage(_ Parameters, arguments ...Any) (Any, error) {
+	l, r := arguments[left], arguments[right]
+	if isNumber(l) && isNumber(r) {
+		return toFloat64(l) > toFloat64(r), nil
+	}
+	if isComparable(l) && isComparable(r) {
+		a := l.(Comparable)
+		b := r.(Comparable)
+		return a.Greater(b), nil
+	}
+	return nil, ArgumentTypeError
+}
+
+// ltStage symbol '<'
+// less than
+func ltStage(_ Parameters, arguments ...Any) (Any, error) {
+	l, r := arguments[left], arguments[right]
+	if isNumber(l) && isNumber(r) {
+		return toFloat64(l) < toFloat64(r), nil
+	}
+	if isComparable(l) && isComparable(r) {
+		a := l.(Comparable)
+		b := r.(Comparable)
+		return a.LessThan(b), nil
+	}
+	return nil, ArgumentTypeError
+}
+
+// gteStage symbol '>='
+// greater or equal
+func gteStage(_ Parameters, arguments ...Any) (Any, error) {
+	l, r := arguments[left], arguments[right]
+	if isNumber(l) && isNumber(r) {
+		return toFloat64(l) >= toFloat64(r), nil
+	}
+	if isComparable(l) && isComparable(r) {
+		a := l.(Comparable)
+		b := r.(Comparable)
+		return !a.LessThan(b), nil
+	}
+	return nil, ArgumentTypeError
+}
+
+// lteStage symbol '<='
+// less or equal
+func lteStage(_ Parameters, arguments ...Any) (Any, error) {
+	l, r := arguments[left], arguments[right]
+	if isNumber(l) && isNumber(r) {
+		return toFloat64(l) <= toFloat64(r), nil
+	}
+	if isComparable(l) && isComparable(r) {
+		a := l.(Comparable)
+		b := r.(Comparable)
+		return !a.Greater(b), nil
+	}
+	return nil, ArgumentTypeError
+}
+
+// andStage symbol '&&'
+func andStage(_ Parameters, arguments ...Any) (Any, error) {
+	l, r := arguments[left], arguments[right]
+	if isBool(l) && isBool(r) {
+		return l.(bool) && r.(bool), nil
+	}
+	return nil, ArgumentTypeError
+}
+
+// orStage symbol '||'
+func orStage(_ Parameters, arguments ...Any) (Any, error) {
+	l, r := arguments[left], arguments[right]
+	if isBool(l) && isBool(r) {
+		return l.(bool) || r.(bool), nil
+	}
+	return nil, ArgumentTypeError
 }
 
 // modify op '+'

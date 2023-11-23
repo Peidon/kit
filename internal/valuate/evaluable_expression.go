@@ -11,6 +11,7 @@ package valuate
 import (
 	"github.com/antlr/antlr4/runtime/Go/antlr"
 	parser "kit/internal/valuate/ast"
+	"strings"
 )
 
 type EvaluableExpression struct {
@@ -101,6 +102,15 @@ func (eval *EvaluableExpression) VisitExpression(ctx *parser.ExpressionContext) 
 			typeCheck: numberTypeCheck,
 		}
 	}
+	if op := ctx.MODULUS(); op != nil {
+		return evaluationStage{
+			symbol:    MODULUS,
+			opType:    binary,
+			operator:  modulusStage,
+			depends:   stages,
+			typeCheck: numberTypeCheck,
+		}
+	}
 	if op := ctx.PLUS(); op != nil {
 		return evaluationStage{
 			symbol:    PLUS,
@@ -119,13 +129,77 @@ func (eval *EvaluableExpression) VisitExpression(ctx *parser.ExpressionContext) 
 			typeCheck: numberTypeCheck,
 		}
 	}
-	if op := ctx.MODULUS(); op != nil {
+
+	if op := ctx.EQUALS(); op != nil {
 		return evaluationStage{
-			symbol:    MODULUS,
+			symbol:    EQ,
 			opType:    binary,
-			operator:  modulusStage,
+			operator:  equalStage,
 			depends:   stages,
-			typeCheck: numberTypeCheck,
+			typeCheck: comparableCheck,
+		}
+	}
+	if op := ctx.NOT_EQUALS(); op != nil {
+		return evaluationStage{
+			symbol:    NEQ,
+			opType:    binary,
+			operator:  notEqualStage,
+			depends:   stages,
+			typeCheck: comparableCheck,
+		}
+	}
+	if op := ctx.GREATER(); op != nil {
+		return evaluationStage{
+			symbol:    GT,
+			opType:    binary,
+			operator:  gtStage,
+			depends:   stages,
+			typeCheck: comparableCheck,
+		}
+	}
+	if op := ctx.LESS(); op != nil {
+		return evaluationStage{
+			symbol:    LT,
+			opType:    binary,
+			operator:  ltStage,
+			depends:   stages,
+			typeCheck: comparableCheck,
+		}
+	}
+	if op := ctx.GREATER_OR_EQUALS(); op != nil {
+		return evaluationStage{
+			symbol:    GTE,
+			opType:    binary,
+			operator:  gteStage,
+			depends:   stages,
+			typeCheck: comparableCheck,
+		}
+	}
+	if op := ctx.LESS_OR_EQUALS(); op != nil {
+		return evaluationStage{
+			symbol:    LTE,
+			opType:    binary,
+			operator:  lteStage,
+			depends:   stages,
+			typeCheck: comparableCheck,
+		}
+	}
+	if op := ctx.LOGICAL_AND(); op != nil {
+		return evaluationStage{
+			symbol:    AND,
+			opType:    binary,
+			operator:  andStage,
+			depends:   stages,
+			typeCheck: boolTypeCheck,
+		}
+	}
+	if op := ctx.LOGICAL_OR(); op != nil {
+		return evaluationStage{
+			symbol:    OR,
+			opType:    binary,
+			operator:  orStage,
+			depends:   stages,
+			typeCheck: boolTypeCheck,
 		}
 	}
 	return nil
@@ -134,6 +208,9 @@ func (eval *EvaluableExpression) VisitExpression(ctx *parser.ExpressionContext) 
 func (eval *EvaluableExpression) VisitPrimaryExpr(ctx *parser.PrimaryExprContext) interface{} {
 	if operand := ctx.Operand(); operand != nil {
 		return operand.Accept(eval)
+	}
+	if varID := ctx.Variate(); varID != nil {
+		return varID.Accept(eval)
 	}
 
 	return nil
@@ -168,71 +245,63 @@ func (eval *EvaluableExpression) VisitBasicLit(ctx *parser.BasicLitContext) inte
 	if nilLit := ctx.NIL_LIT(); nilLit != nil {
 		op := makeLiteralStage(nilLit.GetText(), NIL)
 		return evaluationStage{
-			symbol:   LITERAL,
+			symbol:   VALUE,
 			operator: op,
 		}
 	}
 	if lit := ctx.TRUE(); lit != nil {
 		op := makeLiteralStage(lit.GetText(), Bool)
 		return evaluationStage{
-			symbol:   LITERAL,
+			symbol:   VALUE,
 			operator: op,
 		}
 	}
 	if lit := ctx.FALSE(); lit != nil {
 		op := makeLiteralStage(lit.GetText(), Bool)
 		return evaluationStage{
-			symbol:   LITERAL,
+			symbol:   VALUE,
 			operator: op,
 		}
 	}
 	if lit := ctx.INT(); lit != nil {
 		op := makeLiteralStage(lit.GetText(), Int)
 		return evaluationStage{
-			symbol:   LITERAL,
+			symbol:   VALUE,
 			operator: op,
 		}
 	}
 	if lit := ctx.STRING(); lit != nil {
 		op := makeLiteralStage(lit.GetText(), String)
 		return evaluationStage{
-			symbol:   LITERAL,
+			symbol:   VALUE,
 			operator: op,
 		}
 	}
 	if lit := ctx.FLOAT_NUMBER(); lit != nil {
 		op := makeLiteralStage(lit.GetText(), Float)
 		return evaluationStage{
-			symbol:   LITERAL,
+			symbol:   VALUE,
 			operator: op,
 		}
-	}
-
-	if varID := ctx.Variate(); varID != nil {
-		return varID.Accept(eval)
 	}
 
 	return nil
 }
 
 func (eval *EvaluableExpression) VisitVariate(ctx *parser.VariateContext) interface{} {
-	if q := ctx.QUALIFIED(); q != nil {
-		k := q.GetText()
-		op := makeParameterStage(k)
-		return evaluationStage{
-			symbol:   LITERAL,
-			operator: op,
-		}
+
+	var identifiers []string
+
+	for _, id := range ctx.AllIDENTIFIER() {
+		identifiers = append(identifiers, id.GetText())
 	}
-	if i := ctx.IDENTIFIER(); i != nil {
-		k := i.GetText()
-		op := makeParameterStage(k)
-		return evaluationStage{
-			symbol:   LITERAL,
-			operator: op,
-		}
+
+	k := strings.Join(identifiers, ".")
+	op := makeParameterStage(k)
+	return evaluationStage{
+		symbol:   LITERAL,
+		operator: op,
 	}
-	return nil
 }
 
 func (eval *EvaluableExpression) VisitIndex(ctx *parser.IndexContext) interface{} {
