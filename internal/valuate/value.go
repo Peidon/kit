@@ -41,5 +41,4 @@ func GetBool(v Value) bool {
 type Comparable interface {
 	Equal(other Comparable) bool
 	Greater(other Comparable) bool
-	LessThan(other Comparable) bool
 }
