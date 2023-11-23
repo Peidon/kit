@@ -38,6 +38,28 @@ const (
 	ACCESS
 )
 
+var (
+	symbolMap = map[OperatorSymbol]string{
+		EQ:       "==",
+		NEQ:      "!=",
+		LT:       "<",
+		GT:       ">",
+		LTE:      "<=",
+		GTE:      ">=",
+		AND:      "&&",
+		OR:       "||",
+		PLUS:     "+",
+		MINUS:    "subtract -",
+		MULTIPLY: "multiply *",
+		DIVIDE:   "divide /",
+		MODULUS:  "modulus %",
+		INDEX:    "array index []",
+		ACCESS:   "accessor .",
+		INVERT:   "!",
+		NEGATE:   "negate -",
+	}
+)
+
 // OperatorArgument /*
 /*
 Operator Argument Index

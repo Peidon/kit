@@ -35,10 +35,10 @@ func (the *StageError) Append(token string) {
 
 // TypeError operator arguments type error
 type TypeError struct {
-	operate    string
-	valueToken string
+	operateSym OperatorSymbol
+	typeName   string
 }
 
 func (ter TypeError) Error() string {
-	return "Value '" + ter.valueToken + "' cannot be used with the operator '" + ter.operate + "'"
+	return "Type '" + ter.typeName + "' cannot be used with the operator '" + symbolMap[ter.operateSym] + "'"
 }

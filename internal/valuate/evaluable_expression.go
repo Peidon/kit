@@ -347,10 +347,9 @@ func (eval *EvaluableExpression) evaluateStage(stage *evaluationStage, parameter
 		args = append(args, arg)
 	}
 
-	if stage.typeCheck != nil {
-		if err := stage.typeCheck(args...); err != nil {
-			return nil, err
-		}
+	// 参数类型检查
+	if err := stage.argsTypeCheck(args...); err != nil {
+		return nil, err
 	}
 
 	return stage.operator(parameters, args...)

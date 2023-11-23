@@ -32,6 +32,27 @@ type evaluationStage struct {
 	typeCheck stageCombinedTypeCheck
 }
 
+func (stage evaluationStage) argsTypeCheck(args ...Any) (err error) {
+	if stage.typeCheck == nil {
+		return
+	}
+
+	if err = stage.typeCheck(args...); err != nil {
+		tp := ""
+		for _, a := range args {
+			reType := reflect.TypeOf(a)
+			tp = reType.String()
+			break
+		}
+
+		return TypeError{
+			operateSym: stage.symbol,
+			typeName:   tp,
+		}
+	}
+	return
+}
+
 // type checking depends on Stage Operator
 type stageCombinedTypeCheck func(arguments ...Any) error
 
@@ -67,7 +88,11 @@ func isComparable(obj Any) bool {
 // comparable operators check
 func comparableCheck(arguments ...Any) error {
 	for _, arg := range arguments {
-		if !isNumber(arg) && !isString(arg) && !isBool(arg) && !isComparable(arg) {
+		if !isNumber(arg) &&
+			!isString(arg) &&
+			!isBool(arg) &&
+			!isComparable(arg) &&
+			!isNil(arg) {
 			return ArgumentTypeError
 		}
 	}
@@ -378,6 +403,10 @@ func isFloat(value interface{}) bool {
 		return true
 	}
 	return false
+}
+
+func isNil(value interface{}) bool {
+	return value == nil
 }
 
 var (
