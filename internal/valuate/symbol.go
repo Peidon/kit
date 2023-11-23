@@ -57,6 +57,7 @@ var (
 		ACCESS:   "accessor .",
 		INVERT:   "!",
 		NEGATE:   "negate -",
+		NOOP:     "unknown",
 	}
 )
 
@@ -72,15 +73,15 @@ const (
 	right
 
 	// unary arguments index
-	unaryIndex OperatorArgument = 0
+	unary OperatorArgument = 0
 )
 
 type OperatorType int
 
 const (
 	noop OperatorType = iota
-	unary
-	binary
+	unaryOp
+	binaryOp
 )
 
 type Any = interface{}

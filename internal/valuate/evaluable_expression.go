@@ -87,7 +87,7 @@ func (eval *EvaluableExpression) VisitExpression(ctx *parser.ExpressionContext) 
 	if op := ctx.DIV(); op != nil {
 		return evaluationStage{
 			symbol:    DIVIDE,
-			opType:    binary,
+			opType:    binaryOp,
 			operator:  divideStage,
 			depends:   stages,
 			typeCheck: numberTypeCheck,
@@ -96,7 +96,7 @@ func (eval *EvaluableExpression) VisitExpression(ctx *parser.ExpressionContext) 
 	if op := ctx.STAR(); op != nil {
 		return evaluationStage{
 			symbol:    MULTIPLY,
-			opType:    binary,
+			opType:    binaryOp,
 			operator:  multipleStage,
 			depends:   stages,
 			typeCheck: numberTypeCheck,
@@ -105,7 +105,7 @@ func (eval *EvaluableExpression) VisitExpression(ctx *parser.ExpressionContext) 
 	if op := ctx.MODULUS(); op != nil {
 		return evaluationStage{
 			symbol:    MODULUS,
-			opType:    binary,
+			opType:    binaryOp,
 			operator:  modulusStage,
 			depends:   stages,
 			typeCheck: numberTypeCheck,
@@ -114,7 +114,7 @@ func (eval *EvaluableExpression) VisitExpression(ctx *parser.ExpressionContext) 
 	if op := ctx.PLUS(); op != nil {
 		return evaluationStage{
 			symbol:    PLUS,
-			opType:    binary,
+			opType:    binaryOp,
 			operator:  addStage,
 			depends:   stages,
 			typeCheck: numberTypeCheck,
@@ -123,7 +123,7 @@ func (eval *EvaluableExpression) VisitExpression(ctx *parser.ExpressionContext) 
 	if op := ctx.MINUS(); op != nil {
 		return evaluationStage{
 			symbol:    MINUS,
-			opType:    binary,
+			opType:    binaryOp,
 			operator:  subtractStage,
 			depends:   stages,
 			typeCheck: numberTypeCheck,
@@ -133,7 +133,7 @@ func (eval *EvaluableExpression) VisitExpression(ctx *parser.ExpressionContext) 
 	if op := ctx.EQUALS(); op != nil {
 		return evaluationStage{
 			symbol:    EQ,
-			opType:    binary,
+			opType:    binaryOp,
 			operator:  equalStage,
 			depends:   stages,
 			typeCheck: comparableCheck,
@@ -142,7 +142,7 @@ func (eval *EvaluableExpression) VisitExpression(ctx *parser.ExpressionContext) 
 	if op := ctx.NOT_EQUALS(); op != nil {
 		return evaluationStage{
 			symbol:    NEQ,
-			opType:    binary,
+			opType:    binaryOp,
 			operator:  notEqualStage,
 			depends:   stages,
 			typeCheck: comparableCheck,
@@ -151,7 +151,7 @@ func (eval *EvaluableExpression) VisitExpression(ctx *parser.ExpressionContext) 
 	if op := ctx.GREATER(); op != nil {
 		return evaluationStage{
 			symbol:    GT,
-			opType:    binary,
+			opType:    binaryOp,
 			operator:  gtStage,
 			depends:   stages,
 			typeCheck: comparableCheck,
@@ -160,7 +160,7 @@ func (eval *EvaluableExpression) VisitExpression(ctx *parser.ExpressionContext) 
 	if op := ctx.LESS(); op != nil {
 		return evaluationStage{
 			symbol:    LT,
-			opType:    binary,
+			opType:    binaryOp,
 			operator:  ltStage,
 			depends:   stages,
 			typeCheck: comparableCheck,
@@ -169,7 +169,7 @@ func (eval *EvaluableExpression) VisitExpression(ctx *parser.ExpressionContext) 
 	if op := ctx.GREATER_OR_EQUALS(); op != nil {
 		return evaluationStage{
 			symbol:    GTE,
-			opType:    binary,
+			opType:    binaryOp,
 			operator:  gteStage,
 			depends:   stages,
 			typeCheck: comparableCheck,
@@ -178,7 +178,7 @@ func (eval *EvaluableExpression) VisitExpression(ctx *parser.ExpressionContext) 
 	if op := ctx.LESS_OR_EQUALS(); op != nil {
 		return evaluationStage{
 			symbol:    LTE,
-			opType:    binary,
+			opType:    binaryOp,
 			operator:  lteStage,
 			depends:   stages,
 			typeCheck: comparableCheck,
@@ -187,7 +187,7 @@ func (eval *EvaluableExpression) VisitExpression(ctx *parser.ExpressionContext) 
 	if op := ctx.LOGICAL_AND(); op != nil {
 		return evaluationStage{
 			symbol:    AND,
-			opType:    binary,
+			opType:    binaryOp,
 			operator:  andStage,
 			depends:   stages,
 			typeCheck: boolTypeCheck,
@@ -196,7 +196,7 @@ func (eval *EvaluableExpression) VisitExpression(ctx *parser.ExpressionContext) 
 	if op := ctx.LOGICAL_OR(); op != nil {
 		return evaluationStage{
 			symbol:    OR,
-			opType:    binary,
+			opType:    binaryOp,
 			operator:  orStage,
 			depends:   stages,
 			typeCheck: boolTypeCheck,
