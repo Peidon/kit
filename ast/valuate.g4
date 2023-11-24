@@ -105,7 +105,7 @@ obj
     ;
 
 pair
-    : STRING ':' basicLit
+    : STRING_LITERAL ':' basicLit
     ;
 
 
@@ -127,14 +127,6 @@ index
 /*
  * lexer rules
  */
-
-STRING
- : STRING_LITERAL
- | SHORT_BYTES
- | LONG_BYTES
- ;
-
-
 STRING_LITERAL
    : '"' (ESC | SAFECODEPOINT)* '"'
    ;
@@ -158,6 +150,11 @@ FLOAT_NUMBER
  | EXPONENT_FLOAT
  ;
 
+STRING
+ : STRING_LITERAL
+ | SHORT_BYTES
+ | LONG_BYTES
+ ;
 
 /*
  * fragments

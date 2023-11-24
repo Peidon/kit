@@ -288,6 +288,18 @@ func (eval *EvaluableExpression) VisitBasicLit(ctx *parser.BasicLitContext) inte
 	return nil
 }
 
+func (eval *EvaluableExpression) VisitArr(ctx *parser.ArrContext) interface{} {
+	return nil
+}
+
+func (eval *EvaluableExpression) VisitObj(ctx *parser.ObjContext) interface{} {
+	return nil
+}
+
+func (eval *EvaluableExpression) VisitPair(ctx *parser.PairContext) interface{} {
+	return nil
+}
+
 func (eval *EvaluableExpression) VisitVariate(ctx *parser.VariateContext) interface{} {
 
 	var identifiers []string

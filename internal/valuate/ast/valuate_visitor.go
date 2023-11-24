@@ -32,6 +32,15 @@ type valuateVisitor interface {
 	// Visit a parse tree produced by valuateParser#basicLit.
 	VisitBasicLit(ctx *BasicLitContext) interface{}
 
+	// Visit a parse tree produced by valuateParser#obj.
+	VisitObj(ctx *ObjContext) interface{}
+
+	// Visit a parse tree produced by valuateParser#pair.
+	VisitPair(ctx *PairContext) interface{}
+
+	// Visit a parse tree produced by valuateParser#arr.
+	VisitArr(ctx *ArrContext) interface{}
+
 	// Visit a parse tree produced by valuateParser#variate.
 	VisitVariate(ctx *VariateContext) interface{}
 

@@ -40,6 +40,18 @@ func (v *BasevaluateVisitor) VisitBasicLit(ctx *BasicLitContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
+func (v *BasevaluateVisitor) VisitObj(ctx *ObjContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BasevaluateVisitor) VisitPair(ctx *PairContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BasevaluateVisitor) VisitArr(ctx *ArrContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
 func (v *BasevaluateVisitor) VisitVariate(ctx *VariateContext) interface{} {
 	return v.VisitChildren(ctx)
 }
