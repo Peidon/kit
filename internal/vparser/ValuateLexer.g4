@@ -1,6 +1,4 @@
-// package ast
-// alias antlr4='java -Xmx500M -cp "/usr/local/lib/antlr-4.10.1-complete.jar:$CLASSPATH" org.antlr.v4.Tool'
-grammar valuate;
+lexer grammar ValuateLexer;
 
 // Keywords
 TRUE :  'true';
@@ -31,6 +29,9 @@ LESS_OR_EQUALS         : '<=';
 GREATER                : '>';
 GREATER_OR_EQUALS      : '>=';
 
+// unary
+EXCLAMATION            : '!';
+
 // Arithmetic operators
 DIV                    : '/';
 PLUS                   : '+';
@@ -47,97 +48,19 @@ WHITESPACE
 
 IDENTIFIER : LETTER (LETTER | DIGIT)* ;
 
-/*
- *  parser Rules
- */
-plan: expression EOF;
-
-expression
-    : primaryExpr
-    | unaryExpr
-    | expression ('*' | '/' | '%' ) expression
-    | expression ('+' | '-' ) expression
-    | expression ('==' | '!=' | '<' | '<=' | '>' | '>=') expression
-    | expression '&&' expression
-    | expression '||' expression
+VARKEY_OPEN
+    : '{' VARID -> pushMode(VAR)
     ;
-
-primaryExpr
-    : operand
-    | variate
-    | primaryExpr ( DOT IDENTIFIER
-                  | index
-                  | arguments)
-    ;
-
-unaryExpr
-    : ('-' | '!') expression
-    ;
-
-arguments
-    : LP (expressionList)? RP
-    ;
-
-expressionList
-    : expression (COMMA expression)*
-    ;
-
-operand
-    : basicLit
-    | LP expression RP
-    ;
-
-basicLit
-    : STRING
-    | INT
-    | FLOAT_NUMBER
-    | obj
-    | arr
-    | TRUE
-    | FALSE
-    | NIL_LIT
-    ;
-
-
-obj
-    : L_CURLY pair (',' pair)* R_CURLY
-    | '{' '}'
-    ;
-
-pair
-    : STRING ':' basicLit
-    ;
-
-
-arr
-    : '[' basicLit (',' basicLit)* ']'
-    | '[' ']'
-    ;
-
-// variate literal : _abc ab_c {ab.c}
-variate
-    : IDENTIFIER
-    | L_CURLY IDENTIFIER (DOT IDENTIFIER)* R_CURLY
-    ;
-
-index
-    : '[' expression ']'
-    ;
-
-/*
- * lexer rules
- */
 
 STRING
- : STRING_LITERAL
- | SHORT_BYTES
- | LONG_BYTES
- ;
-
+    : STRING_LITERAL
+    | SHORT_BYTES
+    | LONG_BYTES
+    ;
 
 STRING_LITERAL
-   : '"' (ESC | SAFECODEPOINT)* '"'
-   ;
+    : '"' (ESC | SAFECODEPOINT)* '"'
+    ;
 
 /// bytesliteral   ::=  bytesprefix(shortbytes | longbytes)
 /// bytesprefix    ::=  "b" | "B" | "br" | "Br" | "bR" | "BR" | "rb" | "rB" | "Rb" | "RB"
@@ -157,6 +80,16 @@ FLOAT_NUMBER
  : POINT_FLOAT
  | EXPONENT_FLOAT
  ;
+
+ // variable ID
+ mode VAR;
+ VARID
+     : IDENTIFIER (DOT IDENTIFIER)*
+     ;
+
+ VARKEY_CLOSE
+     : '}' -> popMode
+     ;
 
 
 /*
