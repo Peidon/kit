@@ -10,8 +10,7 @@ package valuate
 
 import (
 	"github.com/antlr/antlr4/runtime/Go/antlr"
-	parser "kit/internal/valuate/ast"
-	"strings"
+	"kit/internal/valuate/parser"
 )
 
 type EvaluableExpression struct {
@@ -28,11 +27,11 @@ func NewExpression(input string) (ee *EvaluableExpression, err error) {
 
 	// lexer
 	stream := antlr.NewInputStream(input)
-	lexer := parser.NewvaluateLexer(stream)
+	lexer := parser.NewValuateLexer(stream)
 
 	// parser
 	tokenStream := antlr.NewCommonTokenStream(lexer, antlr.TokenDefaultChannel)
-	p := parser.NewvaluateParser(tokenStream)
+	p := parser.NewValuateParser(tokenStream)
 	plan := p.Plan()
 
 	// new Evaluable
@@ -76,7 +75,7 @@ func (eval *EvaluableExpression) VisitExpression(ctx *parser.ExpressionContext) 
 	for _, expr := range ctx.AllExpression() {
 		stageInf := expr.Accept(eval)
 		if stageInf == nil {
-			eval.errorTrack.tokens = append(eval.errorTrack.tokens, expr.GetText())
+			eval.errorTrack.Append(expr.GetText())
 			return nil
 		}
 
@@ -245,46 +244,47 @@ func (eval *EvaluableExpression) VisitBasicLit(ctx *parser.BasicLitContext) inte
 	if nilLit := ctx.NIL_LIT(); nilLit != nil {
 		op := makeLiteralStage(nilLit.GetText(), NIL)
 		return evaluationStage{
-			symbol:   VALUE,
+			symbol:   LITERAL,
 			operator: op,
 		}
 	}
 	if lit := ctx.TRUE(); lit != nil {
 		op := makeLiteralStage(lit.GetText(), Bool)
 		return evaluationStage{
-			symbol:   VALUE,
+			symbol:   LITERAL,
 			operator: op,
 		}
 	}
 	if lit := ctx.FALSE(); lit != nil {
 		op := makeLiteralStage(lit.GetText(), Bool)
 		return evaluationStage{
-			symbol:   VALUE,
+			symbol:   LITERAL,
 			operator: op,
 		}
 	}
 	if lit := ctx.INT(); lit != nil {
 		op := makeLiteralStage(lit.GetText(), Int)
 		return evaluationStage{
-			symbol:   VALUE,
+			symbol:   LITERAL,
 			operator: op,
 		}
 	}
 	if lit := ctx.STRING(); lit != nil {
 		op := makeLiteralStage(lit.GetText(), String)
 		return evaluationStage{
-			symbol:   VALUE,
+			symbol:   LITERAL,
 			operator: op,
 		}
 	}
 	if lit := ctx.FLOAT_NUMBER(); lit != nil {
 		op := makeLiteralStage(lit.GetText(), Float)
 		return evaluationStage{
-			symbol:   VALUE,
+			symbol:   LITERAL,
 			operator: op,
 		}
 	}
 
+	eval.errorTrack.Append(ctx.GetText())
 	return nil
 }
 
@@ -302,18 +302,32 @@ func (eval *EvaluableExpression) VisitPair(ctx *parser.PairContext) interface{} 
 
 func (eval *EvaluableExpression) VisitVariate(ctx *parser.VariateContext) interface{} {
 
-	var identifiers []string
+	if varID := ctx.VARID(); varID != nil {
+		k := varID.GetText()
+		// ${} is error
+		if len(k) == 0 {
+			eval.errorTrack.Append(ctx.GetText())
+			return nil
+		}
 
-	for _, id := range ctx.AllIDENTIFIER() {
-		identifiers = append(identifiers, id.GetText())
+		op := makeParameterStage(k)
+		return evaluationStage{
+			symbol:   VALUE,
+			operator: op,
+		}
 	}
 
-	k := strings.Join(identifiers, ".")
-	op := makeParameterStage(k)
-	return evaluationStage{
-		symbol:   LITERAL,
-		operator: op,
+	if varID := ctx.IDENTIFIER(); varID != nil {
+		k := varID.GetText()
+		op := makeParameterStage(k)
+		return evaluationStage{
+			symbol:   VALUE,
+			operator: op,
+		}
 	}
+
+	eval.errorTrack.Append(ctx.GetText())
+	return nil
 }
 
 func (eval *EvaluableExpression) VisitIndex(ctx *parser.IndexContext) interface{} {

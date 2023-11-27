@@ -84,12 +84,12 @@ func TestEvaluableExpression_Evaluate(t *testing.T) {
 			hasError: true,
 		},
 		{
-			input:  "abc > 2 && {c} == true",
+			input:  "abc > 2 && ${c} == true",
 			want:   true,
 			params: MapParameters(map[string]Any{"abc": 3, "c": true}),
 		},
 		{
-			input:  "{ab.c} - 2.0",
+			input:  "${ab.c} - 2.0",
 			want:   1.0,
 			params: MapParameters(map[string]Any{"ab.c": 3}),
 		},

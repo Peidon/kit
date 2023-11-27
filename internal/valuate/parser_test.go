@@ -15,7 +15,7 @@ import (
 func TestAST(t *testing.T) {
 	testsData := []string{
 		"a+b-c",
-		"{a.b}",
+		"${a.b}",
 		"abc(x)",
 		"1+2.0",
 		"acb.b[0].x",

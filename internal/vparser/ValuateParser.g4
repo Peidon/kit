@@ -18,8 +18,8 @@ expression
     ;
 
 primaryExpr
-    : operand
-    | variate
+    : variate
+    | operand
     | primaryExpr ( DOT IDENTIFIER
                   | index
                   | arguments)
@@ -35,6 +35,12 @@ arguments
 
 expressionList
     : expression (COMMA expression)*
+    ;
+
+// variate literal : _abc ab_c ${ab.c}
+variate
+    : VARKEY_OPEN VARID VARKEY_CLOSE
+    | IDENTIFIER
     ;
 
 operand
@@ -69,11 +75,6 @@ arr
     | '[' ']'
     ;
 
-// variate literal : _abc ab_c {ab.c}
-variate
-    : IDENTIFIER
-    | VARKEY_OPEN VARKEY_CLOSE
-    ;
 
 index
     : '[' expression ']'

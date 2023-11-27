@@ -1,6 +1,6 @@
-// Code generated from valuate.g4 by ANTLR 4.10.1. DO NOT EDIT.
+// Code generated from ValuateParser.g4 by ANTLR 4.10.1. DO NOT EDIT.
 
-package parser // valuate
+package parser // ValuateParser
 
 import (
 	"fmt"
@@ -15,11 +15,11 @@ var _ = fmt.Printf
 var _ = strconv.Itoa
 var _ = sync.Once{}
 
-type valuateParser struct {
+type ValuateParser struct {
 	*antlr.BaseParser
 }
 
-var valuateParserStaticData struct {
+var valuateparserParserStaticData struct {
 	once                   sync.Once
 	serializedATN          []int32
 	literalNames           []string
@@ -30,28 +30,29 @@ var valuateParserStaticData struct {
 	decisionToDFA          []*antlr.DFA
 }
 
-func valuateParserInit() {
-	staticData := &valuateParserStaticData
+func valuateparserParserInit() {
+	staticData := &valuateparserParserStaticData
 	staticData.literalNames = []string{
-		"", "'!'", "'true'", "'false'", "'nil'", "'('", "')'", "'{'", "'}'",
-		"'['", "']'", "','", "':'", "'.'", "'||'", "'&&'", "'=='", "'!='", "'<'",
-		"'<='", "'>'", "'>='", "'/'", "'+'", "'-'", "'*'", "'%'",
+		"", "'true'", "'false'", "'nil'", "'('", "')'", "'{'", "", "'['", "']'",
+		"','", "':'", "'.'", "'||'", "'&&'", "'=='", "'!='", "'<'", "'<='",
+		"'>'", "'>='", "'!'", "'/'", "'+'", "'-'", "'*'", "'%'", "", "", "",
+		"'${'",
 	}
 	staticData.symbolicNames = []string{
-		"", "", "TRUE", "FALSE", "NIL_LIT", "LP", "RP", "L_CURLY", "R_CURLY",
-		"L_BRACKET", "R_BRACKET", "COMMA", "COLON", "DOT", "LOGICAL_OR", "LOGICAL_AND",
-		"EQUALS", "NOT_EQUALS", "LESS", "LESS_OR_EQUALS", "GREATER", "GREATER_OR_EQUALS",
-		"DIV", "PLUS", "MINUS", "STAR", "MODULUS", "SKIP_", "WHITESPACE", "IDENTIFIER",
-		"STRING_LITERAL", "BYTES_LITERAL", "INT", "DECIMAL_LIT", "FLOAT_NUMBER",
-		"STRING",
+		"", "TRUE", "FALSE", "NIL_LIT", "LP", "RP", "L_CURLY", "R_CURLY", "L_BRACKET",
+		"R_BRACKET", "COMMA", "COLON", "DOT", "LOGICAL_OR", "LOGICAL_AND", "EQUALS",
+		"NOT_EQUALS", "LESS", "LESS_OR_EQUALS", "GREATER", "GREATER_OR_EQUALS",
+		"EXCLAMATION", "DIV", "PLUS", "MINUS", "STAR", "MODULUS", "SKIP_", "WHITESPACE",
+		"IDENTIFIER", "VARKEY_OPEN", "STRING", "STRING_LITERAL", "BYTES_LITERAL",
+		"INT", "DECIMAL_LIT", "FLOAT_NUMBER", "VARID", "VARKEY_CLOSE",
 	}
 	staticData.ruleNames = []string{
 		"plan", "expression", "primaryExpr", "unaryExpr", "arguments", "expressionList",
-		"operand", "basicLit", "obj", "pair", "arr", "variate", "index",
+		"variate", "operand", "basicLit", "obj", "pair", "arr", "index",
 	}
 	staticData.predictionContextCache = antlr.NewPredictionContextCache()
 	staticData.serializedATN = []int32{
-		4, 1, 35, 157, 2, 0, 7, 0, 2, 1, 7, 1, 2, 2, 7, 2, 2, 3, 7, 3, 2, 4, 7,
+		4, 1, 38, 150, 2, 0, 7, 0, 2, 1, 7, 1, 2, 2, 7, 2, 2, 3, 7, 3, 2, 4, 7,
 		4, 2, 5, 7, 5, 2, 6, 7, 6, 2, 7, 7, 7, 2, 8, 7, 8, 2, 9, 7, 9, 2, 10, 7,
 		10, 2, 11, 7, 11, 2, 12, 7, 12, 1, 0, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 3,
 		1, 33, 8, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
@@ -59,66 +60,62 @@ func valuateParserInit() {
 		2, 1, 2, 1, 2, 3, 2, 58, 8, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 3, 2, 65,
 		8, 2, 5, 2, 67, 8, 2, 10, 2, 12, 2, 70, 9, 2, 1, 3, 1, 3, 1, 3, 1, 4, 1,
 		4, 3, 4, 77, 8, 4, 1, 4, 1, 4, 1, 5, 1, 5, 1, 5, 5, 5, 84, 8, 5, 10, 5,
-		12, 5, 87, 9, 5, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 3, 6, 94, 8, 6, 1, 7, 1,
-		7, 1, 7, 1, 7, 1, 7, 1, 7, 1, 7, 1, 7, 3, 7, 104, 8, 7, 1, 8, 1, 8, 1,
-		8, 1, 8, 5, 8, 110, 8, 8, 10, 8, 12, 8, 113, 9, 8, 1, 8, 1, 8, 1, 8, 1,
-		8, 3, 8, 119, 8, 8, 1, 9, 1, 9, 1, 9, 1, 9, 1, 10, 1, 10, 1, 10, 1, 10,
-		5, 10, 129, 8, 10, 10, 10, 12, 10, 132, 9, 10, 1, 10, 1, 10, 1, 10, 1,
-		10, 3, 10, 138, 8, 10, 1, 11, 1, 11, 1, 11, 1, 11, 1, 11, 5, 11, 145, 8,
-		11, 10, 11, 12, 11, 148, 9, 11, 1, 11, 3, 11, 151, 8, 11, 1, 12, 1, 12,
-		1, 12, 1, 12, 1, 12, 0, 2, 2, 4, 13, 0, 2, 4, 6, 8, 10, 12, 14, 16, 18,
-		20, 22, 24, 0, 4, 2, 0, 22, 22, 25, 26, 1, 0, 23, 24, 1, 0, 16, 21, 2,
-		0, 1, 1, 24, 24, 169, 0, 26, 1, 0, 0, 0, 2, 32, 1, 0, 0, 0, 4, 57, 1, 0,
-		0, 0, 6, 71, 1, 0, 0, 0, 8, 74, 1, 0, 0, 0, 10, 80, 1, 0, 0, 0, 12, 93,
-		1, 0, 0, 0, 14, 103, 1, 0, 0, 0, 16, 118, 1, 0, 0, 0, 18, 120, 1, 0, 0,
-		0, 20, 137, 1, 0, 0, 0, 22, 150, 1, 0, 0, 0, 24, 152, 1, 0, 0, 0, 26, 27,
-		3, 2, 1, 0, 27, 28, 5, 0, 0, 1, 28, 1, 1, 0, 0, 0, 29, 30, 6, 1, -1, 0,
-		30, 33, 3, 4, 2, 0, 31, 33, 3, 6, 3, 0, 32, 29, 1, 0, 0, 0, 32, 31, 1,
-		0, 0, 0, 33, 51, 1, 0, 0, 0, 34, 35, 10, 5, 0, 0, 35, 36, 7, 0, 0, 0, 36,
-		50, 3, 2, 1, 6, 37, 38, 10, 4, 0, 0, 38, 39, 7, 1, 0, 0, 39, 50, 3, 2,
-		1, 5, 40, 41, 10, 3, 0, 0, 41, 42, 7, 2, 0, 0, 42, 50, 3, 2, 1, 4, 43,
-		44, 10, 2, 0, 0, 44, 45, 5, 15, 0, 0, 45, 50, 3, 2, 1, 3, 46, 47, 10, 1,
-		0, 0, 47, 48, 5, 14, 0, 0, 48, 50, 3, 2, 1, 2, 49, 34, 1, 0, 0, 0, 49,
-		37, 1, 0, 0, 0, 49, 40, 1, 0, 0, 0, 49, 43, 1, 0, 0, 0, 49, 46, 1, 0, 0,
-		0, 50, 53, 1, 0, 0, 0, 51, 49, 1, 0, 0, 0, 51, 52, 1, 0, 0, 0, 52, 3, 1,
-		0, 0, 0, 53, 51, 1, 0, 0, 0, 54, 55, 6, 2, -1, 0, 55, 58, 3, 12, 6, 0,
-		56, 58, 3, 22, 11, 0, 57, 54, 1, 0, 0, 0, 57, 56, 1, 0, 0, 0, 58, 68, 1,
-		0, 0, 0, 59, 64, 10, 1, 0, 0, 60, 61, 5, 13, 0, 0, 61, 65, 5, 29, 0, 0,
-		62, 65, 3, 24, 12, 0, 63, 65, 3, 8, 4, 0, 64, 60, 1, 0, 0, 0, 64, 62, 1,
-		0, 0, 0, 64, 63, 1, 0, 0, 0, 65, 67, 1, 0, 0, 0, 66, 59, 1, 0, 0, 0, 67,
-		70, 1, 0, 0, 0, 68, 66, 1, 0, 0, 0, 68, 69, 1, 0, 0, 0, 69, 5, 1, 0, 0,
-		0, 70, 68, 1, 0, 0, 0, 71, 72, 7, 3, 0, 0, 72, 73, 3, 2, 1, 0, 73, 7, 1,
-		0, 0, 0, 74, 76, 5, 5, 0, 0, 75, 77, 3, 10, 5, 0, 76, 75, 1, 0, 0, 0, 76,
-		77, 1, 0, 0, 0, 77, 78, 1, 0, 0, 0, 78, 79, 5, 6, 0, 0, 79, 9, 1, 0, 0,
-		0, 80, 85, 3, 2, 1, 0, 81, 82, 5, 11, 0, 0, 82, 84, 3, 2, 1, 0, 83, 81,
-		1, 0, 0, 0, 84, 87, 1, 0, 0, 0, 85, 83, 1, 0, 0, 0, 85, 86, 1, 0, 0, 0,
-		86, 11, 1, 0, 0, 0, 87, 85, 1, 0, 0, 0, 88, 94, 3, 14, 7, 0, 89, 90, 5,
-		5, 0, 0, 90, 91, 3, 2, 1, 0, 91, 92, 5, 6, 0, 0, 92, 94, 1, 0, 0, 0, 93,
-		88, 1, 0, 0, 0, 93, 89, 1, 0, 0, 0, 94, 13, 1, 0, 0, 0, 95, 104, 5, 35,
-		0, 0, 96, 104, 5, 32, 0, 0, 97, 104, 5, 34, 0, 0, 98, 104, 3, 16, 8, 0,
-		99, 104, 3, 20, 10, 0, 100, 104, 5, 2, 0, 0, 101, 104, 5, 3, 0, 0, 102,
-		104, 5, 4, 0, 0, 103, 95, 1, 0, 0, 0, 103, 96, 1, 0, 0, 0, 103, 97, 1,
-		0, 0, 0, 103, 98, 1, 0, 0, 0, 103, 99, 1, 0, 0, 0, 103, 100, 1, 0, 0, 0,
-		103, 101, 1, 0, 0, 0, 103, 102, 1, 0, 0, 0, 104, 15, 1, 0, 0, 0, 105, 106,
-		5, 7, 0, 0, 106, 111, 3, 18, 9, 0, 107, 108, 5, 11, 0, 0, 108, 110, 3,
-		18, 9, 0, 109, 107, 1, 0, 0, 0, 110, 113, 1, 0, 0, 0, 111, 109, 1, 0, 0,
-		0, 111, 112, 1, 0, 0, 0, 112, 114, 1, 0, 0, 0, 113, 111, 1, 0, 0, 0, 114,
-		115, 5, 8, 0, 0, 115, 119, 1, 0, 0, 0, 116, 117, 5, 7, 0, 0, 117, 119,
-		5, 8, 0, 0, 118, 105, 1, 0, 0, 0, 118, 116, 1, 0, 0, 0, 119, 17, 1, 0,
-		0, 0, 120, 121, 5, 30, 0, 0, 121, 122, 5, 12, 0, 0, 122, 123, 3, 14, 7,
-		0, 123, 19, 1, 0, 0, 0, 124, 125, 5, 9, 0, 0, 125, 130, 3, 14, 7, 0, 126,
-		127, 5, 11, 0, 0, 127, 129, 3, 14, 7, 0, 128, 126, 1, 0, 0, 0, 129, 132,
-		1, 0, 0, 0, 130, 128, 1, 0, 0, 0, 130, 131, 1, 0, 0, 0, 131, 133, 1, 0,
-		0, 0, 132, 130, 1, 0, 0, 0, 133, 134, 5, 10, 0, 0, 134, 138, 1, 0, 0, 0,
-		135, 136, 5, 9, 0, 0, 136, 138, 5, 10, 0, 0, 137, 124, 1, 0, 0, 0, 137,
-		135, 1, 0, 0, 0, 138, 21, 1, 0, 0, 0, 139, 151, 5, 29, 0, 0, 140, 141,
-		5, 7, 0, 0, 141, 146, 5, 29, 0, 0, 142, 143, 5, 13, 0, 0, 143, 145, 5,
-		29, 0, 0, 144, 142, 1, 0, 0, 0, 145, 148, 1, 0, 0, 0, 146, 144, 1, 0, 0,
-		0, 146, 147, 1, 0, 0, 0, 147, 149, 1, 0, 0, 0, 148, 146, 1, 0, 0, 0, 149,
-		151, 5, 8, 0, 0, 150, 139, 1, 0, 0, 0, 150, 140, 1, 0, 0, 0, 151, 23, 1,
-		0, 0, 0, 152, 153, 5, 9, 0, 0, 153, 154, 3, 2, 1, 0, 154, 155, 5, 10, 0,
-		0, 155, 25, 1, 0, 0, 0, 16, 32, 49, 51, 57, 64, 68, 76, 85, 93, 103, 111,
-		118, 130, 137, 146, 150,
+		12, 5, 87, 9, 5, 1, 6, 1, 6, 1, 6, 1, 6, 3, 6, 93, 8, 6, 1, 7, 1, 7, 1,
+		7, 1, 7, 1, 7, 3, 7, 100, 8, 7, 1, 8, 1, 8, 1, 8, 1, 8, 1, 8, 1, 8, 1,
+		8, 1, 8, 3, 8, 110, 8, 8, 1, 9, 1, 9, 1, 9, 1, 9, 5, 9, 116, 8, 9, 10,
+		9, 12, 9, 119, 9, 9, 1, 9, 1, 9, 1, 9, 1, 9, 3, 9, 125, 8, 9, 1, 10, 1,
+		10, 1, 10, 1, 10, 1, 11, 1, 11, 1, 11, 1, 11, 5, 11, 135, 8, 11, 10, 11,
+		12, 11, 138, 9, 11, 1, 11, 1, 11, 1, 11, 1, 11, 3, 11, 144, 8, 11, 1, 12,
+		1, 12, 1, 12, 1, 12, 1, 12, 0, 2, 2, 4, 13, 0, 2, 4, 6, 8, 10, 12, 14,
+		16, 18, 20, 22, 24, 0, 4, 2, 0, 22, 22, 25, 26, 1, 0, 23, 24, 1, 0, 15,
+		20, 2, 0, 21, 21, 24, 24, 161, 0, 26, 1, 0, 0, 0, 2, 32, 1, 0, 0, 0, 4,
+		57, 1, 0, 0, 0, 6, 71, 1, 0, 0, 0, 8, 74, 1, 0, 0, 0, 10, 80, 1, 0, 0,
+		0, 12, 92, 1, 0, 0, 0, 14, 99, 1, 0, 0, 0, 16, 109, 1, 0, 0, 0, 18, 124,
+		1, 0, 0, 0, 20, 126, 1, 0, 0, 0, 22, 143, 1, 0, 0, 0, 24, 145, 1, 0, 0,
+		0, 26, 27, 3, 2, 1, 0, 27, 28, 5, 0, 0, 1, 28, 1, 1, 0, 0, 0, 29, 30, 6,
+		1, -1, 0, 30, 33, 3, 4, 2, 0, 31, 33, 3, 6, 3, 0, 32, 29, 1, 0, 0, 0, 32,
+		31, 1, 0, 0, 0, 33, 51, 1, 0, 0, 0, 34, 35, 10, 5, 0, 0, 35, 36, 7, 0,
+		0, 0, 36, 50, 3, 2, 1, 6, 37, 38, 10, 4, 0, 0, 38, 39, 7, 1, 0, 0, 39,
+		50, 3, 2, 1, 5, 40, 41, 10, 3, 0, 0, 41, 42, 7, 2, 0, 0, 42, 50, 3, 2,
+		1, 4, 43, 44, 10, 2, 0, 0, 44, 45, 5, 14, 0, 0, 45, 50, 3, 2, 1, 3, 46,
+		47, 10, 1, 0, 0, 47, 48, 5, 13, 0, 0, 48, 50, 3, 2, 1, 2, 49, 34, 1, 0,
+		0, 0, 49, 37, 1, 0, 0, 0, 49, 40, 1, 0, 0, 0, 49, 43, 1, 0, 0, 0, 49, 46,
+		1, 0, 0, 0, 50, 53, 1, 0, 0, 0, 51, 49, 1, 0, 0, 0, 51, 52, 1, 0, 0, 0,
+		52, 3, 1, 0, 0, 0, 53, 51, 1, 0, 0, 0, 54, 55, 6, 2, -1, 0, 55, 58, 3,
+		12, 6, 0, 56, 58, 3, 14, 7, 0, 57, 54, 1, 0, 0, 0, 57, 56, 1, 0, 0, 0,
+		58, 68, 1, 0, 0, 0, 59, 64, 10, 1, 0, 0, 60, 61, 5, 12, 0, 0, 61, 65, 5,
+		29, 0, 0, 62, 65, 3, 24, 12, 0, 63, 65, 3, 8, 4, 0, 64, 60, 1, 0, 0, 0,
+		64, 62, 1, 0, 0, 0, 64, 63, 1, 0, 0, 0, 65, 67, 1, 0, 0, 0, 66, 59, 1,
+		0, 0, 0, 67, 70, 1, 0, 0, 0, 68, 66, 1, 0, 0, 0, 68, 69, 1, 0, 0, 0, 69,
+		5, 1, 0, 0, 0, 70, 68, 1, 0, 0, 0, 71, 72, 7, 3, 0, 0, 72, 73, 3, 2, 1,
+		0, 73, 7, 1, 0, 0, 0, 74, 76, 5, 4, 0, 0, 75, 77, 3, 10, 5, 0, 76, 75,
+		1, 0, 0, 0, 76, 77, 1, 0, 0, 0, 77, 78, 1, 0, 0, 0, 78, 79, 5, 5, 0, 0,
+		79, 9, 1, 0, 0, 0, 80, 85, 3, 2, 1, 0, 81, 82, 5, 10, 0, 0, 82, 84, 3,
+		2, 1, 0, 83, 81, 1, 0, 0, 0, 84, 87, 1, 0, 0, 0, 85, 83, 1, 0, 0, 0, 85,
+		86, 1, 0, 0, 0, 86, 11, 1, 0, 0, 0, 87, 85, 1, 0, 0, 0, 88, 89, 5, 30,
+		0, 0, 89, 90, 5, 37, 0, 0, 90, 93, 5, 38, 0, 0, 91, 93, 5, 29, 0, 0, 92,
+		88, 1, 0, 0, 0, 92, 91, 1, 0, 0, 0, 93, 13, 1, 0, 0, 0, 94, 100, 3, 16,
+		8, 0, 95, 96, 5, 4, 0, 0, 96, 97, 3, 2, 1, 0, 97, 98, 5, 5, 0, 0, 98, 100,
+		1, 0, 0, 0, 99, 94, 1, 0, 0, 0, 99, 95, 1, 0, 0, 0, 100, 15, 1, 0, 0, 0,
+		101, 110, 5, 31, 0, 0, 102, 110, 5, 34, 0, 0, 103, 110, 5, 36, 0, 0, 104,
+		110, 3, 18, 9, 0, 105, 110, 3, 22, 11, 0, 106, 110, 5, 1, 0, 0, 107, 110,
+		5, 2, 0, 0, 108, 110, 5, 3, 0, 0, 109, 101, 1, 0, 0, 0, 109, 102, 1, 0,
+		0, 0, 109, 103, 1, 0, 0, 0, 109, 104, 1, 0, 0, 0, 109, 105, 1, 0, 0, 0,
+		109, 106, 1, 0, 0, 0, 109, 107, 1, 0, 0, 0, 109, 108, 1, 0, 0, 0, 110,
+		17, 1, 0, 0, 0, 111, 112, 5, 6, 0, 0, 112, 117, 3, 20, 10, 0, 113, 114,
+		5, 10, 0, 0, 114, 116, 3, 20, 10, 0, 115, 113, 1, 0, 0, 0, 116, 119, 1,
+		0, 0, 0, 117, 115, 1, 0, 0, 0, 117, 118, 1, 0, 0, 0, 118, 120, 1, 0, 0,
+		0, 119, 117, 1, 0, 0, 0, 120, 121, 5, 7, 0, 0, 121, 125, 1, 0, 0, 0, 122,
+		123, 5, 6, 0, 0, 123, 125, 5, 7, 0, 0, 124, 111, 1, 0, 0, 0, 124, 122,
+		1, 0, 0, 0, 125, 19, 1, 0, 0, 0, 126, 127, 5, 31, 0, 0, 127, 128, 5, 11,
+		0, 0, 128, 129, 3, 16, 8, 0, 129, 21, 1, 0, 0, 0, 130, 131, 5, 8, 0, 0,
+		131, 136, 3, 16, 8, 0, 132, 133, 5, 10, 0, 0, 133, 135, 3, 16, 8, 0, 134,
+		132, 1, 0, 0, 0, 135, 138, 1, 0, 0, 0, 136, 134, 1, 0, 0, 0, 136, 137,
+		1, 0, 0, 0, 137, 139, 1, 0, 0, 0, 138, 136, 1, 0, 0, 0, 139, 140, 5, 9,
+		0, 0, 140, 144, 1, 0, 0, 0, 141, 142, 5, 8, 0, 0, 142, 144, 5, 9, 0, 0,
+		143, 130, 1, 0, 0, 0, 143, 141, 1, 0, 0, 0, 144, 23, 1, 0, 0, 0, 145, 146,
+		5, 8, 0, 0, 146, 147, 3, 2, 1, 0, 147, 148, 5, 9, 0, 0, 148, 25, 1, 0,
+		0, 0, 15, 32, 49, 51, 57, 64, 68, 76, 85, 92, 99, 109, 117, 124, 136, 143,
 	}
 	deserializer := antlr.NewATNDeserializer(nil)
 	staticData.atn = deserializer.Deserialize(staticData.serializedATN)
@@ -130,85 +127,88 @@ func valuateParserInit() {
 	}
 }
 
-// valuateParserInit initializes any static state used to implement valuateParser. By default the
+// ValuateParserInit initializes any static state used to implement ValuateParser. By default the
 // static state used to implement the parser is lazily initialized during the first call to
-// NewvaluateParser(). You can call this function if you wish to initialize the static state ahead
+// NewValuateParser(). You can call this function if you wish to initialize the static state ahead
 // of time.
 func ValuateParserInit() {
-	staticData := &valuateParserStaticData
-	staticData.once.Do(valuateParserInit)
+	staticData := &valuateparserParserStaticData
+	staticData.once.Do(valuateparserParserInit)
 }
 
-// NewvaluateParser produces a new parser instance for the optional input antlr.TokenStream.
-func NewvaluateParser(input antlr.TokenStream) *valuateParser {
+// NewValuateParser produces a new parser instance for the optional input antlr.TokenStream.
+func NewValuateParser(input antlr.TokenStream) *ValuateParser {
 	ValuateParserInit()
-	this := new(valuateParser)
+	this := new(ValuateParser)
 	this.BaseParser = antlr.NewBaseParser(input)
-	staticData := &valuateParserStaticData
+	staticData := &valuateparserParserStaticData
 	this.Interpreter = antlr.NewParserATNSimulator(this, staticData.atn, staticData.decisionToDFA, staticData.predictionContextCache)
 	this.RuleNames = staticData.ruleNames
 	this.LiteralNames = staticData.literalNames
 	this.SymbolicNames = staticData.symbolicNames
-	this.GrammarFileName = "valuate.g4"
+	this.GrammarFileName = "ValuateParser.g4"
 
 	return this
 }
 
-// valuateParser tokens.
+// ValuateParser tokens.
 const (
-	valuateParserEOF               = antlr.TokenEOF
-	valuateParserT__0              = 1
-	valuateParserTRUE              = 2
-	valuateParserFALSE             = 3
-	valuateParserNIL_LIT           = 4
-	valuateParserLP                = 5
-	valuateParserRP                = 6
-	valuateParserL_CURLY           = 7
-	valuateParserR_CURLY           = 8
-	valuateParserL_BRACKET         = 9
-	valuateParserR_BRACKET         = 10
-	valuateParserCOMMA             = 11
-	valuateParserCOLON             = 12
-	valuateParserDOT               = 13
-	valuateParserLOGICAL_OR        = 14
-	valuateParserLOGICAL_AND       = 15
-	valuateParserEQUALS            = 16
-	valuateParserNOT_EQUALS        = 17
-	valuateParserLESS              = 18
-	valuateParserLESS_OR_EQUALS    = 19
-	valuateParserGREATER           = 20
-	valuateParserGREATER_OR_EQUALS = 21
-	valuateParserDIV               = 22
-	valuateParserPLUS              = 23
-	valuateParserMINUS             = 24
-	valuateParserSTAR              = 25
-	valuateParserMODULUS           = 26
-	valuateParserSKIP_             = 27
-	valuateParserWHITESPACE        = 28
-	valuateParserIDENTIFIER        = 29
-	valuateParserSTRING_LITERAL    = 30
-	valuateParserBYTES_LITERAL     = 31
-	valuateParserINT               = 32
-	valuateParserDECIMAL_LIT       = 33
-	valuateParserFLOAT_NUMBER      = 34
-	valuateParserSTRING            = 35
+	ValuateParserEOF               = antlr.TokenEOF
+	ValuateParserTRUE              = 1
+	ValuateParserFALSE             = 2
+	ValuateParserNIL_LIT           = 3
+	ValuateParserLP                = 4
+	ValuateParserRP                = 5
+	ValuateParserL_CURLY           = 6
+	ValuateParserR_CURLY           = 7
+	ValuateParserL_BRACKET         = 8
+	ValuateParserR_BRACKET         = 9
+	ValuateParserCOMMA             = 10
+	ValuateParserCOLON             = 11
+	ValuateParserDOT               = 12
+	ValuateParserLOGICAL_OR        = 13
+	ValuateParserLOGICAL_AND       = 14
+	ValuateParserEQUALS            = 15
+	ValuateParserNOT_EQUALS        = 16
+	ValuateParserLESS              = 17
+	ValuateParserLESS_OR_EQUALS    = 18
+	ValuateParserGREATER           = 19
+	ValuateParserGREATER_OR_EQUALS = 20
+	ValuateParserEXCLAMATION       = 21
+	ValuateParserDIV               = 22
+	ValuateParserPLUS              = 23
+	ValuateParserMINUS             = 24
+	ValuateParserSTAR              = 25
+	ValuateParserMODULUS           = 26
+	ValuateParserSKIP_             = 27
+	ValuateParserWHITESPACE        = 28
+	ValuateParserIDENTIFIER        = 29
+	ValuateParserVARKEY_OPEN       = 30
+	ValuateParserSTRING            = 31
+	ValuateParserSTRING_LITERAL    = 32
+	ValuateParserBYTES_LITERAL     = 33
+	ValuateParserINT               = 34
+	ValuateParserDECIMAL_LIT       = 35
+	ValuateParserFLOAT_NUMBER      = 36
+	ValuateParserVARID             = 37
+	ValuateParserVARKEY_CLOSE      = 38
 )
 
-// valuateParser rules.
+// ValuateParser rules.
 const (
-	valuateParserRULE_plan           = 0
-	valuateParserRULE_expression     = 1
-	valuateParserRULE_primaryExpr    = 2
-	valuateParserRULE_unaryExpr      = 3
-	valuateParserRULE_arguments      = 4
-	valuateParserRULE_expressionList = 5
-	valuateParserRULE_operand        = 6
-	valuateParserRULE_basicLit       = 7
-	valuateParserRULE_obj            = 8
-	valuateParserRULE_pair           = 9
-	valuateParserRULE_arr            = 10
-	valuateParserRULE_variate        = 11
-	valuateParserRULE_index          = 12
+	ValuateParserRULE_plan           = 0
+	ValuateParserRULE_expression     = 1
+	ValuateParserRULE_primaryExpr    = 2
+	ValuateParserRULE_unaryExpr      = 3
+	ValuateParserRULE_arguments      = 4
+	ValuateParserRULE_expressionList = 5
+	ValuateParserRULE_variate        = 6
+	ValuateParserRULE_operand        = 7
+	ValuateParserRULE_basicLit       = 8
+	ValuateParserRULE_obj            = 9
+	ValuateParserRULE_pair           = 10
+	ValuateParserRULE_arr            = 11
+	ValuateParserRULE_index          = 12
 )
 
 // IPlanContext is an interface to support dynamic dispatch.
@@ -230,7 +230,7 @@ type PlanContext struct {
 func NewEmptyPlanContext() *PlanContext {
 	var p = new(PlanContext)
 	p.BaseParserRuleContext = antlr.NewBaseParserRuleContext(nil, -1)
-	p.RuleIndex = valuateParserRULE_plan
+	p.RuleIndex = ValuateParserRULE_plan
 	return p
 }
 
@@ -242,7 +242,7 @@ func NewPlanContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokin
 	p.BaseParserRuleContext = antlr.NewBaseParserRuleContext(parent, invokingState)
 
 	p.parser = parser
-	p.RuleIndex = valuateParserRULE_plan
+	p.RuleIndex = ValuateParserRULE_plan
 
 	return p
 }
@@ -266,7 +266,7 @@ func (s *PlanContext) Expression() IExpressionContext {
 }
 
 func (s *PlanContext) EOF() antlr.TerminalNode {
-	return s.GetToken(valuateParserEOF, 0)
+	return s.GetToken(ValuateParserEOF, 0)
 }
 
 func (s *PlanContext) GetRuleContext() antlr.RuleContext {
@@ -279,7 +279,7 @@ func (s *PlanContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) s
 
 func (s *PlanContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
 	switch t := visitor.(type) {
-	case valuateVisitor:
+	case ValuateParserVisitor:
 		return t.VisitPlan(s)
 
 	default:
@@ -287,12 +287,12 @@ func (s *PlanContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
 	}
 }
 
-func (p *valuateParser) Plan() (localctx IPlanContext) {
+func (p *ValuateParser) Plan() (localctx IPlanContext) {
 	this := p
 	_ = this
 
 	localctx = NewPlanContext(p, p.GetParserRuleContext(), p.GetState())
-	p.EnterRule(localctx, 0, valuateParserRULE_plan)
+	p.EnterRule(localctx, 0, ValuateParserRULE_plan)
 
 	defer func() {
 		p.ExitRule()
@@ -317,7 +317,7 @@ func (p *valuateParser) Plan() (localctx IPlanContext) {
 	}
 	{
 		p.SetState(27)
-		p.Match(valuateParserEOF)
+		p.Match(ValuateParserEOF)
 	}
 
 	return localctx
@@ -342,7 +342,7 @@ type ExpressionContext struct {
 func NewEmptyExpressionContext() *ExpressionContext {
 	var p = new(ExpressionContext)
 	p.BaseParserRuleContext = antlr.NewBaseParserRuleContext(nil, -1)
-	p.RuleIndex = valuateParserRULE_expression
+	p.RuleIndex = ValuateParserRULE_expression
 	return p
 }
 
@@ -354,7 +354,7 @@ func NewExpressionContext(parser antlr.Parser, parent antlr.ParserRuleContext, i
 	p.BaseParserRuleContext = antlr.NewBaseParserRuleContext(parent, invokingState)
 
 	p.parser = parser
-	p.RuleIndex = valuateParserRULE_expression
+	p.RuleIndex = ValuateParserRULE_expression
 
 	return p
 }
@@ -435,55 +435,55 @@ func (s *ExpressionContext) Expression(i int) IExpressionContext {
 }
 
 func (s *ExpressionContext) STAR() antlr.TerminalNode {
-	return s.GetToken(valuateParserSTAR, 0)
+	return s.GetToken(ValuateParserSTAR, 0)
 }
 
 func (s *ExpressionContext) DIV() antlr.TerminalNode {
-	return s.GetToken(valuateParserDIV, 0)
+	return s.GetToken(ValuateParserDIV, 0)
 }
 
 func (s *ExpressionContext) MODULUS() antlr.TerminalNode {
-	return s.GetToken(valuateParserMODULUS, 0)
+	return s.GetToken(ValuateParserMODULUS, 0)
 }
 
 func (s *ExpressionContext) PLUS() antlr.TerminalNode {
-	return s.GetToken(valuateParserPLUS, 0)
+	return s.GetToken(ValuateParserPLUS, 0)
 }
 
 func (s *ExpressionContext) MINUS() antlr.TerminalNode {
-	return s.GetToken(valuateParserMINUS, 0)
+	return s.GetToken(ValuateParserMINUS, 0)
 }
 
 func (s *ExpressionContext) EQUALS() antlr.TerminalNode {
-	return s.GetToken(valuateParserEQUALS, 0)
+	return s.GetToken(ValuateParserEQUALS, 0)
 }
 
 func (s *ExpressionContext) NOT_EQUALS() antlr.TerminalNode {
-	return s.GetToken(valuateParserNOT_EQUALS, 0)
+	return s.GetToken(ValuateParserNOT_EQUALS, 0)
 }
 
 func (s *ExpressionContext) LESS() antlr.TerminalNode {
-	return s.GetToken(valuateParserLESS, 0)
+	return s.GetToken(ValuateParserLESS, 0)
 }
 
 func (s *ExpressionContext) LESS_OR_EQUALS() antlr.TerminalNode {
-	return s.GetToken(valuateParserLESS_OR_EQUALS, 0)
+	return s.GetToken(ValuateParserLESS_OR_EQUALS, 0)
 }
 
 func (s *ExpressionContext) GREATER() antlr.TerminalNode {
-	return s.GetToken(valuateParserGREATER, 0)
+	return s.GetToken(ValuateParserGREATER, 0)
 }
 
 func (s *ExpressionContext) GREATER_OR_EQUALS() antlr.TerminalNode {
-	return s.GetToken(valuateParserGREATER_OR_EQUALS, 0)
+	return s.GetToken(ValuateParserGREATER_OR_EQUALS, 0)
 }
 
 func (s *ExpressionContext) LOGICAL_AND() antlr.TerminalNode {
-	return s.GetToken(valuateParserLOGICAL_AND, 0)
+	return s.GetToken(ValuateParserLOGICAL_AND, 0)
 }
 
 func (s *ExpressionContext) LOGICAL_OR() antlr.TerminalNode {
-	return s.GetToken(valuateParserLOGICAL_OR, 0)
+	return s.GetToken(ValuateParserLOGICAL_OR, 0)
 }
 
 func (s *ExpressionContext) GetRuleContext() antlr.RuleContext {
@@ -496,7 +496,7 @@ func (s *ExpressionContext) ToStringTree(ruleNames []string, recog antlr.Recogni
 
 func (s *ExpressionContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
 	switch t := visitor.(type) {
-	case valuateVisitor:
+	case ValuateParserVisitor:
 		return t.VisitExpression(s)
 
 	default:
@@ -504,11 +504,11 @@ func (s *ExpressionContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
 	}
 }
 
-func (p *valuateParser) Expression() (localctx IExpressionContext) {
+func (p *ValuateParser) Expression() (localctx IExpressionContext) {
 	return p.expression(0)
 }
 
-func (p *valuateParser) expression(_p int) (localctx IExpressionContext) {
+func (p *ValuateParser) expression(_p int) (localctx IExpressionContext) {
 	this := p
 	_ = this
 
@@ -518,7 +518,7 @@ func (p *valuateParser) expression(_p int) (localctx IExpressionContext) {
 	var _prevctx IExpressionContext = localctx
 	var _ antlr.ParserRuleContext = _prevctx // TODO: To prevent unused variable warning.
 	_startState := 2
-	p.EnterRecursionRule(localctx, 2, valuateParserRULE_expression, _p)
+	p.EnterRecursionRule(localctx, 2, ValuateParserRULE_expression, _p)
 	var _la int
 
 	defer func() {
@@ -544,13 +544,13 @@ func (p *valuateParser) expression(_p int) (localctx IExpressionContext) {
 	p.GetErrorHandler().Sync(p)
 
 	switch p.GetTokenStream().LA(1) {
-	case valuateParserTRUE, valuateParserFALSE, valuateParserNIL_LIT, valuateParserLP, valuateParserL_CURLY, valuateParserL_BRACKET, valuateParserIDENTIFIER, valuateParserINT, valuateParserFLOAT_NUMBER, valuateParserSTRING:
+	case ValuateParserTRUE, ValuateParserFALSE, ValuateParserNIL_LIT, ValuateParserLP, ValuateParserL_CURLY, ValuateParserL_BRACKET, ValuateParserIDENTIFIER, ValuateParserVARKEY_OPEN, ValuateParserSTRING, ValuateParserINT, ValuateParserFLOAT_NUMBER:
 		{
 			p.SetState(30)
 			p.primaryExpr(0)
 		}
 
-	case valuateParserT__0, valuateParserMINUS:
+	case ValuateParserEXCLAMATION, ValuateParserMINUS:
 		{
 			p.SetState(31)
 			p.UnaryExpr()
@@ -575,7 +575,7 @@ func (p *valuateParser) expression(_p int) (localctx IExpressionContext) {
 			switch p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), 1, p.GetParserRuleContext()) {
 			case 1:
 				localctx = NewExpressionContext(p, _parentctx, _parentState)
-				p.PushNewRecursionContext(localctx, _startState, valuateParserRULE_expression)
+				p.PushNewRecursionContext(localctx, _startState, ValuateParserRULE_expression)
 				p.SetState(34)
 
 				if !(p.Precpred(p.GetParserRuleContext(), 5)) {
@@ -585,7 +585,7 @@ func (p *valuateParser) expression(_p int) (localctx IExpressionContext) {
 					p.SetState(35)
 					_la = p.GetTokenStream().LA(1)
 
-					if !(((_la)&-(0x1f+1)) == 0 && ((1<<uint(_la))&((1<<valuateParserDIV)|(1<<valuateParserSTAR)|(1<<valuateParserMODULUS))) != 0) {
+					if !(((_la)&-(0x1f+1)) == 0 && ((1<<uint(_la))&((1<<ValuateParserDIV)|(1<<ValuateParserSTAR)|(1<<ValuateParserMODULUS))) != 0) {
 						p.GetErrorHandler().RecoverInline(p)
 					} else {
 						p.GetErrorHandler().ReportMatch(p)
@@ -599,7 +599,7 @@ func (p *valuateParser) expression(_p int) (localctx IExpressionContext) {
 
 			case 2:
 				localctx = NewExpressionContext(p, _parentctx, _parentState)
-				p.PushNewRecursionContext(localctx, _startState, valuateParserRULE_expression)
+				p.PushNewRecursionContext(localctx, _startState, ValuateParserRULE_expression)
 				p.SetState(37)
 
 				if !(p.Precpred(p.GetParserRuleContext(), 4)) {
@@ -609,7 +609,7 @@ func (p *valuateParser) expression(_p int) (localctx IExpressionContext) {
 					p.SetState(38)
 					_la = p.GetTokenStream().LA(1)
 
-					if !(_la == valuateParserPLUS || _la == valuateParserMINUS) {
+					if !(_la == ValuateParserPLUS || _la == ValuateParserMINUS) {
 						p.GetErrorHandler().RecoverInline(p)
 					} else {
 						p.GetErrorHandler().ReportMatch(p)
@@ -623,7 +623,7 @@ func (p *valuateParser) expression(_p int) (localctx IExpressionContext) {
 
 			case 3:
 				localctx = NewExpressionContext(p, _parentctx, _parentState)
-				p.PushNewRecursionContext(localctx, _startState, valuateParserRULE_expression)
+				p.PushNewRecursionContext(localctx, _startState, ValuateParserRULE_expression)
 				p.SetState(40)
 
 				if !(p.Precpred(p.GetParserRuleContext(), 3)) {
@@ -633,7 +633,7 @@ func (p *valuateParser) expression(_p int) (localctx IExpressionContext) {
 					p.SetState(41)
 					_la = p.GetTokenStream().LA(1)
 
-					if !(((_la)&-(0x1f+1)) == 0 && ((1<<uint(_la))&((1<<valuateParserEQUALS)|(1<<valuateParserNOT_EQUALS)|(1<<valuateParserLESS)|(1<<valuateParserLESS_OR_EQUALS)|(1<<valuateParserGREATER)|(1<<valuateParserGREATER_OR_EQUALS))) != 0) {
+					if !(((_la)&-(0x1f+1)) == 0 && ((1<<uint(_la))&((1<<ValuateParserEQUALS)|(1<<ValuateParserNOT_EQUALS)|(1<<ValuateParserLESS)|(1<<ValuateParserLESS_OR_EQUALS)|(1<<ValuateParserGREATER)|(1<<ValuateParserGREATER_OR_EQUALS))) != 0) {
 						p.GetErrorHandler().RecoverInline(p)
 					} else {
 						p.GetErrorHandler().ReportMatch(p)
@@ -647,7 +647,7 @@ func (p *valuateParser) expression(_p int) (localctx IExpressionContext) {
 
 			case 4:
 				localctx = NewExpressionContext(p, _parentctx, _parentState)
-				p.PushNewRecursionContext(localctx, _startState, valuateParserRULE_expression)
+				p.PushNewRecursionContext(localctx, _startState, ValuateParserRULE_expression)
 				p.SetState(43)
 
 				if !(p.Precpred(p.GetParserRuleContext(), 2)) {
@@ -655,7 +655,7 @@ func (p *valuateParser) expression(_p int) (localctx IExpressionContext) {
 				}
 				{
 					p.SetState(44)
-					p.Match(valuateParserLOGICAL_AND)
+					p.Match(ValuateParserLOGICAL_AND)
 				}
 				{
 					p.SetState(45)
@@ -664,7 +664,7 @@ func (p *valuateParser) expression(_p int) (localctx IExpressionContext) {
 
 			case 5:
 				localctx = NewExpressionContext(p, _parentctx, _parentState)
-				p.PushNewRecursionContext(localctx, _startState, valuateParserRULE_expression)
+				p.PushNewRecursionContext(localctx, _startState, ValuateParserRULE_expression)
 				p.SetState(46)
 
 				if !(p.Precpred(p.GetParserRuleContext(), 1)) {
@@ -672,7 +672,7 @@ func (p *valuateParser) expression(_p int) (localctx IExpressionContext) {
 				}
 				{
 					p.SetState(47)
-					p.Match(valuateParserLOGICAL_OR)
+					p.Match(ValuateParserLOGICAL_OR)
 				}
 				{
 					p.SetState(48)
@@ -709,7 +709,7 @@ type PrimaryExprContext struct {
 func NewEmptyPrimaryExprContext() *PrimaryExprContext {
 	var p = new(PrimaryExprContext)
 	p.BaseParserRuleContext = antlr.NewBaseParserRuleContext(nil, -1)
-	p.RuleIndex = valuateParserRULE_primaryExpr
+	p.RuleIndex = ValuateParserRULE_primaryExpr
 	return p
 }
 
@@ -721,28 +721,12 @@ func NewPrimaryExprContext(parser antlr.Parser, parent antlr.ParserRuleContext, 
 	p.BaseParserRuleContext = antlr.NewBaseParserRuleContext(parent, invokingState)
 
 	p.parser = parser
-	p.RuleIndex = valuateParserRULE_primaryExpr
+	p.RuleIndex = ValuateParserRULE_primaryExpr
 
 	return p
 }
 
 func (s *PrimaryExprContext) GetParser() antlr.Parser { return s.parser }
-
-func (s *PrimaryExprContext) Operand() IOperandContext {
-	var t antlr.RuleContext
-	for _, ctx := range s.GetChildren() {
-		if _, ok := ctx.(IOperandContext); ok {
-			t = ctx.(antlr.RuleContext)
-			break
-		}
-	}
-
-	if t == nil {
-		return nil
-	}
-
-	return t.(IOperandContext)
-}
 
 func (s *PrimaryExprContext) Variate() IVariateContext {
 	var t antlr.RuleContext
@@ -758,6 +742,22 @@ func (s *PrimaryExprContext) Variate() IVariateContext {
 	}
 
 	return t.(IVariateContext)
+}
+
+func (s *PrimaryExprContext) Operand() IOperandContext {
+	var t antlr.RuleContext
+	for _, ctx := range s.GetChildren() {
+		if _, ok := ctx.(IOperandContext); ok {
+			t = ctx.(antlr.RuleContext)
+			break
+		}
+	}
+
+	if t == nil {
+		return nil
+	}
+
+	return t.(IOperandContext)
 }
 
 func (s *PrimaryExprContext) PrimaryExpr() IPrimaryExprContext {
@@ -777,11 +777,11 @@ func (s *PrimaryExprContext) PrimaryExpr() IPrimaryExprContext {
 }
 
 func (s *PrimaryExprContext) DOT() antlr.TerminalNode {
-	return s.GetToken(valuateParserDOT, 0)
+	return s.GetToken(ValuateParserDOT, 0)
 }
 
 func (s *PrimaryExprContext) IDENTIFIER() antlr.TerminalNode {
-	return s.GetToken(valuateParserIDENTIFIER, 0)
+	return s.GetToken(ValuateParserIDENTIFIER, 0)
 }
 
 func (s *PrimaryExprContext) Index() IIndexContext {
@@ -826,7 +826,7 @@ func (s *PrimaryExprContext) ToStringTree(ruleNames []string, recog antlr.Recogn
 
 func (s *PrimaryExprContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
 	switch t := visitor.(type) {
-	case valuateVisitor:
+	case ValuateParserVisitor:
 		return t.VisitPrimaryExpr(s)
 
 	default:
@@ -834,11 +834,11 @@ func (s *PrimaryExprContext) Accept(visitor antlr.ParseTreeVisitor) interface{} 
 	}
 }
 
-func (p *valuateParser) PrimaryExpr() (localctx IPrimaryExprContext) {
+func (p *ValuateParser) PrimaryExpr() (localctx IPrimaryExprContext) {
 	return p.primaryExpr(0)
 }
 
-func (p *valuateParser) primaryExpr(_p int) (localctx IPrimaryExprContext) {
+func (p *ValuateParser) primaryExpr(_p int) (localctx IPrimaryExprContext) {
 	this := p
 	_ = this
 
@@ -848,7 +848,7 @@ func (p *valuateParser) primaryExpr(_p int) (localctx IPrimaryExprContext) {
 	var _prevctx IPrimaryExprContext = localctx
 	var _ antlr.ParserRuleContext = _prevctx // TODO: To prevent unused variable warning.
 	_startState := 4
-	p.EnterRecursionRule(localctx, 4, valuateParserRULE_primaryExpr, _p)
+	p.EnterRecursionRule(localctx, 4, ValuateParserRULE_primaryExpr, _p)
 
 	defer func() {
 		p.UnrollRecursionContexts(_parentctx)
@@ -871,19 +871,22 @@ func (p *valuateParser) primaryExpr(_p int) (localctx IPrimaryExprContext) {
 	p.EnterOuterAlt(localctx, 1)
 	p.SetState(57)
 	p.GetErrorHandler().Sync(p)
-	switch p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), 3, p.GetParserRuleContext()) {
-	case 1:
+
+	switch p.GetTokenStream().LA(1) {
+	case ValuateParserIDENTIFIER, ValuateParserVARKEY_OPEN:
 		{
 			p.SetState(55)
-			p.Operand()
-		}
-
-	case 2:
-		{
-			p.SetState(56)
 			p.Variate()
 		}
 
+	case ValuateParserTRUE, ValuateParserFALSE, ValuateParserNIL_LIT, ValuateParserLP, ValuateParserL_CURLY, ValuateParserL_BRACKET, ValuateParserSTRING, ValuateParserINT, ValuateParserFLOAT_NUMBER:
+		{
+			p.SetState(56)
+			p.Operand()
+		}
+
+	default:
+		panic(antlr.NewNoViableAltException(p, nil, nil, nil, nil, nil))
 	}
 	p.GetParserRuleContext().SetStop(p.GetTokenStream().LT(-1))
 	p.SetState(68)
@@ -897,7 +900,7 @@ func (p *valuateParser) primaryExpr(_p int) (localctx IPrimaryExprContext) {
 			}
 			_prevctx = localctx
 			localctx = NewPrimaryExprContext(p, _parentctx, _parentState)
-			p.PushNewRecursionContext(localctx, _startState, valuateParserRULE_primaryExpr)
+			p.PushNewRecursionContext(localctx, _startState, ValuateParserRULE_primaryExpr)
 			p.SetState(59)
 
 			if !(p.Precpred(p.GetParserRuleContext(), 1)) {
@@ -907,23 +910,23 @@ func (p *valuateParser) primaryExpr(_p int) (localctx IPrimaryExprContext) {
 			p.GetErrorHandler().Sync(p)
 
 			switch p.GetTokenStream().LA(1) {
-			case valuateParserDOT:
+			case ValuateParserDOT:
 				{
 					p.SetState(60)
-					p.Match(valuateParserDOT)
+					p.Match(ValuateParserDOT)
 				}
 				{
 					p.SetState(61)
-					p.Match(valuateParserIDENTIFIER)
+					p.Match(ValuateParserIDENTIFIER)
 				}
 
-			case valuateParserL_BRACKET:
+			case ValuateParserL_BRACKET:
 				{
 					p.SetState(62)
 					p.Index()
 				}
 
-			case valuateParserLP:
+			case ValuateParserLP:
 				{
 					p.SetState(63)
 					p.Arguments()
@@ -961,7 +964,7 @@ type UnaryExprContext struct {
 func NewEmptyUnaryExprContext() *UnaryExprContext {
 	var p = new(UnaryExprContext)
 	p.BaseParserRuleContext = antlr.NewBaseParserRuleContext(nil, -1)
-	p.RuleIndex = valuateParserRULE_unaryExpr
+	p.RuleIndex = ValuateParserRULE_unaryExpr
 	return p
 }
 
@@ -973,7 +976,7 @@ func NewUnaryExprContext(parser antlr.Parser, parent antlr.ParserRuleContext, in
 	p.BaseParserRuleContext = antlr.NewBaseParserRuleContext(parent, invokingState)
 
 	p.parser = parser
-	p.RuleIndex = valuateParserRULE_unaryExpr
+	p.RuleIndex = ValuateParserRULE_unaryExpr
 
 	return p
 }
@@ -997,7 +1000,11 @@ func (s *UnaryExprContext) Expression() IExpressionContext {
 }
 
 func (s *UnaryExprContext) MINUS() antlr.TerminalNode {
-	return s.GetToken(valuateParserMINUS, 0)
+	return s.GetToken(ValuateParserMINUS, 0)
+}
+
+func (s *UnaryExprContext) EXCLAMATION() antlr.TerminalNode {
+	return s.GetToken(ValuateParserEXCLAMATION, 0)
 }
 
 func (s *UnaryExprContext) GetRuleContext() antlr.RuleContext {
@@ -1010,7 +1017,7 @@ func (s *UnaryExprContext) ToStringTree(ruleNames []string, recog antlr.Recogniz
 
 func (s *UnaryExprContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
 	switch t := visitor.(type) {
-	case valuateVisitor:
+	case ValuateParserVisitor:
 		return t.VisitUnaryExpr(s)
 
 	default:
@@ -1018,12 +1025,12 @@ func (s *UnaryExprContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
 	}
 }
 
-func (p *valuateParser) UnaryExpr() (localctx IUnaryExprContext) {
+func (p *ValuateParser) UnaryExpr() (localctx IUnaryExprContext) {
 	this := p
 	_ = this
 
 	localctx = NewUnaryExprContext(p, p.GetParserRuleContext(), p.GetState())
-	p.EnterRule(localctx, 6, valuateParserRULE_unaryExpr)
+	p.EnterRule(localctx, 6, ValuateParserRULE_unaryExpr)
 	var _la int
 
 	defer func() {
@@ -1047,7 +1054,7 @@ func (p *valuateParser) UnaryExpr() (localctx IUnaryExprContext) {
 		p.SetState(71)
 		_la = p.GetTokenStream().LA(1)
 
-		if !(_la == valuateParserT__0 || _la == valuateParserMINUS) {
+		if !(_la == ValuateParserEXCLAMATION || _la == ValuateParserMINUS) {
 			p.GetErrorHandler().RecoverInline(p)
 		} else {
 			p.GetErrorHandler().ReportMatch(p)
@@ -1081,7 +1088,7 @@ type ArgumentsContext struct {
 func NewEmptyArgumentsContext() *ArgumentsContext {
 	var p = new(ArgumentsContext)
 	p.BaseParserRuleContext = antlr.NewBaseParserRuleContext(nil, -1)
-	p.RuleIndex = valuateParserRULE_arguments
+	p.RuleIndex = ValuateParserRULE_arguments
 	return p
 }
 
@@ -1093,7 +1100,7 @@ func NewArgumentsContext(parser antlr.Parser, parent antlr.ParserRuleContext, in
 	p.BaseParserRuleContext = antlr.NewBaseParserRuleContext(parent, invokingState)
 
 	p.parser = parser
-	p.RuleIndex = valuateParserRULE_arguments
+	p.RuleIndex = ValuateParserRULE_arguments
 
 	return p
 }
@@ -1101,11 +1108,11 @@ func NewArgumentsContext(parser antlr.Parser, parent antlr.ParserRuleContext, in
 func (s *ArgumentsContext) GetParser() antlr.Parser { return s.parser }
 
 func (s *ArgumentsContext) LP() antlr.TerminalNode {
-	return s.GetToken(valuateParserLP, 0)
+	return s.GetToken(ValuateParserLP, 0)
 }
 
 func (s *ArgumentsContext) RP() antlr.TerminalNode {
-	return s.GetToken(valuateParserRP, 0)
+	return s.GetToken(ValuateParserRP, 0)
 }
 
 func (s *ArgumentsContext) ExpressionList() IExpressionListContext {
@@ -1134,7 +1141,7 @@ func (s *ArgumentsContext) ToStringTree(ruleNames []string, recog antlr.Recogniz
 
 func (s *ArgumentsContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
 	switch t := visitor.(type) {
-	case valuateVisitor:
+	case ValuateParserVisitor:
 		return t.VisitArguments(s)
 
 	default:
@@ -1142,12 +1149,12 @@ func (s *ArgumentsContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
 	}
 }
 
-func (p *valuateParser) Arguments() (localctx IArgumentsContext) {
+func (p *ValuateParser) Arguments() (localctx IArgumentsContext) {
 	this := p
 	_ = this
 
 	localctx = NewArgumentsContext(p, p.GetParserRuleContext(), p.GetState())
-	p.EnterRule(localctx, 8, valuateParserRULE_arguments)
+	p.EnterRule(localctx, 8, ValuateParserRULE_arguments)
 	var _la int
 
 	defer func() {
@@ -1169,13 +1176,13 @@ func (p *valuateParser) Arguments() (localctx IArgumentsContext) {
 	p.EnterOuterAlt(localctx, 1)
 	{
 		p.SetState(74)
-		p.Match(valuateParserLP)
+		p.Match(ValuateParserLP)
 	}
 	p.SetState(76)
 	p.GetErrorHandler().Sync(p)
 	_la = p.GetTokenStream().LA(1)
 
-	if (((_la)&-(0x1f+1)) == 0 && ((1<<uint(_la))&((1<<valuateParserT__0)|(1<<valuateParserTRUE)|(1<<valuateParserFALSE)|(1<<valuateParserNIL_LIT)|(1<<valuateParserLP)|(1<<valuateParserL_CURLY)|(1<<valuateParserL_BRACKET)|(1<<valuateParserMINUS)|(1<<valuateParserIDENTIFIER))) != 0) || (((_la-32)&-(0x1f+1)) == 0 && ((1<<uint((_la-32)))&((1<<(valuateParserINT-32))|(1<<(valuateParserFLOAT_NUMBER-32))|(1<<(valuateParserSTRING-32)))) != 0) {
+	if (((_la)&-(0x1f+1)) == 0 && ((1<<uint(_la))&((1<<ValuateParserTRUE)|(1<<ValuateParserFALSE)|(1<<ValuateParserNIL_LIT)|(1<<ValuateParserLP)|(1<<ValuateParserL_CURLY)|(1<<ValuateParserL_BRACKET)|(1<<ValuateParserEXCLAMATION)|(1<<ValuateParserMINUS)|(1<<ValuateParserIDENTIFIER)|(1<<ValuateParserVARKEY_OPEN)|(1<<ValuateParserSTRING))) != 0) || _la == ValuateParserINT || _la == ValuateParserFLOAT_NUMBER {
 		{
 			p.SetState(75)
 			p.ExpressionList()
@@ -1184,7 +1191,7 @@ func (p *valuateParser) Arguments() (localctx IArgumentsContext) {
 	}
 	{
 		p.SetState(78)
-		p.Match(valuateParserRP)
+		p.Match(ValuateParserRP)
 	}
 
 	return localctx
@@ -1209,7 +1216,7 @@ type ExpressionListContext struct {
 func NewEmptyExpressionListContext() *ExpressionListContext {
 	var p = new(ExpressionListContext)
 	p.BaseParserRuleContext = antlr.NewBaseParserRuleContext(nil, -1)
-	p.RuleIndex = valuateParserRULE_expressionList
+	p.RuleIndex = ValuateParserRULE_expressionList
 	return p
 }
 
@@ -1221,7 +1228,7 @@ func NewExpressionListContext(parser antlr.Parser, parent antlr.ParserRuleContex
 	p.BaseParserRuleContext = antlr.NewBaseParserRuleContext(parent, invokingState)
 
 	p.parser = parser
-	p.RuleIndex = valuateParserRULE_expressionList
+	p.RuleIndex = ValuateParserRULE_expressionList
 
 	return p
 }
@@ -1270,11 +1277,11 @@ func (s *ExpressionListContext) Expression(i int) IExpressionContext {
 }
 
 func (s *ExpressionListContext) AllCOMMA() []antlr.TerminalNode {
-	return s.GetTokens(valuateParserCOMMA)
+	return s.GetTokens(ValuateParserCOMMA)
 }
 
 func (s *ExpressionListContext) COMMA(i int) antlr.TerminalNode {
-	return s.GetToken(valuateParserCOMMA, i)
+	return s.GetToken(ValuateParserCOMMA, i)
 }
 
 func (s *ExpressionListContext) GetRuleContext() antlr.RuleContext {
@@ -1287,7 +1294,7 @@ func (s *ExpressionListContext) ToStringTree(ruleNames []string, recog antlr.Rec
 
 func (s *ExpressionListContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
 	switch t := visitor.(type) {
-	case valuateVisitor:
+	case ValuateParserVisitor:
 		return t.VisitExpressionList(s)
 
 	default:
@@ -1295,12 +1302,12 @@ func (s *ExpressionListContext) Accept(visitor antlr.ParseTreeVisitor) interface
 	}
 }
 
-func (p *valuateParser) ExpressionList() (localctx IExpressionListContext) {
+func (p *ValuateParser) ExpressionList() (localctx IExpressionListContext) {
 	this := p
 	_ = this
 
 	localctx = NewExpressionListContext(p, p.GetParserRuleContext(), p.GetState())
-	p.EnterRule(localctx, 10, valuateParserRULE_expressionList)
+	p.EnterRule(localctx, 10, ValuateParserRULE_expressionList)
 	var _la int
 
 	defer func() {
@@ -1328,10 +1335,10 @@ func (p *valuateParser) ExpressionList() (localctx IExpressionListContext) {
 	p.GetErrorHandler().Sync(p)
 	_la = p.GetTokenStream().LA(1)
 
-	for _la == valuateParserCOMMA {
+	for _la == ValuateParserCOMMA {
 		{
 			p.SetState(81)
-			p.Match(valuateParserCOMMA)
+			p.Match(ValuateParserCOMMA)
 		}
 		{
 			p.SetState(82)
@@ -1341,6 +1348,134 @@ func (p *valuateParser) ExpressionList() (localctx IExpressionListContext) {
 		p.SetState(87)
 		p.GetErrorHandler().Sync(p)
 		_la = p.GetTokenStream().LA(1)
+	}
+
+	return localctx
+}
+
+// IVariateContext is an interface to support dynamic dispatch.
+type IVariateContext interface {
+	antlr.ParserRuleContext
+
+	// GetParser returns the parser.
+	GetParser() antlr.Parser
+
+	// IsVariateContext differentiates from other interfaces.
+	IsVariateContext()
+}
+
+type VariateContext struct {
+	*antlr.BaseParserRuleContext
+	parser antlr.Parser
+}
+
+func NewEmptyVariateContext() *VariateContext {
+	var p = new(VariateContext)
+	p.BaseParserRuleContext = antlr.NewBaseParserRuleContext(nil, -1)
+	p.RuleIndex = ValuateParserRULE_variate
+	return p
+}
+
+func (*VariateContext) IsVariateContext() {}
+
+func NewVariateContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *VariateContext {
+	var p = new(VariateContext)
+
+	p.BaseParserRuleContext = antlr.NewBaseParserRuleContext(parent, invokingState)
+
+	p.parser = parser
+	p.RuleIndex = ValuateParserRULE_variate
+
+	return p
+}
+
+func (s *VariateContext) GetParser() antlr.Parser { return s.parser }
+
+func (s *VariateContext) VARKEY_OPEN() antlr.TerminalNode {
+	return s.GetToken(ValuateParserVARKEY_OPEN, 0)
+}
+
+func (s *VariateContext) VARID() antlr.TerminalNode {
+	return s.GetToken(ValuateParserVARID, 0)
+}
+
+func (s *VariateContext) VARKEY_CLOSE() antlr.TerminalNode {
+	return s.GetToken(ValuateParserVARKEY_CLOSE, 0)
+}
+
+func (s *VariateContext) IDENTIFIER() antlr.TerminalNode {
+	return s.GetToken(ValuateParserIDENTIFIER, 0)
+}
+
+func (s *VariateContext) GetRuleContext() antlr.RuleContext {
+	return s
+}
+
+func (s *VariateContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string {
+	return antlr.TreesStringTree(s, ruleNames, recog)
+}
+
+func (s *VariateContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
+	switch t := visitor.(type) {
+	case ValuateParserVisitor:
+		return t.VisitVariate(s)
+
+	default:
+		return t.VisitChildren(s)
+	}
+}
+
+func (p *ValuateParser) Variate() (localctx IVariateContext) {
+	this := p
+	_ = this
+
+	localctx = NewVariateContext(p, p.GetParserRuleContext(), p.GetState())
+	p.EnterRule(localctx, 12, ValuateParserRULE_variate)
+
+	defer func() {
+		p.ExitRule()
+	}()
+
+	defer func() {
+		if err := recover(); err != nil {
+			if v, ok := err.(antlr.RecognitionException); ok {
+				localctx.SetException(v)
+				p.GetErrorHandler().ReportError(p, v)
+				p.GetErrorHandler().Recover(p, v)
+			} else {
+				panic(err)
+			}
+		}
+	}()
+
+	p.SetState(92)
+	p.GetErrorHandler().Sync(p)
+
+	switch p.GetTokenStream().LA(1) {
+	case ValuateParserVARKEY_OPEN:
+		p.EnterOuterAlt(localctx, 1)
+		{
+			p.SetState(88)
+			p.Match(ValuateParserVARKEY_OPEN)
+		}
+		{
+			p.SetState(89)
+			p.Match(ValuateParserVARID)
+		}
+		{
+			p.SetState(90)
+			p.Match(ValuateParserVARKEY_CLOSE)
+		}
+
+	case ValuateParserIDENTIFIER:
+		p.EnterOuterAlt(localctx, 2)
+		{
+			p.SetState(91)
+			p.Match(ValuateParserIDENTIFIER)
+		}
+
+	default:
+		panic(antlr.NewNoViableAltException(p, nil, nil, nil, nil, nil))
 	}
 
 	return localctx
@@ -1365,7 +1500,7 @@ type OperandContext struct {
 func NewEmptyOperandContext() *OperandContext {
 	var p = new(OperandContext)
 	p.BaseParserRuleContext = antlr.NewBaseParserRuleContext(nil, -1)
-	p.RuleIndex = valuateParserRULE_operand
+	p.RuleIndex = ValuateParserRULE_operand
 	return p
 }
 
@@ -1377,7 +1512,7 @@ func NewOperandContext(parser antlr.Parser, parent antlr.ParserRuleContext, invo
 	p.BaseParserRuleContext = antlr.NewBaseParserRuleContext(parent, invokingState)
 
 	p.parser = parser
-	p.RuleIndex = valuateParserRULE_operand
+	p.RuleIndex = ValuateParserRULE_operand
 
 	return p
 }
@@ -1401,7 +1536,7 @@ func (s *OperandContext) BasicLit() IBasicLitContext {
 }
 
 func (s *OperandContext) LP() antlr.TerminalNode {
-	return s.GetToken(valuateParserLP, 0)
+	return s.GetToken(ValuateParserLP, 0)
 }
 
 func (s *OperandContext) Expression() IExpressionContext {
@@ -1421,7 +1556,7 @@ func (s *OperandContext) Expression() IExpressionContext {
 }
 
 func (s *OperandContext) RP() antlr.TerminalNode {
-	return s.GetToken(valuateParserRP, 0)
+	return s.GetToken(ValuateParserRP, 0)
 }
 
 func (s *OperandContext) GetRuleContext() antlr.RuleContext {
@@ -1434,7 +1569,7 @@ func (s *OperandContext) ToStringTree(ruleNames []string, recog antlr.Recognizer
 
 func (s *OperandContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
 	switch t := visitor.(type) {
-	case valuateVisitor:
+	case ValuateParserVisitor:
 		return t.VisitOperand(s)
 
 	default:
@@ -1442,12 +1577,12 @@ func (s *OperandContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
 	}
 }
 
-func (p *valuateParser) Operand() (localctx IOperandContext) {
+func (p *ValuateParser) Operand() (localctx IOperandContext) {
 	this := p
 	_ = this
 
 	localctx = NewOperandContext(p, p.GetParserRuleContext(), p.GetState())
-	p.EnterRule(localctx, 12, valuateParserRULE_operand)
+	p.EnterRule(localctx, 14, ValuateParserRULE_operand)
 
 	defer func() {
 		p.ExitRule()
@@ -1465,30 +1600,30 @@ func (p *valuateParser) Operand() (localctx IOperandContext) {
 		}
 	}()
 
-	p.SetState(93)
+	p.SetState(99)
 	p.GetErrorHandler().Sync(p)
 
 	switch p.GetTokenStream().LA(1) {
-	case valuateParserTRUE, valuateParserFALSE, valuateParserNIL_LIT, valuateParserL_CURLY, valuateParserL_BRACKET, valuateParserINT, valuateParserFLOAT_NUMBER, valuateParserSTRING:
+	case ValuateParserTRUE, ValuateParserFALSE, ValuateParserNIL_LIT, ValuateParserL_CURLY, ValuateParserL_BRACKET, ValuateParserSTRING, ValuateParserINT, ValuateParserFLOAT_NUMBER:
 		p.EnterOuterAlt(localctx, 1)
 		{
-			p.SetState(88)
+			p.SetState(94)
 			p.BasicLit()
 		}
 
-	case valuateParserLP:
+	case ValuateParserLP:
 		p.EnterOuterAlt(localctx, 2)
 		{
-			p.SetState(89)
-			p.Match(valuateParserLP)
+			p.SetState(95)
+			p.Match(ValuateParserLP)
 		}
 		{
-			p.SetState(90)
+			p.SetState(96)
 			p.expression(0)
 		}
 		{
-			p.SetState(91)
-			p.Match(valuateParserRP)
+			p.SetState(97)
+			p.Match(ValuateParserRP)
 		}
 
 	default:
@@ -1517,7 +1652,7 @@ type BasicLitContext struct {
 func NewEmptyBasicLitContext() *BasicLitContext {
 	var p = new(BasicLitContext)
 	p.BaseParserRuleContext = antlr.NewBaseParserRuleContext(nil, -1)
-	p.RuleIndex = valuateParserRULE_basicLit
+	p.RuleIndex = ValuateParserRULE_basicLit
 	return p
 }
 
@@ -1529,7 +1664,7 @@ func NewBasicLitContext(parser antlr.Parser, parent antlr.ParserRuleContext, inv
 	p.BaseParserRuleContext = antlr.NewBaseParserRuleContext(parent, invokingState)
 
 	p.parser = parser
-	p.RuleIndex = valuateParserRULE_basicLit
+	p.RuleIndex = ValuateParserRULE_basicLit
 
 	return p
 }
@@ -1537,15 +1672,15 @@ func NewBasicLitContext(parser antlr.Parser, parent antlr.ParserRuleContext, inv
 func (s *BasicLitContext) GetParser() antlr.Parser { return s.parser }
 
 func (s *BasicLitContext) STRING() antlr.TerminalNode {
-	return s.GetToken(valuateParserSTRING, 0)
+	return s.GetToken(ValuateParserSTRING, 0)
 }
 
 func (s *BasicLitContext) INT() antlr.TerminalNode {
-	return s.GetToken(valuateParserINT, 0)
+	return s.GetToken(ValuateParserINT, 0)
 }
 
 func (s *BasicLitContext) FLOAT_NUMBER() antlr.TerminalNode {
-	return s.GetToken(valuateParserFLOAT_NUMBER, 0)
+	return s.GetToken(ValuateParserFLOAT_NUMBER, 0)
 }
 
 func (s *BasicLitContext) Obj() IObjContext {
@@ -1581,15 +1716,15 @@ func (s *BasicLitContext) Arr() IArrContext {
 }
 
 func (s *BasicLitContext) TRUE() antlr.TerminalNode {
-	return s.GetToken(valuateParserTRUE, 0)
+	return s.GetToken(ValuateParserTRUE, 0)
 }
 
 func (s *BasicLitContext) FALSE() antlr.TerminalNode {
-	return s.GetToken(valuateParserFALSE, 0)
+	return s.GetToken(ValuateParserFALSE, 0)
 }
 
 func (s *BasicLitContext) NIL_LIT() antlr.TerminalNode {
-	return s.GetToken(valuateParserNIL_LIT, 0)
+	return s.GetToken(ValuateParserNIL_LIT, 0)
 }
 
 func (s *BasicLitContext) GetRuleContext() antlr.RuleContext {
@@ -1602,7 +1737,7 @@ func (s *BasicLitContext) ToStringTree(ruleNames []string, recog antlr.Recognize
 
 func (s *BasicLitContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
 	switch t := visitor.(type) {
-	case valuateVisitor:
+	case ValuateParserVisitor:
 		return t.VisitBasicLit(s)
 
 	default:
@@ -1610,12 +1745,12 @@ func (s *BasicLitContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
 	}
 }
 
-func (p *valuateParser) BasicLit() (localctx IBasicLitContext) {
+func (p *ValuateParser) BasicLit() (localctx IBasicLitContext) {
 	this := p
 	_ = this
 
 	localctx = NewBasicLitContext(p, p.GetParserRuleContext(), p.GetState())
-	p.EnterRule(localctx, 14, valuateParserRULE_basicLit)
+	p.EnterRule(localctx, 16, ValuateParserRULE_basicLit)
 
 	defer func() {
 		p.ExitRule()
@@ -1633,64 +1768,64 @@ func (p *valuateParser) BasicLit() (localctx IBasicLitContext) {
 		}
 	}()
 
-	p.SetState(103)
+	p.SetState(109)
 	p.GetErrorHandler().Sync(p)
 
 	switch p.GetTokenStream().LA(1) {
-	case valuateParserSTRING:
+	case ValuateParserSTRING:
 		p.EnterOuterAlt(localctx, 1)
 		{
-			p.SetState(95)
-			p.Match(valuateParserSTRING)
+			p.SetState(101)
+			p.Match(ValuateParserSTRING)
 		}
 
-	case valuateParserINT:
+	case ValuateParserINT:
 		p.EnterOuterAlt(localctx, 2)
 		{
-			p.SetState(96)
-			p.Match(valuateParserINT)
+			p.SetState(102)
+			p.Match(ValuateParserINT)
 		}
 
-	case valuateParserFLOAT_NUMBER:
+	case ValuateParserFLOAT_NUMBER:
 		p.EnterOuterAlt(localctx, 3)
 		{
-			p.SetState(97)
-			p.Match(valuateParserFLOAT_NUMBER)
+			p.SetState(103)
+			p.Match(ValuateParserFLOAT_NUMBER)
 		}
 
-	case valuateParserL_CURLY:
+	case ValuateParserL_CURLY:
 		p.EnterOuterAlt(localctx, 4)
 		{
-			p.SetState(98)
+			p.SetState(104)
 			p.Obj()
 		}
 
-	case valuateParserL_BRACKET:
+	case ValuateParserL_BRACKET:
 		p.EnterOuterAlt(localctx, 5)
 		{
-			p.SetState(99)
+			p.SetState(105)
 			p.Arr()
 		}
 
-	case valuateParserTRUE:
+	case ValuateParserTRUE:
 		p.EnterOuterAlt(localctx, 6)
 		{
-			p.SetState(100)
-			p.Match(valuateParserTRUE)
+			p.SetState(106)
+			p.Match(ValuateParserTRUE)
 		}
 
-	case valuateParserFALSE:
+	case ValuateParserFALSE:
 		p.EnterOuterAlt(localctx, 7)
 		{
-			p.SetState(101)
-			p.Match(valuateParserFALSE)
+			p.SetState(107)
+			p.Match(ValuateParserFALSE)
 		}
 
-	case valuateParserNIL_LIT:
+	case ValuateParserNIL_LIT:
 		p.EnterOuterAlt(localctx, 8)
 		{
-			p.SetState(102)
-			p.Match(valuateParserNIL_LIT)
+			p.SetState(108)
+			p.Match(ValuateParserNIL_LIT)
 		}
 
 	default:
@@ -1719,7 +1854,7 @@ type ObjContext struct {
 func NewEmptyObjContext() *ObjContext {
 	var p = new(ObjContext)
 	p.BaseParserRuleContext = antlr.NewBaseParserRuleContext(nil, -1)
-	p.RuleIndex = valuateParserRULE_obj
+	p.RuleIndex = ValuateParserRULE_obj
 	return p
 }
 
@@ -1731,7 +1866,7 @@ func NewObjContext(parser antlr.Parser, parent antlr.ParserRuleContext, invoking
 	p.BaseParserRuleContext = antlr.NewBaseParserRuleContext(parent, invokingState)
 
 	p.parser = parser
-	p.RuleIndex = valuateParserRULE_obj
+	p.RuleIndex = ValuateParserRULE_obj
 
 	return p
 }
@@ -1739,7 +1874,7 @@ func NewObjContext(parser antlr.Parser, parent antlr.ParserRuleContext, invoking
 func (s *ObjContext) GetParser() antlr.Parser { return s.parser }
 
 func (s *ObjContext) L_CURLY() antlr.TerminalNode {
-	return s.GetToken(valuateParserL_CURLY, 0)
+	return s.GetToken(ValuateParserL_CURLY, 0)
 }
 
 func (s *ObjContext) AllPair() []IPairContext {
@@ -1784,15 +1919,15 @@ func (s *ObjContext) Pair(i int) IPairContext {
 }
 
 func (s *ObjContext) R_CURLY() antlr.TerminalNode {
-	return s.GetToken(valuateParserR_CURLY, 0)
+	return s.GetToken(ValuateParserR_CURLY, 0)
 }
 
 func (s *ObjContext) AllCOMMA() []antlr.TerminalNode {
-	return s.GetTokens(valuateParserCOMMA)
+	return s.GetTokens(ValuateParserCOMMA)
 }
 
 func (s *ObjContext) COMMA(i int) antlr.TerminalNode {
-	return s.GetToken(valuateParserCOMMA, i)
+	return s.GetToken(ValuateParserCOMMA, i)
 }
 
 func (s *ObjContext) GetRuleContext() antlr.RuleContext {
@@ -1805,7 +1940,7 @@ func (s *ObjContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) st
 
 func (s *ObjContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
 	switch t := visitor.(type) {
-	case valuateVisitor:
+	case ValuateParserVisitor:
 		return t.VisitObj(s)
 
 	default:
@@ -1813,12 +1948,12 @@ func (s *ObjContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
 	}
 }
 
-func (p *valuateParser) Obj() (localctx IObjContext) {
+func (p *ValuateParser) Obj() (localctx IObjContext) {
 	this := p
 	_ = this
 
 	localctx = NewObjContext(p, p.GetParserRuleContext(), p.GetState())
-	p.EnterRule(localctx, 16, valuateParserRULE_obj)
+	p.EnterRule(localctx, 18, ValuateParserRULE_obj)
 	var _la int
 
 	defer func() {
@@ -1837,51 +1972,51 @@ func (p *valuateParser) Obj() (localctx IObjContext) {
 		}
 	}()
 
-	p.SetState(118)
+	p.SetState(124)
 	p.GetErrorHandler().Sync(p)
-	switch p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), 11, p.GetParserRuleContext()) {
+	switch p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), 12, p.GetParserRuleContext()) {
 	case 1:
 		p.EnterOuterAlt(localctx, 1)
 		{
-			p.SetState(105)
-			p.Match(valuateParserL_CURLY)
+			p.SetState(111)
+			p.Match(ValuateParserL_CURLY)
 		}
 		{
-			p.SetState(106)
+			p.SetState(112)
 			p.Pair()
 		}
-		p.SetState(111)
+		p.SetState(117)
 		p.GetErrorHandler().Sync(p)
 		_la = p.GetTokenStream().LA(1)
 
-		for _la == valuateParserCOMMA {
+		for _la == ValuateParserCOMMA {
 			{
-				p.SetState(107)
-				p.Match(valuateParserCOMMA)
+				p.SetState(113)
+				p.Match(ValuateParserCOMMA)
 			}
 			{
-				p.SetState(108)
+				p.SetState(114)
 				p.Pair()
 			}
 
-			p.SetState(113)
+			p.SetState(119)
 			p.GetErrorHandler().Sync(p)
 			_la = p.GetTokenStream().LA(1)
 		}
 		{
-			p.SetState(114)
-			p.Match(valuateParserR_CURLY)
+			p.SetState(120)
+			p.Match(ValuateParserR_CURLY)
 		}
 
 	case 2:
 		p.EnterOuterAlt(localctx, 2)
 		{
-			p.SetState(116)
-			p.Match(valuateParserL_CURLY)
+			p.SetState(122)
+			p.Match(ValuateParserL_CURLY)
 		}
 		{
-			p.SetState(117)
-			p.Match(valuateParserR_CURLY)
+			p.SetState(123)
+			p.Match(ValuateParserR_CURLY)
 		}
 
 	}
@@ -1908,7 +2043,7 @@ type PairContext struct {
 func NewEmptyPairContext() *PairContext {
 	var p = new(PairContext)
 	p.BaseParserRuleContext = antlr.NewBaseParserRuleContext(nil, -1)
-	p.RuleIndex = valuateParserRULE_pair
+	p.RuleIndex = ValuateParserRULE_pair
 	return p
 }
 
@@ -1920,19 +2055,19 @@ func NewPairContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokin
 	p.BaseParserRuleContext = antlr.NewBaseParserRuleContext(parent, invokingState)
 
 	p.parser = parser
-	p.RuleIndex = valuateParserRULE_pair
+	p.RuleIndex = ValuateParserRULE_pair
 
 	return p
 }
 
 func (s *PairContext) GetParser() antlr.Parser { return s.parser }
 
-func (s *PairContext) STRING_LITERAL() antlr.TerminalNode {
-	return s.GetToken(valuateParserSTRING_LITERAL, 0)
+func (s *PairContext) STRING() antlr.TerminalNode {
+	return s.GetToken(ValuateParserSTRING, 0)
 }
 
 func (s *PairContext) COLON() antlr.TerminalNode {
-	return s.GetToken(valuateParserCOLON, 0)
+	return s.GetToken(ValuateParserCOLON, 0)
 }
 
 func (s *PairContext) BasicLit() IBasicLitContext {
@@ -1961,7 +2096,7 @@ func (s *PairContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) s
 
 func (s *PairContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
 	switch t := visitor.(type) {
-	case valuateVisitor:
+	case ValuateParserVisitor:
 		return t.VisitPair(s)
 
 	default:
@@ -1969,12 +2104,12 @@ func (s *PairContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
 	}
 }
 
-func (p *valuateParser) Pair() (localctx IPairContext) {
+func (p *ValuateParser) Pair() (localctx IPairContext) {
 	this := p
 	_ = this
 
 	localctx = NewPairContext(p, p.GetParserRuleContext(), p.GetState())
-	p.EnterRule(localctx, 18, valuateParserRULE_pair)
+	p.EnterRule(localctx, 20, ValuateParserRULE_pair)
 
 	defer func() {
 		p.ExitRule()
@@ -1994,15 +2129,15 @@ func (p *valuateParser) Pair() (localctx IPairContext) {
 
 	p.EnterOuterAlt(localctx, 1)
 	{
-		p.SetState(120)
-		p.Match(valuateParserSTRING_LITERAL)
+		p.SetState(126)
+		p.Match(ValuateParserSTRING)
 	}
 	{
-		p.SetState(121)
-		p.Match(valuateParserCOLON)
+		p.SetState(127)
+		p.Match(ValuateParserCOLON)
 	}
 	{
-		p.SetState(122)
+		p.SetState(128)
 		p.BasicLit()
 	}
 
@@ -2028,7 +2163,7 @@ type ArrContext struct {
 func NewEmptyArrContext() *ArrContext {
 	var p = new(ArrContext)
 	p.BaseParserRuleContext = antlr.NewBaseParserRuleContext(nil, -1)
-	p.RuleIndex = valuateParserRULE_arr
+	p.RuleIndex = ValuateParserRULE_arr
 	return p
 }
 
@@ -2040,7 +2175,7 @@ func NewArrContext(parser antlr.Parser, parent antlr.ParserRuleContext, invoking
 	p.BaseParserRuleContext = antlr.NewBaseParserRuleContext(parent, invokingState)
 
 	p.parser = parser
-	p.RuleIndex = valuateParserRULE_arr
+	p.RuleIndex = ValuateParserRULE_arr
 
 	return p
 }
@@ -2048,7 +2183,7 @@ func NewArrContext(parser antlr.Parser, parent antlr.ParserRuleContext, invoking
 func (s *ArrContext) GetParser() antlr.Parser { return s.parser }
 
 func (s *ArrContext) L_BRACKET() antlr.TerminalNode {
-	return s.GetToken(valuateParserL_BRACKET, 0)
+	return s.GetToken(ValuateParserL_BRACKET, 0)
 }
 
 func (s *ArrContext) AllBasicLit() []IBasicLitContext {
@@ -2093,15 +2228,15 @@ func (s *ArrContext) BasicLit(i int) IBasicLitContext {
 }
 
 func (s *ArrContext) R_BRACKET() antlr.TerminalNode {
-	return s.GetToken(valuateParserR_BRACKET, 0)
+	return s.GetToken(ValuateParserR_BRACKET, 0)
 }
 
 func (s *ArrContext) AllCOMMA() []antlr.TerminalNode {
-	return s.GetTokens(valuateParserCOMMA)
+	return s.GetTokens(ValuateParserCOMMA)
 }
 
 func (s *ArrContext) COMMA(i int) antlr.TerminalNode {
-	return s.GetToken(valuateParserCOMMA, i)
+	return s.GetToken(ValuateParserCOMMA, i)
 }
 
 func (s *ArrContext) GetRuleContext() antlr.RuleContext {
@@ -2114,7 +2249,7 @@ func (s *ArrContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) st
 
 func (s *ArrContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
 	switch t := visitor.(type) {
-	case valuateVisitor:
+	case ValuateParserVisitor:
 		return t.VisitArr(s)
 
 	default:
@@ -2122,12 +2257,12 @@ func (s *ArrContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
 	}
 }
 
-func (p *valuateParser) Arr() (localctx IArrContext) {
+func (p *ValuateParser) Arr() (localctx IArrContext) {
 	this := p
 	_ = this
 
 	localctx = NewArrContext(p, p.GetParserRuleContext(), p.GetState())
-	p.EnterRule(localctx, 20, valuateParserRULE_arr)
+	p.EnterRule(localctx, 22, ValuateParserRULE_arr)
 	var _la int
 
 	defer func() {
@@ -2146,208 +2281,53 @@ func (p *valuateParser) Arr() (localctx IArrContext) {
 		}
 	}()
 
-	p.SetState(137)
+	p.SetState(143)
 	p.GetErrorHandler().Sync(p)
-	switch p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), 13, p.GetParserRuleContext()) {
+	switch p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), 14, p.GetParserRuleContext()) {
 	case 1:
 		p.EnterOuterAlt(localctx, 1)
 		{
-			p.SetState(124)
-			p.Match(valuateParserL_BRACKET)
+			p.SetState(130)
+			p.Match(ValuateParserL_BRACKET)
 		}
 		{
-			p.SetState(125)
+			p.SetState(131)
 			p.BasicLit()
 		}
-		p.SetState(130)
+		p.SetState(136)
 		p.GetErrorHandler().Sync(p)
 		_la = p.GetTokenStream().LA(1)
 
-		for _la == valuateParserCOMMA {
+		for _la == ValuateParserCOMMA {
 			{
-				p.SetState(126)
-				p.Match(valuateParserCOMMA)
+				p.SetState(132)
+				p.Match(ValuateParserCOMMA)
 			}
 			{
-				p.SetState(127)
+				p.SetState(133)
 				p.BasicLit()
 			}
 
-			p.SetState(132)
+			p.SetState(138)
 			p.GetErrorHandler().Sync(p)
 			_la = p.GetTokenStream().LA(1)
 		}
 		{
-			p.SetState(133)
-			p.Match(valuateParserR_BRACKET)
+			p.SetState(139)
+			p.Match(ValuateParserR_BRACKET)
 		}
 
 	case 2:
 		p.EnterOuterAlt(localctx, 2)
 		{
-			p.SetState(135)
-			p.Match(valuateParserL_BRACKET)
-		}
-		{
-			p.SetState(136)
-			p.Match(valuateParserR_BRACKET)
-		}
-
-	}
-
-	return localctx
-}
-
-// IVariateContext is an interface to support dynamic dispatch.
-type IVariateContext interface {
-	antlr.ParserRuleContext
-
-	// GetParser returns the parser.
-	GetParser() antlr.Parser
-
-	// IsVariateContext differentiates from other interfaces.
-	IsVariateContext()
-}
-
-type VariateContext struct {
-	*antlr.BaseParserRuleContext
-	parser antlr.Parser
-}
-
-func NewEmptyVariateContext() *VariateContext {
-	var p = new(VariateContext)
-	p.BaseParserRuleContext = antlr.NewBaseParserRuleContext(nil, -1)
-	p.RuleIndex = valuateParserRULE_variate
-	return p
-}
-
-func (*VariateContext) IsVariateContext() {}
-
-func NewVariateContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *VariateContext {
-	var p = new(VariateContext)
-
-	p.BaseParserRuleContext = antlr.NewBaseParserRuleContext(parent, invokingState)
-
-	p.parser = parser
-	p.RuleIndex = valuateParserRULE_variate
-
-	return p
-}
-
-func (s *VariateContext) GetParser() antlr.Parser { return s.parser }
-
-func (s *VariateContext) AllIDENTIFIER() []antlr.TerminalNode {
-	return s.GetTokens(valuateParserIDENTIFIER)
-}
-
-func (s *VariateContext) IDENTIFIER(i int) antlr.TerminalNode {
-	return s.GetToken(valuateParserIDENTIFIER, i)
-}
-
-func (s *VariateContext) L_CURLY() antlr.TerminalNode {
-	return s.GetToken(valuateParserL_CURLY, 0)
-}
-
-func (s *VariateContext) R_CURLY() antlr.TerminalNode {
-	return s.GetToken(valuateParserR_CURLY, 0)
-}
-
-func (s *VariateContext) AllDOT() []antlr.TerminalNode {
-	return s.GetTokens(valuateParserDOT)
-}
-
-func (s *VariateContext) DOT(i int) antlr.TerminalNode {
-	return s.GetToken(valuateParserDOT, i)
-}
-
-func (s *VariateContext) GetRuleContext() antlr.RuleContext {
-	return s
-}
-
-func (s *VariateContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string {
-	return antlr.TreesStringTree(s, ruleNames, recog)
-}
-
-func (s *VariateContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
-	switch t := visitor.(type) {
-	case valuateVisitor:
-		return t.VisitVariate(s)
-
-	default:
-		return t.VisitChildren(s)
-	}
-}
-
-func (p *valuateParser) Variate() (localctx IVariateContext) {
-	this := p
-	_ = this
-
-	localctx = NewVariateContext(p, p.GetParserRuleContext(), p.GetState())
-	p.EnterRule(localctx, 22, valuateParserRULE_variate)
-	var _la int
-
-	defer func() {
-		p.ExitRule()
-	}()
-
-	defer func() {
-		if err := recover(); err != nil {
-			if v, ok := err.(antlr.RecognitionException); ok {
-				localctx.SetException(v)
-				p.GetErrorHandler().ReportError(p, v)
-				p.GetErrorHandler().Recover(p, v)
-			} else {
-				panic(err)
-			}
-		}
-	}()
-
-	p.SetState(150)
-	p.GetErrorHandler().Sync(p)
-
-	switch p.GetTokenStream().LA(1) {
-	case valuateParserIDENTIFIER:
-		p.EnterOuterAlt(localctx, 1)
-		{
-			p.SetState(139)
-			p.Match(valuateParserIDENTIFIER)
-		}
-
-	case valuateParserL_CURLY:
-		p.EnterOuterAlt(localctx, 2)
-		{
-			p.SetState(140)
-			p.Match(valuateParserL_CURLY)
-		}
-		{
 			p.SetState(141)
-			p.Match(valuateParserIDENTIFIER)
-		}
-		p.SetState(146)
-		p.GetErrorHandler().Sync(p)
-		_la = p.GetTokenStream().LA(1)
-
-		for _la == valuateParserDOT {
-			{
-				p.SetState(142)
-				p.Match(valuateParserDOT)
-			}
-			{
-				p.SetState(143)
-				p.Match(valuateParserIDENTIFIER)
-			}
-
-			p.SetState(148)
-			p.GetErrorHandler().Sync(p)
-			_la = p.GetTokenStream().LA(1)
+			p.Match(ValuateParserL_BRACKET)
 		}
 		{
-			p.SetState(149)
-			p.Match(valuateParserR_CURLY)
+			p.SetState(142)
+			p.Match(ValuateParserR_BRACKET)
 		}
 
-	default:
-		panic(antlr.NewNoViableAltException(p, nil, nil, nil, nil, nil))
 	}
 
 	return localctx
@@ -2372,7 +2352,7 @@ type IndexContext struct {
 func NewEmptyIndexContext() *IndexContext {
 	var p = new(IndexContext)
 	p.BaseParserRuleContext = antlr.NewBaseParserRuleContext(nil, -1)
-	p.RuleIndex = valuateParserRULE_index
+	p.RuleIndex = ValuateParserRULE_index
 	return p
 }
 
@@ -2384,7 +2364,7 @@ func NewIndexContext(parser antlr.Parser, parent antlr.ParserRuleContext, invoki
 	p.BaseParserRuleContext = antlr.NewBaseParserRuleContext(parent, invokingState)
 
 	p.parser = parser
-	p.RuleIndex = valuateParserRULE_index
+	p.RuleIndex = ValuateParserRULE_index
 
 	return p
 }
@@ -2392,7 +2372,7 @@ func NewIndexContext(parser antlr.Parser, parent antlr.ParserRuleContext, invoki
 func (s *IndexContext) GetParser() antlr.Parser { return s.parser }
 
 func (s *IndexContext) L_BRACKET() antlr.TerminalNode {
-	return s.GetToken(valuateParserL_BRACKET, 0)
+	return s.GetToken(ValuateParserL_BRACKET, 0)
 }
 
 func (s *IndexContext) Expression() IExpressionContext {
@@ -2412,7 +2392,7 @@ func (s *IndexContext) Expression() IExpressionContext {
 }
 
 func (s *IndexContext) R_BRACKET() antlr.TerminalNode {
-	return s.GetToken(valuateParserR_BRACKET, 0)
+	return s.GetToken(ValuateParserR_BRACKET, 0)
 }
 
 func (s *IndexContext) GetRuleContext() antlr.RuleContext {
@@ -2425,7 +2405,7 @@ func (s *IndexContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) 
 
 func (s *IndexContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
 	switch t := visitor.(type) {
-	case valuateVisitor:
+	case ValuateParserVisitor:
 		return t.VisitIndex(s)
 
 	default:
@@ -2433,12 +2413,12 @@ func (s *IndexContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
 	}
 }
 
-func (p *valuateParser) Index() (localctx IIndexContext) {
+func (p *ValuateParser) Index() (localctx IIndexContext) {
 	this := p
 	_ = this
 
 	localctx = NewIndexContext(p, p.GetParserRuleContext(), p.GetState())
-	p.EnterRule(localctx, 24, valuateParserRULE_index)
+	p.EnterRule(localctx, 24, ValuateParserRULE_index)
 
 	defer func() {
 		p.ExitRule()
@@ -2458,22 +2438,22 @@ func (p *valuateParser) Index() (localctx IIndexContext) {
 
 	p.EnterOuterAlt(localctx, 1)
 	{
-		p.SetState(152)
-		p.Match(valuateParserL_BRACKET)
+		p.SetState(145)
+		p.Match(ValuateParserL_BRACKET)
 	}
 	{
-		p.SetState(153)
+		p.SetState(146)
 		p.expression(0)
 	}
 	{
-		p.SetState(154)
-		p.Match(valuateParserR_BRACKET)
+		p.SetState(147)
+		p.Match(ValuateParserR_BRACKET)
 	}
 
 	return localctx
 }
 
-func (p *valuateParser) Sempred(localctx antlr.RuleContext, ruleIndex, predIndex int) bool {
+func (p *ValuateParser) Sempred(localctx antlr.RuleContext, ruleIndex, predIndex int) bool {
 	switch ruleIndex {
 	case 1:
 		var t *ExpressionContext = nil
@@ -2494,7 +2474,7 @@ func (p *valuateParser) Sempred(localctx antlr.RuleContext, ruleIndex, predIndex
 	}
 }
 
-func (p *valuateParser) Expression_Sempred(localctx antlr.RuleContext, predIndex int) bool {
+func (p *ValuateParser) Expression_Sempred(localctx antlr.RuleContext, predIndex int) bool {
 	this := p
 	_ = this
 
@@ -2519,7 +2499,7 @@ func (p *valuateParser) Expression_Sempred(localctx antlr.RuleContext, predIndex
 	}
 }
 
-func (p *valuateParser) PrimaryExpr_Sempred(localctx antlr.RuleContext, predIndex int) bool {
+func (p *ValuateParser) PrimaryExpr_Sempred(localctx antlr.RuleContext, predIndex int) bool {
 	this := p
 	_ = this
 

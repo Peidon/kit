@@ -42,6 +42,7 @@ MODULUS                : '%';
 SKIP_
  : ( SPACES | LINE_JOINING ) -> skip
  ;
+
 WHITESPACE
  : [ \r\n\t]+ -> skip
  ;
@@ -49,7 +50,7 @@ WHITESPACE
 IDENTIFIER : LETTER (LETTER | DIGIT)* ;
 
 VARKEY_OPEN
-    : '{' VARID -> pushMode(VAR)
+    : '${' -> pushMode(VAR)
     ;
 
 STRING
@@ -80,16 +81,6 @@ FLOAT_NUMBER
  : POINT_FLOAT
  | EXPONENT_FLOAT
  ;
-
- // variable ID
- mode VAR;
- VARID
-     : IDENTIFIER (DOT IDENTIFIER)*
-     ;
-
- VARKEY_CLOSE
-     : '}' -> popMode
-     ;
 
 
 /*
@@ -222,3 +213,14 @@ fragment SAFECODEPOINT
 fragment HEX
    : [0-9a-fA-F]
    ;
+
+// variable ID
+mode VAR;
+
+VARID
+    : IDENTIFIER (DOT IDENTIFIER)*
+    ;
+
+VARKEY_CLOSE
+    : '}' -> popMode
+    ;
