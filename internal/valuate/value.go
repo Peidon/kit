@@ -109,117 +109,78 @@ func AnyValue(any interface{}) Value {
 	case bool:
 		return BoolValue(val)
 	case *bool:
-
-	case []bool:
-		return ArrayValue(Bools(val))
-
 	case float64:
 		return FloatValue(val)
-	case *float64:
-	case []float64:
-		return ArrayValue(Float64s(val))
-
+	case *float64, *float32:
 	case float32:
 		return FloatValue(float64(val))
-
-	case *float32:
-
-	case []float32:
-		return ArrayValue(Float32s(val))
-
 	case int:
 		return IntValue(int64(val))
-
-	case *int:
-
-	case []int:
-		return ArrayValue(Ints(val))
-
+	case *int, *int64, *int32, *int16, *int8:
 	case int64:
 		return IntValue(val)
-	case *int64:
-
-	case []int64:
-		return ArrayValue(Int64s(val))
-
 	case int32:
 		return IntValue(int64(val))
-
-	case *int32:
-
-	case []int32:
-		return ArrayValue(Int32s(val))
-
 	case int16:
 		return IntValue(int64(val))
-	case *int16:
-
-	case []int16:
-		return ArrayValue(Int16s(val))
-
 	case int8:
 		return IntValue(int64(val))
-
-	case *int8:
-
-	case []int8:
-		return ArrayValue(Int8s(val))
-
 	case string:
 		return StringValue(val)
-
 	case *string:
-
-	case []string:
-		return ArrayValue(Strings(val))
-
 	case uint:
 		return UintValue(uint64(val))
-
-	case *uint:
-
-	case []uint:
-		return ArrayValue(Uints(val))
-
+	case *uint, *uint64, *uint32, *uint16, *uint8:
 	case uint64:
 		return UintValue(val)
-
-	case *uint64:
-
-	case []uint64:
-		return ArrayValue(Uint64s(val))
 	case uint32:
 		return UintValue(uint64(val))
-	case *uint32:
-	case []uint32:
-		return ArrayValue(Uint32s(val))
 	case uint16:
 		return UintValue(uint64(val))
-	case *uint16:
-	case []uint16:
 	case uint8:
 		return UintValue(uint64(val))
-	case *uint8:
-	case []byte:
-		return ByteString(val)
 	case uintptr:
 		return UintPoint(val)
 	case *uintptr:
-	case []uintptr:
-		return ArrayValue(UintPoints(val))
 	case time.Time:
 		return TimeValue(val)
 	case *time.Time:
-	case []time.Time:
-
 	case time.Duration:
 		return DurationValue(val)
-
 	case *time.Duration:
-
+	case []bool:
+		return ArrayValue(Bools(val))
+	case []float64:
+		return ArrayValue(Float64s(val))
+	case []float32:
+		return ArrayValue(Float32s(val))
+	case []int:
+		return ArrayValue(Ints(val))
+	case []int64:
+		return ArrayValue(Int64s(val))
+	case []int32:
+		return ArrayValue(Int32s(val))
+	case []int16:
+		return ArrayValue(Int16s(val))
+	case []int8:
+		return ArrayValue(Int8s(val))
+	case []string:
+		return ArrayValue(Strings(val))
+	case []uint:
+		return ArrayValue(Uints(val))
+	case []uint64:
+		return ArrayValue(Uint64s(val))
+	case []uint32:
+		return ArrayValue(Uint32s(val))
+	case []uint16:
+		return ArrayValue(Uint16s(val))
+	case []byte:
+		return ByteString(val)
+	case []uintptr:
+		return ArrayValue(UintPoints(val))
 	case []time.Duration:
 		return ArrayValue(Durations(val))
-
+	case []time.Time:
 	default:
 		// reflect struct or slice
 

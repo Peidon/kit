@@ -124,6 +124,17 @@ func (s Uint32s) Values() (ret []Value) {
 	return
 }
 
+type Uint16s []uint16
+
+func (s Uint16s) Values() (ret []Value) {
+	for i := range s {
+
+		ret = append(ret, UintValue(uint64(s[i])))
+	}
+
+	return
+}
+
 type Float64s []float64
 
 func (s Float64s) Values() (ret []Value) {
