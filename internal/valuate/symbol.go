@@ -79,8 +79,7 @@ const (
 type OperatorType int
 
 const (
-	noop OperatorType = iota
-	unaryOp
+	unaryOp OperatorType = iota + 1
 	binaryOp
 )
 

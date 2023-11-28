@@ -217,19 +217,56 @@ func (eval *EvaluableExpression) VisitPrimaryExpr(ctx *parser.PrimaryExprContext
 
 func (eval *EvaluableExpression) VisitUnaryExpr(ctx *parser.UnaryExprContext) interface{} {
 
-	if minus := ctx.MINUS(); minus != nil {
+	var dep []evaluationStage
 
+	if expr := ctx.Expression(); expr != nil {
+		stageInf := expr.Accept(eval)
+
+		if stageInf == nil {
+			eval.errorTrack.Append(expr.GetText())
+			return nil
+		}
+
+		if stage, ok := stageInf.(evaluationStage); ok {
+			dep = append(dep, stage)
+		}
 	}
+
+	if minus := ctx.MINUS(); minus != nil {
+		return evaluationStage{
+			symbol:    NEGATE,
+			opType:    unaryOp,
+			operator:  negateStage,
+			typeCheck: numberTypeCheck,
+			depends:   dep,
+		}
+	}
+
+	if invert := ctx.EXCLAMATION(); invert != nil {
+		return evaluationStage{
+			symbol:    INVERT,
+			opType:    unaryOp,
+			operator:  invertStage,
+			typeCheck: boolTypeCheck,
+			depends:   dep,
+		}
+	}
+
+	eval.errorTrack.Append(ctx.GetText())
 	return nil
 }
 
 func (eval *EvaluableExpression) VisitArguments(ctx *parser.ArgumentsContext) interface{} {
-	println("visit arguments")
+	if expr := ctx.ExpressionList(); expr != nil {
+		return expr.Accept(eval)
+	}
+
+	eval.errorTrack.Append(ctx.GetText())
 	return nil
 }
 
 func (eval *EvaluableExpression) VisitExpressionList(ctx *parser.ExpressionListContext) interface{} {
-	println("visit expression list")
+
 	return nil
 }
 
@@ -293,11 +330,11 @@ func (eval *EvaluableExpression) VisitArr(ctx *parser.ArrContext) interface{} {
 }
 
 func (eval *EvaluableExpression) VisitObj(ctx *parser.ObjContext) interface{} {
-	return nil
+	return eval.VisitChildren(ctx)
 }
 
 func (eval *EvaluableExpression) VisitPair(ctx *parser.PairContext) interface{} {
-	return nil
+	return eval.VisitChildren(ctx)
 }
 
 func (eval *EvaluableExpression) VisitVariate(ctx *parser.VariateContext) interface{} {
