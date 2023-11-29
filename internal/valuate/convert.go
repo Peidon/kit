@@ -8,7 +8,10 @@
 
 package valuate
 
-import "reflect"
+import (
+	"reflect"
+	"strings"
+)
 
 func toInt(v interface{}) int {
 	v = indirect(v)
@@ -124,4 +127,30 @@ func indirect(a interface{}) interface{} {
 		v = v.Elem()
 	}
 	return v.Interface()
+}
+
+const (
+	TagJson      = "json"
+	TagIgnore    = "-"
+	TagOmitEmpty = "omitempty"
+	EmptyStr     = ""
+	CommaStr     = ","
+)
+
+func getKey(tagStr string) (key string, ignore, omitempty bool) {
+
+	if tagStr == EmptyStr {
+		return "", false, false
+	}
+
+	key = strings.Split(tagStr, CommaStr)[0]
+	if key == TagIgnore {
+		ignore = true
+		return
+	}
+	if strings.Contains(tagStr, TagOmitEmpty) {
+		omitempty = true
+	}
+
+	return
 }

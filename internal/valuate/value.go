@@ -10,15 +10,16 @@ package valuate
 
 import (
 	"math"
+	"reflect"
 	"time"
 )
 
 type Value struct {
 	Type ValueType
-	// use integer store unsigned int value, uint ptr, int, float, bool value
+	// use integer store unsigned int value, uint ptr, int, float, bool value, duration
 	// use str store string value
 	// combine integer and inf store time value
-	// use inf store other value, e.g. object, array, duration
+	// use inf store other value, e.g. struct, array
 
 	integer int64
 	str     string
@@ -108,15 +109,12 @@ func AnyValue(any interface{}) Value {
 	switch val := any.(type) {
 	case bool:
 		return BoolValue(val)
-	case *bool:
 	case float64:
 		return FloatValue(val)
-	case *float64, *float32:
 	case float32:
 		return FloatValue(float64(val))
 	case int:
 		return IntValue(int64(val))
-	case *int, *int64, *int32, *int16, *int8:
 	case int64:
 		return IntValue(val)
 	case int32:
@@ -127,10 +125,8 @@ func AnyValue(any interface{}) Value {
 		return IntValue(int64(val))
 	case string:
 		return StringValue(val)
-	case *string:
 	case uint:
 		return UintValue(uint64(val))
-	case *uint, *uint64, *uint32, *uint16, *uint8:
 	case uint64:
 		return UintValue(val)
 	case uint32:
@@ -141,13 +137,10 @@ func AnyValue(any interface{}) Value {
 		return UintValue(uint64(val))
 	case uintptr:
 		return UintPoint(val)
-	case *uintptr:
 	case time.Time:
 		return TimeValue(val)
-	case *time.Time:
 	case time.Duration:
 		return DurationValue(val)
-	case *time.Duration:
 	case []bool:
 		return ArrayValue(Bools(val))
 	case []float64:
@@ -180,16 +173,68 @@ func AnyValue(any interface{}) Value {
 		return ArrayValue(UintPoints(val))
 	case []time.Duration:
 		return ArrayValue(Durations(val))
-	case []time.Time:
+	case reflect.Value:
+		return reflectValue(val)
 	default:
-		// reflect struct or slice
-
+		// reflect ptr, struct or slice
+		return reflectValue(reflect.ValueOf(val))
 	}
-	return Value{
-		Type: UnknownType,
-		inf:  any,
-	}
+}
 
+func reflectValue(val reflect.Value) Value {
+
+	switch val.Kind() {
+	case reflect.Pointer:
+		return AnyValue(val.Elem())
+
+	case reflect.Struct:
+
+		s := Struct{}
+		tp := val.Type()
+
+		for i := 0; i < tp.NumField(); i++ {
+			field := tp.Field(i)
+			tagStr, ok := field.Tag.Lookup(TagJson)
+			if !ok {
+				tagStr = field.Name
+			}
+			key, ignore, omitempty := getKey(tagStr)
+			if ignore || key == EmptyStr {
+				continue
+			}
+
+			value := reflect.Indirect(val).Field(i)
+			if value.IsZero() && omitempty {
+				continue
+			}
+
+			s[key] = AnyValue(value.Interface())
+		}
+
+		return Value{
+			Type: StructType,
+			inf:  s,
+		}
+
+	case reflect.Slice, reflect.Array:
+		arr := make([]Value, 0, val.Len())
+
+		for i := 0; i < val.Len(); i++ {
+			v := val.Index(i)
+			arr = append(arr, AnyValue(v.Interface()))
+		}
+
+		return Value{
+			Type: ArrayType,
+			inf:  arr,
+		}
+
+	default:
+		return Value{
+			Type: UnknownType,
+			str:  val.Kind().String(),
+		}
+	}
 }
 
 type Struct map[string]Value
@@ -204,7 +249,7 @@ func StructValue(obj Struct) Value {
 func ArrayValue(arr Array) Value {
 	return Value{
 		Type: ArrayType,
-		inf:  arr,
+		inf:  arr.Values(),
 	}
 }
 
