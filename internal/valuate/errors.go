@@ -14,12 +14,10 @@ import (
 )
 
 var (
-	ArgumentTypeError  = errors.New("argument type error")
-	ArgumentsError     = errors.New("arguments number error")
-	DivideZeroError    = errors.New("divide zero")
-	NoNeedEvaluate     = errors.New("no need evaluate")
-	GetBytesValueError = errors.New("get bytes value error")
-	GetTimeValueError  = errors.New("get time value error")
+	ArgumentTypeError = errors.New("argument type error")
+	ArgumentsError    = errors.New("arguments number error")
+	DivideZeroError   = errors.New("divide zero")
+	NoNeedEvaluate    = errors.New("no need evaluate")
 )
 
 // StageError track errors when plan stages

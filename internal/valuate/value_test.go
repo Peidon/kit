@@ -13,5 +13,13 @@ import "testing"
 func TestAnyValue(t *testing.T) {
 	b := []bool{true, false}
 	v := AnyValue(b)
-	t.Log(v)
+
+	a := v.GetArray()
+	t.Log(a)
+}
+
+type ABC struct {
+	a int
+	B string `json:"b"`
+	c bool
 }

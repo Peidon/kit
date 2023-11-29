@@ -51,14 +51,14 @@ var (
 	_maxTimeInt64 = time.Unix(0, math.MaxInt64)
 )
 
-func (v Value) GetBytes() ([]byte, error) {
+func (v Value) GetBytes() []byte {
 	if v.Type != BinaryType {
-		return nil, nil
+		return nil
 	}
 	if ret, ok := v.inf.([]byte); ok {
-		return ret, nil
+		return ret
 	}
-	return nil, GetBytesValueError
+	return nil
 }
 
 func (v Value) GetString() string {
@@ -85,24 +85,44 @@ func (v Value) GetDuration() time.Duration {
 	return time.Duration(v.integer)
 }
 
-func (v Value) GetTime() (time.Time, error) {
+func (v Value) GetTime() time.Time {
 	if v.Type == TimeFullType {
-		return v.inf.(time.Time), nil
+		return v.inf.(time.Time)
 	}
 
 	if v.inf != nil {
 		if lo, ok := v.inf.(*time.Location); ok {
-			return time.Unix(0, v.integer).In(lo), nil
+			return time.Unix(0, v.integer).In(lo)
 		}
-		return time.Time{}, GetTimeValueError
+		return time.Time{}
 	} else {
 		// Fall back to UTC if location is nil.
-		return time.Unix(0, v.integer), nil
+		return time.Unix(0, v.integer)
 	}
 }
 
 func (v Value) GetPtr() uintptr {
 	return uintptr(v.integer)
+}
+
+func (v Value) GetStruct() Struct {
+	if v.Type != StructType {
+		return nil
+	}
+	if val, ok := v.inf.(Struct); ok {
+		return val
+	}
+	return nil
+}
+
+func (v Value) GetArray() []Value {
+	if v.Type != ArrayType {
+		return nil
+	}
+	if val, ok := v.inf.([]Value); ok {
+		return val
+	}
+	return nil
 }
 
 func AnyValue(any interface{}) Value {
