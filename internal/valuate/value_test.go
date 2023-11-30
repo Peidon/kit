@@ -112,13 +112,13 @@ func TestStructValue(t *testing.T) {
 	}
 
 	// testing nested struct value
-	v = s.Field("e")
+	v = s.Field("abc")
 	if v.Type != StructType {
 		t.Error("struct nested error")
 		return
 	}
-	s = v.GetStruct()
-	v = s.Field("a")
+	ns := v.GetStruct()
+	v = ns.Field("a")
 	if v.Type != IntType || v.GetInt() != int64(abc.E.a) {
 		t.Error("struct nested error")
 		return
