@@ -27,6 +27,16 @@ func toInt(v interface{}) int {
 		return int(s)
 	case int:
 		return s
+	case uint64:
+		return int(s)
+	case uint32:
+		return int(s)
+	case uint16:
+		return int(s)
+	case uint8:
+		return int(s)
+	case uint:
+		return int(s)
 	}
 	return -1
 }
@@ -44,6 +54,16 @@ func toFloat64(v interface{}) float64 {
 	case int8:
 		return float64(s)
 	case int:
+		return float64(s)
+	case uint64:
+		return float64(s)
+	case uint32:
+		return float64(s)
+	case uint16:
+		return float64(s)
+	case uint8:
+		return float64(s)
+	case uint:
 		return float64(s)
 	case float32:
 		return float64(s)
@@ -65,7 +85,7 @@ func isNumber(value interface{}) bool {
 	switch value.(type) {
 	case float64, float32:
 		return true
-	case int64, int32, int16, int8, int:
+	case int64, int32, int16, int8, int, uint64, uint32, uint16, uint8, uint:
 		return true
 	}
 	return false
@@ -73,7 +93,7 @@ func isNumber(value interface{}) bool {
 
 func isInt(value interface{}) bool {
 	switch value.(type) {
-	case int64, int32, int16, int8, int:
+	case int64, int32, int16, int8, int, uint64, uint32, uint16, uint8, uint:
 		return true
 	}
 	return false

@@ -18,6 +18,7 @@ var (
 	ArgumentsError    = errors.New("arguments number error")
 	DivideZeroError   = errors.New("divide zero")
 	NoNeedEvaluate    = errors.New("no need evaluate")
+	PlanStageError    = errors.New("plan stage error")
 )
 
 // StageError track errors when plan stages

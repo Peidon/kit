@@ -205,12 +205,13 @@ func (eval *EvaluableExpression) VisitExpression(ctx *parser.ExpressionContext) 
 }
 
 func (eval *EvaluableExpression) VisitPrimaryExpr(ctx *parser.PrimaryExprContext) interface{} {
-	if operand := ctx.Operand(); operand != nil {
-		return operand.Accept(eval)
-	}
 	if varID := ctx.Variate(); varID != nil {
 		return varID.Accept(eval)
 	}
+	if operand := ctx.Operand(); operand != nil {
+		return operand.Accept(eval)
+	}
+	// todo
 
 	return nil
 }
@@ -267,13 +268,34 @@ func (eval *EvaluableExpression) VisitArguments(ctx *parser.ArgumentsContext) in
 
 func (eval *EvaluableExpression) VisitExpressionList(ctx *parser.ExpressionListContext) interface{} {
 
-	return nil
+	var dep []evaluationStage
+
+	for _, expr := range ctx.AllExpression() {
+
+		stageInf := expr.Accept(eval)
+
+		if stageInf == nil {
+			eval.errorTrack.Append(expr.GetText())
+			return nil
+		}
+
+		if stage, ok := stageInf.(evaluationStage); ok {
+			dep = append(dep, stage)
+		}
+	}
+
+	return evaluationStage{
+		symbol:   VALUE,
+		depends:  dep,
+		operator: exprListStage,
+	}
 }
 
 func (eval *EvaluableExpression) VisitOperand(ctx *parser.OperandContext) interface{} {
 	if basicLit := ctx.BasicLit(); basicLit != nil {
 		return basicLit.Accept(eval)
 	}
+	// todo
 	return eval.VisitChildren(ctx)
 }
 
@@ -326,7 +348,24 @@ func (eval *EvaluableExpression) VisitBasicLit(ctx *parser.BasicLitContext) inte
 }
 
 func (eval *EvaluableExpression) VisitArr(ctx *parser.ArrContext) interface{} {
-	return nil
+
+	var ifs []interface{}
+
+	for _, lit := range ctx.AllBasicLit() {
+		ifs = append(ifs, lit.Accept(eval))
+	}
+
+	dep, err := stagesInf(ifs)
+	if err != nil {
+		eval.errorTrack.Append(ctx.GetText())
+		return nil
+	}
+
+	return evaluationStage{
+		symbol:   LITERAL,
+		operator: arrayValueStage,
+		depends:  dep,
+	}
 }
 
 func (eval *EvaluableExpression) VisitObj(ctx *parser.ObjContext) interface{} {
@@ -341,7 +380,7 @@ func (eval *EvaluableExpression) VisitVariate(ctx *parser.VariateContext) interf
 
 	if varID := ctx.VARID(); varID != nil {
 		k := varID.GetText()
-		// ${} is error
+
 		if len(k) == 0 {
 			eval.errorTrack.Append(ctx.GetText())
 			return nil
@@ -368,7 +407,27 @@ func (eval *EvaluableExpression) VisitVariate(ctx *parser.VariateContext) interf
 }
 
 func (eval *EvaluableExpression) VisitIndex(ctx *parser.IndexContext) interface{} {
-	return nil
+
+	var ifs []interface{}
+
+	if idx := ctx.Expression(); idx != nil {
+		stageInf := idx.Accept(eval)
+		ifs = append(ifs, stageInf)
+	}
+
+	dep, err := stagesInf(ifs)
+	if err != nil {
+		eval.errorTrack.Append(ctx.GetText())
+		return nil
+	}
+
+	return evaluationStage{
+		symbol:    INDEX,
+		opType:    unaryOp,
+		operator:  indexStage,
+		depends:   dep,
+		typeCheck: numberTypeCheck,
+	}
 }
 
 func (eval *EvaluableExpression) Evaluate(parameters map[string]interface{}) (interface{}, error) {
@@ -423,4 +482,18 @@ func checkOperatorType(stage *evaluationStage) error {
 		return ArgumentsError
 	}
 	return nil
+}
+
+func stagesInf(ifs []interface{}) (stages []evaluationStage, err error) {
+	for _, inf := range ifs {
+		if inf == nil {
+			err = PlanStageError
+			return
+		}
+
+		if stage, ok := inf.(evaluationStage); ok {
+			stages = append(stages, stage)
+		}
+	}
+	return
 }

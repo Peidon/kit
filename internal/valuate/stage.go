@@ -342,18 +342,28 @@ func invertStage(_ Parameters, arguments ...Any) (Any, error) {
 	return nil, ArgumentTypeError
 }
 
+// functional arguments list
 func exprListStage(_ Parameters, arguments ...Any) (Any, error) {
 	var vars []Value
 	for _, arg := range arguments {
 
-		if isBool(arg) {
-
-		}
-
-		v := Value{}
+		v := AnyValue(arg)
 
 		vars = append(vars, v)
 	}
 
 	return vars, nil
+}
+
+// op '[idx]'
+func indexStage(_ Parameters, arguments ...Any) (Any, error) {
+	arg := arguments[unary]
+	if isInt(arg) {
+		return toInt(arg), nil
+	}
+	return nil, ArgumentTypeError
+}
+
+func arrayValueStage(_ Parameters, arguments ...Any) (Any, error) {
+	return arguments, nil
 }
