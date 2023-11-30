@@ -30,6 +30,7 @@ type ValueType int
 
 const (
 	UnknownType ValueType = iota
+	VoidType
 	BinaryType
 	BoolType
 	IntType
@@ -50,6 +51,34 @@ var (
 	_minTimeInt64 = time.Unix(0, math.MinInt64)
 	_maxTimeInt64 = time.Unix(0, math.MaxInt64)
 )
+
+func (v Value) Get() Any {
+	switch v.Type {
+	case BinaryType:
+		return v.GetBytes()
+	case BoolType:
+		return v.GetBool()
+	case IntType:
+		return v.GetInt()
+	case UintType:
+		return v.GetUint()
+	case FloatType:
+		return v.GetFloat()
+	case StringType:
+		return v.GetString()
+	case DurationType:
+		return v.GetDuration()
+	case ArrayType:
+		return v.GetArray()
+	case StructType:
+		return v.GetStruct()
+	case TimeType, TimeFullType:
+		return v.GetTime()
+	case PtrType:
+		return v.GetPtr()
+	}
+	return nil
+}
 
 func (v Value) GetBytes() []byte {
 	if v.Type != BinaryType {
@@ -194,9 +223,10 @@ func AnyValue(any interface{}) Value {
 	case []time.Duration:
 		return ArrayValue(Durations(val))
 	case reflect.Value:
+		// reflect
 		return reflectValue(val)
 	default:
-		// reflect ptr, struct or slice
+		// ptr, struct or slice
 		return reflectValue(reflect.ValueOf(val))
 	}
 }
@@ -204,8 +234,28 @@ func AnyValue(any interface{}) Value {
 func reflectValue(val reflect.Value) Value {
 
 	switch val.Kind() {
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		return IntValue(val.Int())
+
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+		return UintValue(val.Uint())
+
+	case reflect.String:
+		return StringValue(val.String())
+
+	case reflect.Bool:
+		return BoolValue(val.Bool())
+
+	case reflect.Float32, reflect.Float64:
+		return FloatValue(val.Float())
+
 	case reflect.Pointer:
 		return AnyValue(val.Elem())
+
+	case reflect.Interface:
+		if val.CanInterface() {
+			return AnyValue(val.Interface())
+		}
 
 	case reflect.Struct:
 
@@ -216,6 +266,7 @@ func reflectValue(val reflect.Value) Value {
 			field := tp.Field(i)
 			tagStr, ok := field.Tag.Lookup(TagJson)
 			if !ok {
+				// if no json tag, use field name
 				tagStr = field.Name
 			}
 			key, ignore, omitempty := getKey(tagStr)
@@ -224,11 +275,11 @@ func reflectValue(val reflect.Value) Value {
 			}
 
 			value := reflect.Indirect(val).Field(i)
-			if value.IsZero() && omitempty {
+			if ok && value.IsZero() && omitempty {
 				continue
 			}
 
-			s[key] = AnyValue(value.Interface())
+			s[key] = AnyValue(value)
 		}
 
 		return Value{
@@ -241,7 +292,7 @@ func reflectValue(val reflect.Value) Value {
 
 		for i := 0; i < val.Len(); i++ {
 			v := val.Index(i)
-			arr = append(arr, AnyValue(v.Interface()))
+			arr = append(arr, AnyValue(v))
 		}
 
 		return Value{
@@ -249,15 +300,25 @@ func reflectValue(val reflect.Value) Value {
 			inf:  arr,
 		}
 
-	default:
-		return Value{
-			Type: UnknownType,
-			str:  val.Kind().String(),
-		}
+	}
+	return Value{
+		Type: UnknownType,
+		str:  val.Kind().String(),
 	}
 }
 
+// Struct 优先使用json tag 中的名字作为 key
+// 如果没有 json tag 则使用Field Name 作为 Key
 type Struct map[string]Value
+
+func (s Struct) Field(k string) Value {
+	if v, ok := s[k]; ok {
+		return v
+	}
+	return Value{
+		Type: VoidType,
+	}
+}
 
 func StructValue(obj Struct) Value {
 	return Value{
