@@ -234,6 +234,8 @@ func (eval *EvaluableExpression) VisitPrimaryExpr(ctx *parser.PrimaryExprContext
 			}
 		}
 
+		// todo
+
 	}
 
 	eval.errorTrack.Append(ctx.GetText())
@@ -319,8 +321,12 @@ func (eval *EvaluableExpression) VisitOperand(ctx *parser.OperandContext) interf
 	if basicLit := ctx.BasicLit(); basicLit != nil {
 		return basicLit.Accept(eval)
 	}
-	// todo
-	return eval.VisitChildren(ctx)
+	if expr := ctx.Expression(); expr != nil {
+		return expr.Accept(eval)
+	}
+
+	eval.errorTrack.Append(ctx.GetText())
+	return nil
 }
 
 func (eval *EvaluableExpression) VisitBasicLit(ctx *parser.BasicLitContext) interface{} {

@@ -158,6 +158,10 @@ func AnyValue(any interface{}) Value {
 	switch val := any.(type) {
 	case Value:
 		return val
+	case Array:
+		return ArrayValue(val)
+	case Struct:
+		return StructValue(val, "valuate.Struct")
 	case bool:
 		return BoolValue(val)
 	case float64:
@@ -259,6 +263,21 @@ func reflectValue(val reflect.Value) Value {
 			return AnyValue(val.Interface())
 		}
 
+	case reflect.Map:
+		s := Struct{}
+		tp := val.Type()
+
+		keys := val.MapKeys()
+
+		for i := range keys {
+			k := keys[i]
+			v := val.MapIndex(k)
+
+			s[k.String()] = AnyValue(v)
+		}
+
+		return StructValue(s, tp.String())
+
 	case reflect.Struct:
 
 		s := Struct{}
@@ -303,6 +322,7 @@ func reflectValue(val reflect.Value) Value {
 	return Value{
 		Type: UnknownType,
 		str:  val.Kind().String(),
+		inf:  nil,
 	}
 }
 
@@ -404,4 +424,36 @@ func DurationValue(val time.Duration) Value {
 type Comparable interface {
 	Equal(other Comparable) bool
 	Greater(other Comparable) bool
+}
+
+func (v Value) Equal(other Comparable) bool {
+	if ot, ok := other.(Value); ok {
+		return ot.Type == v.Type &&
+			ot.str == v.str &&
+			ot.integer == v.integer &&
+			reflect.DeepEqual(ot.inf, v.inf)
+	}
+
+	return false
+}
+
+func (v Value) Greater(other Comparable) bool {
+	ot, ok := other.(Value)
+	if !ok {
+		return false
+	}
+
+	a := v.Get()
+	b := ot.Get()
+
+	if isNumber(a) && isNumber(b) {
+		return toFloat64(a) > toFloat64(b)
+	}
+
+	if (v.Type == TimeFullType || v.Type == TimeType) &&
+		(ot.Type == TimeType || ot.Type == TimeFullType) {
+		return v.GetTime().After(ot.GetTime())
+	}
+
+	return false
 }

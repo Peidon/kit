@@ -116,3 +116,54 @@ func TestEvaluableExpression_Evaluate(t *testing.T) {
 }
 
 type abc struct{}
+
+func TestAccess(t *testing.T) {
+	s := ABC{
+		a: 12,
+		B: "abc",
+		c: true,
+
+		D: []int64{1, 2, 3},
+
+		E: &ABC{
+			a: 3,
+			B: "efg",
+		},
+
+		f: 1234.2345,
+
+		G: FG{},
+	}
+
+	testData := []struct {
+		input    string
+		want     interface{}
+		params   MapParameters
+		hasError bool
+	}{
+		{
+			input:  "s.abc.b == efg",
+			want:   true,
+			params: MapParameters(map[string]Any{"s": s, "efg": s.E.B}),
+		},
+	}
+
+	for _, td := range testData {
+		expr, err := NewExpression(td.input)
+		if err != nil {
+			t.Error(err)
+			return
+		}
+		got, er := expr.Evaluate(td.params)
+		if er != nil && !td.hasError {
+			t.Error(er)
+			return
+		}
+		if er != nil {
+			t.Log(er)
+		}
+		if got != td.want {
+			t.Error("got: ", got, "\nwant: ", td.want)
+		}
+	}
+}

@@ -385,7 +385,7 @@ func makeAccessorStage(field string) evaluationOperator {
 		if structVal == nil {
 			return nil, TypeError{
 				operateSym: ACCESS,
-				typeName:   "non-struct",
+				typeName:   v.GetString(),
 			}
 		}
 
@@ -396,6 +396,11 @@ func makeAccessorStage(field string) evaluationOperator {
 				structType: v.GetString(),
 				fieldName:  field,
 			}
+		}
+
+		if v.Type == StructType {
+			// 减少反射调用次数
+			return v, nil
 		}
 
 		return v.Get(), nil

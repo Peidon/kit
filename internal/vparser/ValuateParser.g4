@@ -21,8 +21,8 @@ primaryExpr
     : variate
     | operand
     | primaryExpr ( DOT IDENTIFIER
-                  | index
-                  | arguments)
+                  | index)
+    | IDENTIFIER arguments
     ;
 
 unaryExpr

@@ -161,4 +161,6 @@ type ABC struct {
 
 type FG struct {
 	g time.Time
+	h uint
+	j []byte
 }
