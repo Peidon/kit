@@ -156,6 +156,8 @@ func (v Value) GetArray() []Value {
 
 func AnyValue(any interface{}) Value {
 	switch val := any.(type) {
+	case Value:
+		return val
 	case bool:
 		return BoolValue(val)
 	case float64:
@@ -282,10 +284,7 @@ func reflectValue(val reflect.Value) Value {
 			s[key] = AnyValue(value)
 		}
 
-		return Value{
-			Type: StructType,
-			inf:  s,
-		}
+		return StructValue(s, tp.String())
 
 	case reflect.Slice, reflect.Array:
 		arr := make([]Value, 0, val.Len())
@@ -308,7 +307,7 @@ func reflectValue(val reflect.Value) Value {
 }
 
 // Struct 优先使用json tag 中的名字作为 key
-// 如果没有 json tag 则使用Field Name 作为 Key
+// 如果没有 json tag 则使用Field Name 作为 key
 type Struct map[string]Value
 
 func (s Struct) Field(k string) Value {
@@ -320,9 +319,10 @@ func (s Struct) Field(k string) Value {
 	}
 }
 
-func StructValue(obj Struct) Value {
+func StructValue(obj Struct, ty string) Value {
 	return Value{
 		Type: StructType,
+		str:  ty,
 		inf:  obj,
 	}
 }

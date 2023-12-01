@@ -43,3 +43,12 @@ type TypeError struct {
 func (ter TypeError) Error() string {
 	return "Type '" + ter.typeName + "' cannot be used with the operator '" + symbolMap[ter.operateSym] + "'"
 }
+
+type AccessError struct {
+	structType string
+	fieldName  string
+}
+
+func (aer AccessError) Error() string {
+	return "Field " + aer.fieldName + " not exists in " + aer.structType
+}

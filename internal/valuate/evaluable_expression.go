@@ -211,8 +211,32 @@ func (eval *EvaluableExpression) VisitPrimaryExpr(ctx *parser.PrimaryExprContext
 	if operand := ctx.Operand(); operand != nil {
 		return operand.Accept(eval)
 	}
-	// todo
 
+	primary := ctx.PrimaryExpr()
+	if primary == nil {
+		eval.errorTrack.Append(ctx.GetText())
+		return nil
+	}
+
+	stageInf := primary.Accept(eval)
+	if stage, ok := stageInf.(evaluationStage); ok {
+		identify := ctx.IDENTIFIER()
+
+		if ctx.DOT() != nil && identify != nil {
+			// accessors op
+			field := identify.GetText()
+			op := makeAccessorStage(field)
+
+			return evaluationStage{
+				symbol:   ACCESS,
+				operator: op,
+				depends:  []evaluationStage{stage},
+			}
+		}
+
+	}
+
+	eval.errorTrack.Append(ctx.GetText())
 	return nil
 }
 

@@ -173,13 +173,3 @@ func (s Durations) Values() (ret []Value) {
 	}
 	return
 }
-
-type StructList []Struct
-
-func (s StructList) Values() (ret []Value) {
-	for i := range s {
-		ret = append(ret, StructValue(s[i]))
-	}
-
-	return
-}

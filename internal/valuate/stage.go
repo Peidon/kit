@@ -364,6 +364,40 @@ func indexStage(_ Parameters, arguments ...Any) (Any, error) {
 	return nil, ArgumentTypeError
 }
 
+// array value literal
 func arrayValueStage(_ Parameters, arguments ...Any) (Any, error) {
 	return arguments, nil
+}
+
+// op symbol '.'
+func makeAccessorStage(field string) evaluationOperator {
+	return func(parameters Parameters, arguments ...Any) (Any, error) {
+		if len(arguments) == 0 {
+			return nil, TypeError{
+				operateSym: ACCESS,
+				typeName:   "void",
+			}
+		}
+		obj := arguments[0]
+		v := AnyValue(obj)
+
+		structVal := v.GetStruct()
+		if structVal == nil {
+			return nil, TypeError{
+				operateSym: ACCESS,
+				typeName:   "non-struct",
+			}
+		}
+
+		v = structVal.Field(field)
+		if v.Type == VoidType {
+			// 字段不存在
+			return nil, AccessError{
+				structType: v.GetString(),
+				fieldName:  field,
+			}
+		}
+
+		return v.Get(), nil
+	}
 }
