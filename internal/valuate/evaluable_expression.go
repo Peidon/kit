@@ -372,6 +372,9 @@ func (eval *EvaluableExpression) VisitBasicLit(ctx *parser.BasicLitContext) inte
 			operator: op,
 		}
 	}
+	if lit := ctx.Arr(); lit != nil {
+		return lit.Accept(eval)
+	}
 
 	eval.errorTrack.Append(ctx.GetText())
 	return nil

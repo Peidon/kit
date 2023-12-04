@@ -11,6 +11,7 @@ package valuate
 import (
 	"reflect"
 	"strings"
+	"time"
 )
 
 func toInt(v interface{}) int {
@@ -73,6 +74,24 @@ func toFloat64(v interface{}) float64 {
 	return -1
 }
 
+func toTime(v interface{}) time.Time {
+	v = indirect(v)
+
+	switch s := v.(type) {
+	case time.Time:
+		return s
+	}
+	return noopTime
+}
+
+func isTime(value interface{}) bool {
+	switch value.(type) {
+	case time.Time, *time.Time:
+		return true
+	}
+	return false
+}
+
 func isBool(value interface{}) bool {
 	switch value.(type) {
 	case bool:
@@ -125,8 +144,8 @@ var (
 )
 
 /*
-	Converting a boolean to an interface{} requires an allocation.
-	We can use interned bool to avoid this cost.
+Converting a boolean to an interface{} requires an allocation.
+We can use interned bool to avoid this cost.
 */
 func boolInterface(b bool) Any {
 	if b {

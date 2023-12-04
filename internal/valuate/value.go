@@ -26,7 +26,7 @@ type Value struct {
 	inf     interface{}
 }
 
-type ValueType int
+type ValueType int8
 
 const (
 	UnknownType ValueType = iota
@@ -50,6 +50,9 @@ const (
 var (
 	_minTimeInt64 = time.Unix(0, math.MinInt64)
 	_maxTimeInt64 = time.Unix(0, math.MaxInt64)
+
+	noopTime = time.Time{}
+	timeType = reflect.TypeOf(noopTime)
 )
 
 func (v Value) Get() Any {
@@ -279,7 +282,18 @@ func reflectValue(val reflect.Value) Value {
 		return StructValue(s, tp.String())
 
 	case reflect.Struct:
+		// special
+		if val.Type() == timeType {
+			if !val.CanInterface() {
+				return TimeValue(noopTime)
+			}
+			inf := val.Interface()
+			if tim, ok := inf.(time.Time); ok {
+				return TimeValue(tim)
+			}
+		}
 
+		// normal
 		s := Struct{}
 		tp := val.Type()
 

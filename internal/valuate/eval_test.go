@@ -8,7 +8,11 @@
 
 package valuate
 
-import "testing"
+import (
+	"reflect"
+	"testing"
+	"time"
+)
 
 func TestEvaluableExpression_Evaluate(t *testing.T) {
 	testData := []struct {
@@ -93,6 +97,14 @@ func TestEvaluableExpression_Evaluate(t *testing.T) {
 			want:   1.0,
 			params: MapParameters(map[string]Any{"ab.c": 3}),
 		},
+		{
+			input: "[1,2,3]",
+			want:  []interface{}{1, 2, 3},
+		},
+		{
+			input: `["abc", "d"]`,
+			want:  []interface{}{"abc", "d"},
+		},
 	}
 
 	for _, td := range testData {
@@ -109,8 +121,28 @@ func TestEvaluableExpression_Evaluate(t *testing.T) {
 		if er != nil {
 			t.Log(er)
 		}
+
+		// testing array value
+		if arr, ok := td.want.([]interface{}); ok {
+			gotArr, ok := got.([]interface{})
+			if !ok {
+				t.Error("got type not []interface\n got type : ", reflect.TypeOf(got).String())
+			}
+			for i := range arr {
+				a := AnyValue(arr[i])
+				b := AnyValue(gotArr[i])
+				if !a.Equal(b) {
+					t.Error("Array Elem ", arr[i], " and ", gotArr[i], " not equal\n")
+					continue
+				}
+
+			}
+
+			continue
+		}
+
 		if got != td.want {
-			t.Error("got: ", got, "\nwant: ", td.want)
+			t.Error("got: ", got, "\n got type", reflect.TypeOf(got).String(), "\nwant: ", td.want)
 		}
 	}
 }
@@ -118,6 +150,9 @@ func TestEvaluableExpression_Evaluate(t *testing.T) {
 type abc struct{}
 
 func TestAccess(t *testing.T) {
+
+	ti := time.Now()
+
 	s := ABC{
 		a: 12,
 		B: "abc",
@@ -132,7 +167,11 @@ func TestAccess(t *testing.T) {
 
 		f: 1234.2345,
 
-		G: FG{},
+		G: FG{
+			J: ti,
+			h: 10,
+			g: []byte{'g'},
+		},
 	}
 
 	testData := []struct {
@@ -145,6 +184,16 @@ func TestAccess(t *testing.T) {
 			input:  "s.abc.b == efg",
 			want:   true,
 			params: MapParameters(map[string]Any{"s": s, "efg": s.E.B}),
+		},
+		{
+			input:  "s.G.h",
+			want:   uint64(10),
+			params: MapParameters(map[string]Any{"s": s}),
+		},
+		{
+			input:  "s.G.J == ti",
+			want:   true,
+			params: MapParameters(map[string]Any{"s": s, "ti": ti}),
 		},
 	}
 
@@ -163,7 +212,7 @@ func TestAccess(t *testing.T) {
 			t.Log(er)
 		}
 		if got != td.want {
-			t.Error("got: ", got, "\nwant: ", td.want)
+			t.Error("got: ", got, "\n got type", reflect.TypeOf(got).String(), "\nwant: ", td.want)
 		}
 	}
 }

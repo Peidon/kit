@@ -8,7 +8,7 @@
 
 package valuate
 
-type OperatorSymbol int
+type OperatorSymbol int8
 
 const (
 	NOOP OperatorSymbol = iota
@@ -65,7 +65,7 @@ var (
 /*
 Operator Argument Index
 */
-type OperatorArgument int
+type OperatorArgument int8
 
 const (
 	// binary arguments index
@@ -76,7 +76,7 @@ const (
 	unary OperatorArgument = 0
 )
 
-type OperatorType int
+type OperatorType int8
 
 const (
 	unaryOp OperatorType = iota + 1

@@ -89,6 +89,7 @@ func comparableCheck(arguments ...Any) error {
 		if !isNumber(arg) &&
 			!isString(arg) &&
 			!isBool(arg) &&
+			!isTime(arg) &&
 			!isComparable(arg) &&
 			!isNil(arg) {
 			return ArgumentTypeError
@@ -145,6 +146,12 @@ func equalStage(_ Parameters, arguments ...Any) (Any, error) {
 	if isBool(l) && isBool(r) {
 		return l.(bool) == r.(bool), nil
 	}
+
+	if isTime(l) && isTime(r) {
+		lv, rv := toTime(l), toTime(r)
+		return lv.Sub(rv) == 0, nil
+	}
+
 	if isComparable(l) && isComparable(r) {
 		a := l.(Comparable)
 		b := r.(Comparable)
@@ -166,6 +173,11 @@ func notEqualStage(_ Parameters, arguments ...Any) (Any, error) {
 	if isBool(l) && isBool(r) {
 		return l.(bool) != r.(bool), nil
 	}
+	if isTime(l) && isTime(r) {
+		lv, rv := toTime(l), toTime(r)
+		return lv.Sub(rv) != 0, nil
+	}
+
 	if isComparable(l) && isComparable(r) {
 		a := l.(Comparable)
 		b := r.(Comparable)
@@ -180,6 +192,10 @@ func gtStage(_ Parameters, arguments ...Any) (Any, error) {
 	l, r := arguments[left], arguments[right]
 	if isNumber(l) && isNumber(r) {
 		return toFloat64(l) > toFloat64(r), nil
+	}
+	if isTime(l) && isTime(r) {
+		lv, rv := toTime(l), toTime(r)
+		return lv.After(rv), nil
 	}
 	if isComparable(l) && isComparable(r) {
 		a := l.(Comparable)
@@ -196,6 +212,10 @@ func ltStage(_ Parameters, arguments ...Any) (Any, error) {
 	if isNumber(l) && isNumber(r) {
 		return toFloat64(l) < toFloat64(r), nil
 	}
+	if isTime(l) && isTime(r) {
+		lv, rv := toTime(l), toTime(r)
+		return lv.Before(rv), nil
+	}
 	if isComparable(l) && isComparable(r) {
 		a := l.(Comparable)
 		b := r.(Comparable)
@@ -211,6 +231,10 @@ func gteStage(_ Parameters, arguments ...Any) (Any, error) {
 	if isNumber(l) && isNumber(r) {
 		return toFloat64(l) >= toFloat64(r), nil
 	}
+	if isTime(l) && isTime(r) {
+		lv, rv := toTime(l), toTime(r)
+		return !lv.Before(rv), nil
+	}
 	if isComparable(l) && isComparable(r) {
 		a := l.(Comparable)
 		b := r.(Comparable)
@@ -225,6 +249,10 @@ func lteStage(_ Parameters, arguments ...Any) (Any, error) {
 	l, r := arguments[left], arguments[right]
 	if isNumber(l) && isNumber(r) {
 		return toFloat64(l) <= toFloat64(r), nil
+	}
+	if isTime(l) && isTime(r) {
+		lv, rv := toTime(l), toTime(r)
+		return !lv.After(rv), nil
 	}
 	if isComparable(l) && isComparable(r) {
 		a := l.(Comparable)
@@ -389,11 +417,12 @@ func makeAccessorStage(field string) evaluationOperator {
 			}
 		}
 
+		structTyp := v.GetString()
 		v = structVal.Field(field)
 		if v.Type == VoidType {
 			// 字段不存在
 			return nil, AccessError{
-				structType: v.GetString(),
+				structType: structTyp,
 				fieldName:  field,
 			}
 		}

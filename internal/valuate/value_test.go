@@ -160,7 +160,7 @@ type ABC struct {
 }
 
 type FG struct {
-	g time.Time
+	g []byte
 	h uint
-	j []byte
+	J time.Time
 }
