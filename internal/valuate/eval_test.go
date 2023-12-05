@@ -36,9 +36,9 @@ func TestEvaluableExpression_Evaluate(t *testing.T) {
 			hasError: true,
 		},
 		{
-			input:    "abc == nil",
-			params:   MapParameters(map[string]Any{"abc": abc{}}),
-			hasError: true,
+			input:  "abc != nil",
+			params: MapParameters(map[string]Any{"abc": &abc{}}),
+			want:   true,
 		},
 		{
 			input:  "abc == nil",

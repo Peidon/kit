@@ -92,6 +92,15 @@ func isTime(value interface{}) bool {
 	return false
 }
 
+func isPtr(value interface{}) bool {
+	tp := reflect.TypeOf(value)
+	switch tp.Kind() {
+	case reflect.Pointer, reflect.UnsafePointer:
+		return true
+	}
+	return false
+}
+
 func isBool(value interface{}) bool {
 	switch value.(type) {
 	case bool:

@@ -91,7 +91,8 @@ func comparableCheck(arguments ...Any) error {
 			!isBool(arg) &&
 			!isTime(arg) &&
 			!isComparable(arg) &&
-			!isNil(arg) {
+			!isNil(arg) &&
+			!isPtr(arg) {
 			return ArgumentTypeError
 		}
 	}
