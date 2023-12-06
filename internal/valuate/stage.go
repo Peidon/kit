@@ -54,6 +54,19 @@ func (stage evaluationStage) argsTypeCheck(args ...Any) (err error) {
 // type checking depends on Stage Operator
 type stageCombinedTypeCheck func(arguments ...Any) error
 
+// array operator check
+func arrayTypeCheck(arguments ...Any) error {
+	arrInf := arguments[left]
+	idxInf := arguments[right]
+
+	arrType := reflect.TypeOf(arrInf)
+	if arrType.Kind() != reflect.Slice && arrType.Kind() != reflect.Array && !isInt(idxInf) {
+		return ArgumentTypeError
+	}
+
+	return nil
+}
+
 // number operators check
 func numberTypeCheck(arguments ...Any) error {
 	for _, arg := range arguments {
@@ -384,7 +397,7 @@ func exprListStage(_ Parameters, arguments ...Any) (Any, error) {
 	return vars, nil
 }
 
-// op '[idx]'
+// index :  '[' expression ']'
 func indexStage(_ Parameters, arguments ...Any) (Any, error) {
 	arg := arguments[unary]
 	if isInt(arg) {
@@ -394,8 +407,61 @@ func indexStage(_ Parameters, arguments ...Any) (Any, error) {
 }
 
 // array value literal
+// [expr, ... , expr]
 func arrayValueStage(_ Parameters, arguments ...Any) (Any, error) {
 	return arguments, nil
+}
+
+// array index
+// primary_expr '[' index ']'
+func arrayIndexStage(_ Parameters, arguments ...Any) (Any, error) {
+	arrInf := arguments[left]  // primary expr
+	idxInf := arguments[right] // index
+
+	arrVal := AnyValue(arrInf)
+	idx := AnyValue(idxInf)
+
+	arr := arrVal.GetArray()
+	i := int(idx.GetInt())
+
+	if i < 0 || i >= len(arr) {
+		return nil, ArrayIndexError{
+			Index:    i,
+			ArrayLen: len(arr),
+		}
+	}
+
+	return arr[i], nil
+}
+
+// functional
+func makeFuncStage(funcName string, fs map[string]ExpressionFunction) evaluationOperator {
+	return func(parameters Parameters, arguments ...Any) (Any, error) {
+
+		lis := arguments[unary]
+		var args []interface{}
+
+		vars, ok := lis.([]Value)
+		if !ok {
+			argVal := AnyValue(lis)
+			vars = argVal.GetArray()
+		}
+		for _, v := range vars {
+			args = append(args, v.Get())
+		}
+
+		// customize
+		if f, ok := fs[funcName]; ok {
+			return f(args...)
+		}
+		// builtin
+		f, ok := functions[funcName]
+		if !ok {
+			return nil, FunctionNotExists
+		}
+
+		return f(args...)
+	}
 }
 
 // op symbol '.'

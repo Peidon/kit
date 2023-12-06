@@ -173,3 +173,9 @@ func (s Durations) Values() (ret []Value) {
 	}
 	return
 }
+
+type Values []Value
+
+func (s Values) Values() []Value {
+	return s
+}

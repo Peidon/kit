@@ -219,7 +219,7 @@ func (eval *EvaluableExpression) VisitPrimaryExpr(ctx *parser.PrimaryExprContext
 	}
 
 	stageInf := primary.Accept(eval)
-	if stage, ok := stageInf.(evaluationStage); ok {
+	if primaryStage, ok := stageInf.(evaluationStage); ok {
 		identify := ctx.IDENTIFIER()
 
 		if ctx.DOT() != nil && identify != nil {
@@ -230,12 +230,40 @@ func (eval *EvaluableExpression) VisitPrimaryExpr(ctx *parser.PrimaryExprContext
 			return evaluationStage{
 				symbol:   ACCESS,
 				operator: op,
-				depends:  []evaluationStage{stage},
+				depends:  []evaluationStage{primaryStage},
 			}
 		}
 
-		// todo
+		if idx := ctx.Index(); idx != nil {
+			// array index op
+			idxInf := idx.Accept(eval)
 
+			if idxStage, ok := idxInf.(evaluationStage); ok {
+				return evaluationStage{
+					opType:    binaryOp,
+					symbol:    INDEX,
+					operator:  arrayIndexStage,
+					typeCheck: arrayTypeCheck,
+					depends:   []evaluationStage{primaryStage, idxStage},
+				}
+			}
+		}
+
+	}
+
+	// functional
+	if identifier, args := ctx.IDENTIFIER(), ctx.Arguments(); identifier != nil && args != nil {
+		functionName := identifier.GetText()
+		argsInf := args.Accept(eval)
+		if argumentStage, ok := argsInf.(evaluationStage); ok {
+			op := makeFuncStage(functionName, eval.functions)
+			return evaluationStage{
+				opType:   unaryOp,
+				symbol:   FUNCTIONAL,
+				operator: op,
+				depends:  []evaluationStage{argumentStage},
+			}
+		}
 	}
 
 	eval.errorTrack.Append(ctx.GetText())

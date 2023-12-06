@@ -9,3 +9,8 @@
 package valuate
 
 type ExpressionFunction func(arguments ...Any) (Any, error)
+
+var (
+	// builtin functions
+	functions = map[string]ExpressionFunction{}
+)

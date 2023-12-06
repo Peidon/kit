@@ -10,6 +10,7 @@ package valuate
 
 import (
 	"errors"
+	"strconv"
 	"strings"
 )
 
@@ -19,6 +20,7 @@ var (
 	DivideZeroError   = errors.New("divide zero")
 	NoNeedEvaluate    = errors.New("no need evaluate")
 	PlanStageError    = errors.New("plan stage error")
+	FunctionNotExists = errors.New("function not exists")
 )
 
 // StageError track errors when plan stages
@@ -51,4 +53,13 @@ type AccessError struct {
 
 func (aer AccessError) Error() string {
 	return "Field " + aer.fieldName + " not exists in " + aer.structType
+}
+
+type ArrayIndexError struct {
+	ArrayLen int
+	Index    int
+}
+
+func (err ArrayIndexError) Error() string {
+	return "index " + strconv.Itoa(err.Index) + " out of range, array length is " + strconv.Itoa(err.ArrayLen)
 }
