@@ -220,7 +220,7 @@ func ltStage(_ Parameters, arguments ...Any) (Any, error) {
 	if isComparable(l) && isComparable(r) {
 		a := l.(Comparable)
 		b := r.(Comparable)
-		return !a.Greater(b) && !a.Greater(b), nil
+		return !a.Greater(b) && !a.Equal(b), nil
 	}
 	return nil, ArgumentTypeError
 }

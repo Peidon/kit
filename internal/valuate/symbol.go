@@ -57,7 +57,11 @@ var (
 		ACCESS:   "accessor .",
 		INVERT:   "!",
 		NEGATE:   "negate -",
-		NOOP:     "unknown",
+		NOOP:     "noop",
+
+		LITERAL:    "literal",
+		VALUE:      "value",
+		FUNCTIONAL: "functional",
 	}
 )
 
