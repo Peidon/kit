@@ -156,11 +156,13 @@ type ABC struct {
 
 	f float64
 
-	G FG
+	G GG
+
+	GgList []*GG
 }
 
-type FG struct {
-	g []byte
+type GG struct {
+	I []byte
 	h uint
 	J time.Time
 }

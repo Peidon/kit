@@ -98,12 +98,26 @@ func TestEvaluableExpression_Evaluate(t *testing.T) {
 			params: MapParameters(map[string]Any{"ab.c": 3}),
 		},
 		{
+			input: "[]",
+			want:  []interface{}{},
+		},
+		{
 			input: "[1,2,3]",
 			want:  []interface{}{1, 2, 3},
 		},
 		{
 			input: `["abc", "d"]`,
 			want:  []interface{}{"abc", "d"},
+		},
+		{
+			input:  "a[1]",
+			want:   int64(2),
+			params: MapParameters(map[string]Any{"a": []int{1, 2, 3}}),
+		},
+		{
+			input:  "a[idx]",
+			want:   int64(2),
+			params: MapParameters(map[string]Any{"a": []int{1, 2, 3}, "idx": 1}),
 		},
 	}
 
@@ -167,10 +181,22 @@ func TestAccess(t *testing.T) {
 
 		f: 1234.2345,
 
-		G: FG{
-			J: ti,
+		G: GG{
 			h: 10,
-			g: []byte{'g'},
+			I: []byte{'g'},
+			J: ti,
+		},
+
+		GgList: []*GG{
+			{
+				h: 1,
+				I: []byte{'i'},
+				J: ti,
+			},
+			{
+				h: 2,
+				I: []byte{'h', 'i'},
+			},
 		},
 	}
 
@@ -194,6 +220,11 @@ func TestAccess(t *testing.T) {
 			input:  "s.G.J == ti",
 			want:   true,
 			params: MapParameters(map[string]Any{"s": s, "ti": ti}),
+		},
+		{
+			input:  "s.GgList[0].I",
+			want:   []interface{}{'i'},
+			params: MapParameters(map[string]Any{"s": s}),
 		},
 	}
 

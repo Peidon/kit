@@ -92,9 +92,18 @@ func isTime(value interface{}) bool {
 	return false
 }
 
+func isArray(value interface{}) bool {
+	v := reflect.ValueOf(value)
+	switch v.Kind() {
+	case reflect.Slice, reflect.Array:
+		return true
+	}
+	return false
+}
+
 func isPtr(value interface{}) bool {
-	tp := reflect.TypeOf(value)
-	switch tp.Kind() {
+	v := reflect.ValueOf(value)
+	switch v.Kind() {
 	case reflect.Pointer, reflect.UnsafePointer:
 		return true
 	}

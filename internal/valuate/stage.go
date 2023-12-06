@@ -103,6 +103,7 @@ func comparableCheck(arguments ...Any) error {
 			!isString(arg) &&
 			!isBool(arg) &&
 			!isTime(arg) &&
+			!isArray(arg) &&
 			!isComparable(arg) &&
 			!isNil(arg) &&
 			!isPtr(arg) {
@@ -137,7 +138,7 @@ func makeLiteralStage(literal string, tp TokenSymbol) evaluationOperator {
 
 func makeParameterStage(parameterName string) evaluationOperator {
 
-	return func(parameters Parameters, arguments ...Any) (interface{}, error) {
+	return func(parameters Parameters, arguments ...Any) (Any, error) {
 		value, err := parameters.Get(parameterName)
 		if err != nil {
 			return nil, err
@@ -431,7 +432,7 @@ func arrayIndexStage(_ Parameters, arguments ...Any) (Any, error) {
 		}
 	}
 
-	return arr[i], nil
+	return arr[i].Get(), nil
 }
 
 // functional

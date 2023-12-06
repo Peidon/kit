@@ -231,6 +231,8 @@ func AnyValue(any interface{}) Value {
 		return ArrayValue(UintPoints(val))
 	case []time.Duration:
 		return ArrayValue(Durations(val))
+	case []Value:
+		return ArrayValue(Values(val))
 	case reflect.Value:
 		// reflect
 		return reflectValue(val)
