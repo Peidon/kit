@@ -10,7 +10,7 @@ package valuate
 
 import (
 	"github.com/antlr/antlr4/runtime/Go/antlr"
-	"kit/internal/valuate/parser"
+	"kit/pkg/valuate/parser"
 )
 
 type EvaluableExpression struct {
