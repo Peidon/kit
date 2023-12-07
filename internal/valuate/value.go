@@ -83,6 +83,21 @@ func (v Value) Get() Any {
 	return nil
 }
 
+func getAny(v interface{}) interface{} {
+	if v == nil {
+		return nil
+	}
+
+	switch val := v.(type) {
+	case Value:
+		return val.Get()
+	case []Value:
+		return Values(val).Get()
+	}
+
+	return v
+}
+
 func (v Value) GetBytes() []byte {
 	if v.Type != BinaryType {
 		return nil
@@ -444,10 +459,36 @@ type Comparable interface {
 
 func (v Value) Equal(other Comparable) bool {
 	if ot, ok := other.(Value); ok {
-		return ot.Type == v.Type &&
+		if (ot.Type == IntType || ot.Type == UintType || ot.Type == DurationType ||
+			ot.Type == FloatType || ot.Type == PtrType || ot.Type == BoolType) &&
+			(v.Type == IntType || v.Type == UintType || v.Type == DurationType ||
+				v.Type == FloatType || v.Type == PtrType || v.Type == BoolType) {
+			return ot.integer == v.integer
+		}
+
+		if ot.Type == StringType && v.Type == StringType {
+			return ot.str == v.str
+		}
+
+		if ot.Type == BinaryType && v.Type == BinaryType {
+			return reflect.DeepEqual(ot.inf, v.inf)
+		}
+
+		if ot.Type == ArrayType && v.Type == ArrayType {
+			a, b := ot.GetArray(), v.GetArray()
+			for i := range a {
+				if !a[i].Equal(b[i]) {
+					return false
+				}
+			}
+			return true
+		}
+
+		if ot.Type == v.Type &&
 			ot.str == v.str &&
-			ot.integer == v.integer &&
-			reflect.DeepEqual(ot.inf, v.inf)
+			ot.integer == v.integer {
+			return reflect.DeepEqual(ot.inf, v.inf)
+		}
 	}
 
 	return false

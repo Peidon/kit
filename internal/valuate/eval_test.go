@@ -242,6 +242,17 @@ func TestAccess(t *testing.T) {
 		if er != nil {
 			t.Log(er)
 		}
+
+		if isArray(td.want) {
+			w := AnyValue(td.want)
+			g := AnyValue(got)
+
+			if !g.Equal(w) {
+				t.Error("got: ", got, "\nwant: ", td.want)
+			}
+			continue
+		}
+
 		if got != td.want {
 			t.Error("got: ", got, "\n got type", reflect.TypeOf(got).String(), "\nwant: ", td.want)
 		}

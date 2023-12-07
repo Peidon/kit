@@ -179,3 +179,13 @@ type Values []Value
 func (s Values) Values() []Value {
 	return s
 }
+
+func (s Values) Get() Any {
+	var ret []interface{}
+
+	for _, v := range s {
+		ret = append(ret, v.Get())
+	}
+
+	return ret
+}

@@ -508,7 +508,8 @@ func (eval *EvaluableExpression) Eval(parameters Parameters) (interface{}, error
 		parameters = DummyParameters
 	}
 
-	return eval.evaluateStage(eval.stage, parameters)
+	v, err := eval.evaluateStage(eval.stage, parameters)
+	return getAny(v), err
 }
 
 func (eval *EvaluableExpression) evaluateStage(stage *evaluationStage, parameters Parameters) (interface{}, error) {
