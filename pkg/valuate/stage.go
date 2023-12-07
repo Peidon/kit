@@ -467,11 +467,11 @@ func makeFuncStage(funcName string, fs map[string]ExpressionFunction) evaluation
 		ret, err = fn(args...)
 		switch err {
 		case FnArgTypeError:
-			ts := argTypes(args)
-			return nil, errors.New("function " + funcName + " arguments type error : " + strings.Join(ts, ","))
+			ts := argTypes(args...)
+			return nil, errors.New("function '" + funcName + "' arguments type error : " + strings.Join(ts, ","))
 		case FnArgsNumberError:
 			num := len(args)
-			return nil, errors.New("function " + funcName + " arguments number error, number = " + strconv.Itoa(num))
+			return nil, errors.New("function '" + funcName + "' arguments number error, number = " + strconv.Itoa(num))
 		}
 		return
 	}

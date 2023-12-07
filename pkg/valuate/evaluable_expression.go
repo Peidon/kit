@@ -23,8 +23,12 @@ type EvaluableExpression struct {
 	errorTrack *StageError
 }
 
-func NewExpression(input string) (ee *EvaluableExpression, err error) {
+func NewExpression(input string) (*EvaluableExpression, error) {
 
+	return NewWithFunctions(input, nil)
+}
+
+func NewWithFunctions(input string, fs map[string]ExpressionFunction) (ee *EvaluableExpression, err error) {
 	// lexer
 	stream := antlr.NewInputStream(input)
 	lexer := parser.NewValuateLexer(stream)
@@ -38,6 +42,7 @@ func NewExpression(input string) (ee *EvaluableExpression, err error) {
 	ee = &EvaluableExpression{
 		text:       input,
 		errorTrack: &StageError{},
+		functions:  fs,
 	}
 
 	// plan stages
@@ -48,7 +53,6 @@ func NewExpression(input string) (ee *EvaluableExpression, err error) {
 	if ee.stage == nil {
 		err = ee.errorTrack
 	}
-
 	return
 }
 
@@ -253,14 +257,18 @@ func (eval *EvaluableExpression) VisitPrimaryExpr(ctx *parser.PrimaryExprContext
 	if identifier, args := ctx.IDENTIFIER(), ctx.Arguments(); identifier != nil && args != nil {
 		functionName := identifier.GetText()
 		argsInf := args.Accept(eval)
+
+		var dep []evaluationStage
 		if argumentStage, ok := argsInf.(evaluationStage); ok {
-			op := makeFuncStage(functionName, eval.functions)
-			return evaluationStage{
-				opType:   unaryOp,
-				symbol:   FUNCTIONAL,
-				operator: op,
-				depends:  []evaluationStage{argumentStage},
-			}
+			dep = append(dep, argumentStage)
+		}
+
+		op := makeFuncStage(functionName, eval.functions)
+		return evaluationStage{
+			opType:   unaryOp,
+			symbol:   FUNCTIONAL,
+			operator: op,
+			depends:  dep,
 		}
 	}
 
@@ -313,8 +321,6 @@ func (eval *EvaluableExpression) VisitArguments(ctx *parser.ArgumentsContext) in
 	if expr := ctx.ExpressionList(); expr != nil {
 		return expr.Accept(eval)
 	}
-
-	eval.errorTrack.Append(ctx.GetText())
 	return nil
 }
 
@@ -487,12 +493,6 @@ func (eval *EvaluableExpression) VisitIndex(ctx *parser.IndexContext) interface{
 		depends:   dep,
 		typeCheck: numberTypeCheck,
 	}
-}
-
-// Functions /*
-// Setting functions
-func (eval *EvaluableExpression) Functions(fs map[string]ExpressionFunction) {
-	eval.functions = fs
 }
 
 func (eval *EvaluableExpression) Evaluate(parameters map[string]interface{}) (interface{}, error) {

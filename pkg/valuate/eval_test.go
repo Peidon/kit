@@ -9,6 +9,7 @@
 package valuate
 
 import (
+	"encoding/json"
 	"reflect"
 	"testing"
 	"time"
@@ -200,11 +201,50 @@ func TestAccess(t *testing.T) {
 		},
 	}
 
+	fs := map[string]ExpressionFunction{
+		"json_marshal": func(args ...interface{}) (interface{}, error) {
+			if len(args) == 0 || len(args) > 1 {
+				return nil, FnArgsNumberError
+			}
+			return json.Marshal(args[0])
+		},
+		"bytes_to_string": func(args ...interface{}) (interface{}, error) {
+			if len(args) == 0 || len(args) > 1 {
+				return nil, FnArgsNumberError
+			}
+			a := args[0]
+			v, ok := a.([]byte)
+			if !ok {
+				return nil, FnArgTypeError
+			}
+
+			return string(v), nil
+		},
+		"json_unmarshal": func(args ...interface{}) (interface{}, error) {
+			if len(args) != 2 {
+				return nil, FnArgsNumberError
+			}
+			a := args[0]
+			v, ok := a.(string)
+			if !ok {
+				return nil, FnArgTypeError
+			}
+			b := []byte(v)
+			if !isPtr(args[1]) {
+				return nil, FnArgTypeError
+			}
+			err := json.Unmarshal(b, args[1])
+			return args[1], err
+		},
+	}
+
 	testData := []struct {
 		input    string
 		want     interface{}
 		params   MapParameters
 		hasError bool
+
+		functions map[string]ExpressionFunction
 	}{
 		{
 			input:  "s.abc.b == efg",
@@ -231,14 +271,46 @@ func TestAccess(t *testing.T) {
 			want:   true,
 			params: MapParameters(map[string]Any{"s": s}),
 		},
+		{
+			input:  "len(s.GgList) + len(s.G.I) == n",
+			want:   true,
+			params: MapParameters(map[string]Any{"s": s, "n": len(s.GgList) + len(s.G.I)}),
+		},
+		{
+			input:    "len(s)",
+			hasError: true,
+			params:   MapParameters(map[string]Any{"s": s}),
+		},
+		{
+			input:     "len(json_marshal(s.abc)) > 0",
+			params:    MapParameters(map[string]Any{"s": s}),
+			want:      true,
+			functions: fs,
+		},
+		{
+			input:     "bytes_to_string(json_marshal(s.abc))",
+			params:    MapParameters(map[string]Any{"s": s}),
+			want:      `{"G":{"Type":10},"GgList":{"Type":9},"a":{"Type":4},"abc":{"Type":0},"b":{"Type":7},"c":{"Type":3},"d":{"Type":0},"f":{"Type":6}}`,
+			functions: fs,
+		},
+		{
+			input: "json_unmarshal(a, b) == nil",
+			params: MapParameters(map[string]Any{
+				"a": `{"G":{"Type":10},"GgList":{"Type":9},"a":{"Type":4},"abc":{"Type":0},"b":{"Type":7},"c":{"Type":3},"d":{"Type":0},"f":{"Type":6}}`,
+				"b": &s,
+			}),
+			want:      false,
+			functions: fs,
+		},
 	}
 
 	for _, td := range testData {
-		expr, err := NewExpression(td.input)
+		expr, err := NewWithFunctions(td.input, td.functions)
 		if err != nil {
 			t.Error(err)
 			return
 		}
+
 		got, er := expr.Evaluate(td.params)
 		if er != nil && !td.hasError {
 			t.Error(er)

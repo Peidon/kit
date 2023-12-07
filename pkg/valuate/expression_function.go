@@ -20,7 +20,7 @@ var (
 )
 
 func length(args ...Any) (interface{}, error) {
-	if len(args) == 0 {
+	if len(args) == 0 || len(args) > 1 {
 		return nil, FnArgsNumberError
 	}
 	arr := args[0]
@@ -28,6 +28,8 @@ func length(args ...Any) (interface{}, error) {
 	switch v.Kind() {
 	case reflect.Slice, reflect.Array:
 		return v.Len(), nil
+	case reflect.String:
+		return len(v.String()), nil
 	default:
 		return nil, FnArgTypeError
 	}
