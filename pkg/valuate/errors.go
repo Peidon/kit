@@ -20,7 +20,8 @@ var (
 	DivideZeroError   = errors.New("divide zero")
 	NoNeedEvaluate    = errors.New("no need evaluate")
 	PlanStageError    = errors.New("plan stage error")
-	FunctionNotExists = errors.New("function not exists")
+	FnArgsNumberError = errors.New("function arguments number error")
+	FnArgTypeError    = errors.New("function argument type error")
 )
 
 // StageError track errors when plan stages

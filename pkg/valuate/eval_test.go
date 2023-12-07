@@ -226,6 +226,11 @@ func TestAccess(t *testing.T) {
 			want:   []interface{}{'i'},
 			params: MapParameters(map[string]Any{"s": s}),
 		},
+		{
+			input:  "len(s.GgList) == 2",
+			want:   true,
+			params: MapParameters(map[string]Any{"s": s}),
+		},
 	}
 
 	for _, td := range testData {

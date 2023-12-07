@@ -12,6 +12,7 @@ import (
 	"errors"
 	"reflect"
 	"strconv"
+	"strings"
 )
 
 type evaluationStage struct {
@@ -437,7 +438,7 @@ func arrayIndexStage(_ Parameters, arguments ...Any) (Any, error) {
 
 // functional
 func makeFuncStage(funcName string, fs map[string]ExpressionFunction) evaluationOperator {
-	return func(parameters Parameters, arguments ...Any) (Any, error) {
+	return func(parameters Parameters, arguments ...Any) (ret Any, err error) {
 
 		lis := arguments[unary]
 		var args []interface{}
@@ -451,17 +452,28 @@ func makeFuncStage(funcName string, fs map[string]ExpressionFunction) evaluation
 			args = append(args, v.Get())
 		}
 
+		var fn ExpressionFunction
+
 		// customize
-		if f, ok := fs[funcName]; ok {
-			return f(args...)
+		if fn, ok = fs[funcName]; !ok {
+
+			// builtin
+			fn, ok = builtin[funcName]
 		}
-		// builtin
-		f, ok := functions[funcName]
 		if !ok {
-			return nil, FunctionNotExists
+			return nil, errors.New("function " + funcName + " not exists")
 		}
 
-		return f(args...)
+		ret, err = fn(args...)
+		switch err {
+		case FnArgTypeError:
+			ts := argTypes(args)
+			return nil, errors.New("function " + funcName + " arguments type error : " + strings.Join(ts, ","))
+		case FnArgsNumberError:
+			num := len(args)
+			return nil, errors.New("function " + funcName + " arguments number error, number = " + strconv.Itoa(num))
+		}
+		return
 	}
 }
 

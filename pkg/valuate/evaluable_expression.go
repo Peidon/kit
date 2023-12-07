@@ -491,6 +491,12 @@ func (eval *EvaluableExpression) VisitIndex(ctx *parser.IndexContext) interface{
 	}
 }
 
+// Functions /*
+// Setting functions
+func (eval *EvaluableExpression) Functions(fs map[string]ExpressionFunction) {
+	eval.functions = fs
+}
+
 func (eval *EvaluableExpression) Evaluate(parameters map[string]interface{}) (interface{}, error) {
 	if parameters == nil {
 		return eval.Eval(nil)
