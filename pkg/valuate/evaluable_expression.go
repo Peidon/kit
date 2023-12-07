@@ -212,43 +212,41 @@ func (eval *EvaluableExpression) VisitPrimaryExpr(ctx *parser.PrimaryExprContext
 		return operand.Accept(eval)
 	}
 
-	primary := ctx.PrimaryExpr()
-	if primary == nil {
-		eval.errorTrack.Append(ctx.GetText())
-		return nil
-	}
+	if primary := ctx.PrimaryExpr(); primary != nil {
+		stageInf := primary.Accept(eval)
 
-	stageInf := primary.Accept(eval)
-	if primaryStage, ok := stageInf.(evaluationStage); ok {
-		identify := ctx.IDENTIFIER()
+		// primary_expression (. identifier | [index] )
+		if primaryStage, ok := stageInf.(evaluationStage); ok {
 
-		if ctx.DOT() != nil && identify != nil {
-			// accessors op
-			field := identify.GetText()
-			op := makeAccessorStage(field)
+			// accessors op '.'
+			if identify := ctx.IDENTIFIER(); ctx.DOT() != nil && identify != nil {
+				field := identify.GetText()
+				op := makeAccessorStage(field)
 
-			return evaluationStage{
-				symbol:   ACCESS,
-				operator: op,
-				depends:  []evaluationStage{primaryStage},
-			}
-		}
-
-		if idx := ctx.Index(); idx != nil {
-			// array index op
-			idxInf := idx.Accept(eval)
-
-			if idxStage, ok := idxInf.(evaluationStage); ok {
 				return evaluationStage{
-					opType:    binaryOp,
-					symbol:    INDEX,
-					operator:  arrayIndexStage,
-					typeCheck: arrayTypeCheck,
-					depends:   []evaluationStage{primaryStage, idxStage},
+					opType:   unaryOp,
+					symbol:   ACCESS,
+					operator: op,
+					depends:  []evaluationStage{primaryStage},
 				}
 			}
-		}
 
+			// array index op '[' ']'
+			if idx := ctx.Index(); idx != nil {
+
+				idxInf := idx.Accept(eval)
+				if idxStage, ok := idxInf.(evaluationStage); ok {
+					return evaluationStage{
+						opType:    binaryOp,
+						symbol:    INDEX,
+						operator:  arrayIndexStage,
+						typeCheck: arrayTypeCheck,
+						depends:   []evaluationStage{primaryStage, idxStage},
+					}
+				}
+			}
+
+		}
 	}
 
 	// functional
