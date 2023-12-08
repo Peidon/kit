@@ -152,6 +152,7 @@ func makeParameterStage(parameterName string) evaluationOperator {
 // equalStage symbol ==
 // @param arguments left right
 func equalStage(_ Parameters, arguments ...Any) (Any, error) {
+	arguments = getAnyList(arguments)
 	l, r := arguments[left], arguments[right]
 	if isNumber(l) && isNumber(r) {
 		return toFloat64(l) == toFloat64(r), nil
@@ -179,6 +180,7 @@ func equalStage(_ Parameters, arguments ...Any) (Any, error) {
 // notEqualStage symbol !=
 // @param arguments left right
 func notEqualStage(_ Parameters, arguments ...Any) (Any, error) {
+	arguments = getAnyList(arguments)
 	l, r := arguments[left], arguments[right]
 	if isNumber(l) && isNumber(r) {
 		return toFloat64(l) != toFloat64(r), nil
@@ -205,6 +207,7 @@ func notEqualStage(_ Parameters, arguments ...Any) (Any, error) {
 // gtStage symbol '>'
 // greater than
 func gtStage(_ Parameters, arguments ...Any) (Any, error) {
+	arguments = getAnyList(arguments)
 	l, r := arguments[left], arguments[right]
 	if isNumber(l) && isNumber(r) {
 		return toFloat64(l) > toFloat64(r), nil
@@ -224,6 +227,7 @@ func gtStage(_ Parameters, arguments ...Any) (Any, error) {
 // ltStage symbol '<'
 // less than
 func ltStage(_ Parameters, arguments ...Any) (Any, error) {
+	arguments = getAnyList(arguments)
 	l, r := arguments[left], arguments[right]
 	if isNumber(l) && isNumber(r) {
 		return toFloat64(l) < toFloat64(r), nil
@@ -243,6 +247,7 @@ func ltStage(_ Parameters, arguments ...Any) (Any, error) {
 // gteStage symbol '>='
 // greater or equal
 func gteStage(_ Parameters, arguments ...Any) (Any, error) {
+	arguments = getAnyList(arguments)
 	l, r := arguments[left], arguments[right]
 	if isNumber(l) && isNumber(r) {
 		return toFloat64(l) >= toFloat64(r), nil
@@ -262,6 +267,7 @@ func gteStage(_ Parameters, arguments ...Any) (Any, error) {
 // lteStage symbol '<='
 // less or equal
 func lteStage(_ Parameters, arguments ...Any) (Any, error) {
+	arguments = getAnyList(arguments)
 	l, r := arguments[left], arguments[right]
 	if isNumber(l) && isNumber(r) {
 		return toFloat64(l) <= toFloat64(r), nil
@@ -280,6 +286,7 @@ func lteStage(_ Parameters, arguments ...Any) (Any, error) {
 
 // andStage symbol '&&'
 func andStage(_ Parameters, arguments ...Any) (Any, error) {
+	arguments = getAnyList(arguments)
 	l, r := arguments[left], arguments[right]
 	if isBool(l) && isBool(r) {
 		return l.(bool) && r.(bool), nil
@@ -289,6 +296,7 @@ func andStage(_ Parameters, arguments ...Any) (Any, error) {
 
 // orStage symbol '||'
 func orStage(_ Parameters, arguments ...Any) (Any, error) {
+	arguments = getAnyList(arguments)
 	l, r := arguments[left], arguments[right]
 	if isBool(l) && isBool(r) {
 		return l.(bool) || r.(bool), nil
@@ -298,6 +306,7 @@ func orStage(_ Parameters, arguments ...Any) (Any, error) {
 
 // modify op '+'
 func addStage(_ Parameters, arguments ...Any) (Any, error) {
+	arguments = getAnyList(arguments)
 	l, r := arguments[left], arguments[right]
 
 	if isFloat(l) || isFloat(r) {
@@ -308,6 +317,7 @@ func addStage(_ Parameters, arguments ...Any) (Any, error) {
 
 // modify op '/'
 func divideStage(_ Parameters, arguments ...Any) (Any, error) {
+	arguments = getAnyList(arguments)
 	l, r := arguments[left], arguments[right]
 
 	if isInt(l) && isInt(r) {
@@ -328,6 +338,7 @@ func divideStage(_ Parameters, arguments ...Any) (Any, error) {
 
 // modify op '*'
 func multipleStage(_ Parameters, arguments ...Any) (Any, error) {
+	arguments = getAnyList(arguments)
 	l, r := arguments[left], arguments[right]
 
 	if isInt(l) && isInt(r) {
@@ -339,6 +350,7 @@ func multipleStage(_ Parameters, arguments ...Any) (Any, error) {
 
 // modify op '%'
 func modulusStage(_ Parameters, arguments ...Any) (Any, error) {
+	arguments = getAnyList(arguments)
 	l, r := arguments[left], arguments[right]
 
 	if !isInt(l) || !isInt(r) {
@@ -357,6 +369,7 @@ func modulusStage(_ Parameters, arguments ...Any) (Any, error) {
 
 // modify op '-'
 func subtractStage(_ Parameters, arguments ...Any) (Any, error) {
+	arguments = getAnyList(arguments)
 	l, r := arguments[left], arguments[right]
 
 	if isFloat(l) || isFloat(r) {
@@ -367,6 +380,7 @@ func subtractStage(_ Parameters, arguments ...Any) (Any, error) {
 
 // negate op '-'
 func negateStage(_ Parameters, arguments ...Any) (Any, error) {
+	arguments = getAnyList(arguments)
 	u := arguments[unary]
 	if isInt(u) {
 		return -toInt(u), nil
@@ -379,7 +393,7 @@ func negateStage(_ Parameters, arguments ...Any) (Any, error) {
 
 // invert op '!'
 func invertStage(_ Parameters, arguments ...Any) (Any, error) {
-	u := arguments[unary]
+	u := getAny(arguments[unary])
 	if isBool(u) {
 		return !u.(bool), nil
 	}
@@ -388,20 +402,12 @@ func invertStage(_ Parameters, arguments ...Any) (Any, error) {
 
 // functional arguments list
 func exprListStage(_ Parameters, arguments ...Any) (Any, error) {
-	var vars []Value
-	for _, arg := range arguments {
-
-		v := AnyValue(arg)
-
-		vars = append(vars, v)
-	}
-
-	return vars, nil
+	return getAnyList(arguments), nil
 }
 
 // index :  '[' expression ']'
 func indexStage(_ Parameters, arguments ...Any) (Any, error) {
-	arg := arguments[unary]
+	arg := getAny(arguments[unary])
 	if isInt(arg) {
 		return toInt(arg), nil
 	}
@@ -411,12 +417,13 @@ func indexStage(_ Parameters, arguments ...Any) (Any, error) {
 // array value literal
 // [expr, ... , expr]
 func arrayValueStage(_ Parameters, arguments ...Any) (Any, error) {
-	return arguments, nil
+	return getAnyList(arguments), nil
 }
 
 // array index
 // primary_expr '[' index ']'
 func arrayIndexStage(_ Parameters, arguments ...Any) (Any, error) {
+	arguments = getAnyList(arguments)
 	arrInf := arguments[left]  // primary expr
 	idxInf := arguments[right] // index
 
@@ -441,15 +448,17 @@ func makeFuncStage(funcName string, fs map[string]ExpressionFunction) evaluation
 	return func(parameters Parameters, arguments ...Any) (ret Any, err error) {
 
 		lis := arguments[unary]
-		var args []interface{}
 
-		vars, ok := lis.([]Value)
+		var vars []Value
+
+		args, ok := lis.([]interface{})
 		if !ok {
 			argVal := AnyValue(lis)
 			vars = argVal.GetArray()
-		}
-		for _, v := range vars {
-			args = append(args, v.Get())
+
+			for _, v := range vars {
+				args = append(args, v.Get())
+			}
 		}
 
 		var fn ExpressionFunction
@@ -472,8 +481,11 @@ func makeFuncStage(funcName string, fs map[string]ExpressionFunction) evaluation
 		case FnArgsNumberError:
 			num := len(args)
 			return nil, errors.New("function '" + funcName + "' arguments number error, number = " + strconv.Itoa(num))
+		case nil:
+			return
+		default:
+			return nil, errors.New("function '" + funcName + "' error, " + err.Error())
 		}
-		return
 	}
 }
 
@@ -507,11 +519,6 @@ func makeAccessorStage(field string) evaluationOperator {
 			}
 		}
 
-		if v.Type == StructType {
-			// 减少反射调用次数
-			return v, nil
-		}
-
-		return v.Get(), nil
+		return v, nil
 	}
 }

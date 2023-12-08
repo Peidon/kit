@@ -83,7 +83,14 @@ func (v Value) Get() Any {
 	return nil
 }
 
-func getAny(v interface{}) interface{} {
+func getAnyList(lis []interface{}) (ret []Any) {
+	for _, i := range lis {
+		ret = append(ret, getAny(i))
+	}
+	return
+}
+
+func getAny(v interface{}) Any {
 	if v == nil {
 		return nil
 	}
@@ -152,11 +159,11 @@ func (v Value) GetPtr() uintptr {
 	return uintptr(v.integer)
 }
 
-func (v Value) GetStruct() Struct {
+func (v Value) GetStruct() StructMap {
 	if v.Type != StructType {
 		return nil
 	}
-	if val, ok := v.inf.(Struct); ok {
+	if val, ok := v.inf.(StructMap); ok {
 		return val
 	}
 	return nil
@@ -178,8 +185,8 @@ func AnyValue(any interface{}) Value {
 		return val
 	case Array:
 		return ArrayValue(val)
-	case Struct:
-		return StructValue(val, "valuate.Struct")
+	case StructMap:
+		return StructValue(val, "valuate.StructMap")
 	case bool:
 		return BoolValue(val)
 	case float64:
@@ -284,7 +291,7 @@ func reflectValue(val reflect.Value) Value {
 		}
 
 	case reflect.Map:
-		s := Struct{}
+		s := StructMap{}
 		tp := val.Type()
 
 		keys := val.MapKeys()
@@ -293,7 +300,7 @@ func reflectValue(val reflect.Value) Value {
 			k := keys[i]
 			v := val.MapIndex(k)
 
-			s[k.String()] = AnyValue(v)
+			s[k.String()] = AnyValue(v).Get()
 		}
 
 		return StructValue(s, tp.String())
@@ -311,7 +318,7 @@ func reflectValue(val reflect.Value) Value {
 		}
 
 		// normal
-		s := Struct{}
+		s := StructMap{}
 		tp := val.Type()
 
 		for i := 0; i < tp.NumField(); i++ {
@@ -331,7 +338,7 @@ func reflectValue(val reflect.Value) Value {
 				continue
 			}
 
-			s[key] = AnyValue(value)
+			s[key] = AnyValue(value).Get()
 		}
 
 		return StructValue(s, tp.String())
@@ -357,20 +364,20 @@ func reflectValue(val reflect.Value) Value {
 	}
 }
 
-// Struct 优先使用json tag 中的名字作为 key
+// StructMap 优先使用json tag 中的名字作为 key
 // 如果没有 json tag 则使用Field Name 作为 key
-type Struct map[string]Value
+type StructMap map[string]Any
 
-func (s Struct) Field(k string) Value {
+func (s StructMap) Field(k string) Value {
 	if v, ok := s[k]; ok {
-		return v
+		return AnyValue(v)
 	}
 	return Value{
 		Type: VoidType,
 	}
 }
 
-func StructValue(obj Struct, ty string) Value {
+func StructValue(obj StructMap, ty string) Value {
 	return Value{
 		Type: StructType,
 		str:  ty,

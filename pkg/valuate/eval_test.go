@@ -230,11 +230,22 @@ func TestAccess(t *testing.T) {
 				return nil, FnArgTypeError
 			}
 			b := []byte(v)
-			if !isPtr(args[1]) {
-				return nil, FnArgTypeError
-			}
 			err := json.Unmarshal(b, args[1])
 			return args[1], err
+		},
+		"time_stamp": func(args ...interface{}) (interface{}, error) {
+			if len(args) != 1 {
+				return nil, FnArgsNumberError
+			}
+			a := args[0]
+			switch val := a.(type) {
+			case time.Time:
+				return val.Unix(), nil
+			case *time.Time:
+				return val.Unix(), nil
+			}
+
+			return nil, FnArgTypeError
 		},
 	}
 
@@ -257,9 +268,11 @@ func TestAccess(t *testing.T) {
 			params: MapParameters(map[string]Any{"s": s}),
 		},
 		{
-			input:  "s.G.J == ti",
+			input:  "time_stamp(s.G.J) == time_stamp(ti)",
 			want:   true,
 			params: MapParameters(map[string]Any{"s": s, "ti": ti}),
+
+			functions: fs,
 		},
 		{
 			input:  "s.GgList[0].I",
@@ -290,16 +303,16 @@ func TestAccess(t *testing.T) {
 		{
 			input:     "bytes_to_string(json_marshal(s.abc))",
 			params:    MapParameters(map[string]Any{"s": s}),
-			want:      `{"G":{"Type":10},"GgList":{"Type":9},"a":{"Type":4},"abc":{"Type":0},"b":{"Type":7},"c":{"Type":3},"d":{"Type":0},"f":{"Type":6}}`,
+			want:      `{"G":{"I":[],"J":"0001-01-01T00:00:00Z","h":0},"GgList":[],"a":3,"abc":null,"b":"efg","c":false,"d":null,"f":0}`,
 			functions: fs,
 		},
 		{
-			input: "json_unmarshal(a, b) == nil",
+			input: "json_unmarshal(a, b)",
 			params: MapParameters(map[string]Any{
-				"a": `{"G":{"Type":10},"GgList":{"Type":9},"a":{"Type":4},"abc":{"Type":0},"b":{"Type":7},"c":{"Type":3},"d":{"Type":0},"f":{"Type":6}}`,
+				"a": `{"G":{"I":[],"J":"0001-01-01T00:00:00Z","h":0},"GgList":[],"a":3,"abc":null,"b":"efg","c":false,"d":null,"f":0} `,
 				"b": &s,
 			}),
-			want:      false,
+			want:      &s,
 			functions: fs,
 		},
 	}
@@ -325,13 +338,16 @@ func TestAccess(t *testing.T) {
 			g := AnyValue(got)
 
 			if !g.Equal(w) {
-				t.Error("got: ", got, "\nwant: ", td.want)
+				t.Error("eval failed: <"+td.input+">  got: ", got, "\nwant: ", td.want)
+				continue
 			}
 			continue
 		}
 
 		if got != td.want {
-			t.Error("got: ", got, "\n got type", reflect.TypeOf(got).String(), "\nwant: ", td.want)
+			t.Error("eval failed: <"+td.input+"> got: ", got, "\n"+
+				"got type", reflect.TypeOf(got).String(), "\n"+
+				"want: ", td.want)
 		}
 	}
 }
