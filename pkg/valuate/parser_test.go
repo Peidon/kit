@@ -21,7 +21,7 @@ func TestAST(t *testing.T) {
 		"acb.b[0].x",
 	}
 	for _, td := range testsData {
-		eval, err := NewExpression(td)
+		eval, err := Expression(td)
 		t.Log(eval)
 		if err != nil {
 			//t.Error(err)

@@ -440,7 +440,7 @@ func arrayIndexStage(_ Parameters, arguments ...Any) (Any, error) {
 		}
 	}
 
-	return arr[i].Get(), nil
+	return arr[i], nil
 }
 
 // functional
@@ -449,12 +449,10 @@ func makeFuncStage(funcName string, fs map[string]ExpressionFunction) evaluation
 
 		lis := arguments[unary]
 
-		var vars []Value
-
 		args, ok := lis.([]interface{})
 		if !ok {
 			argVal := AnyValue(lis)
-			vars = argVal.GetArray()
+			vars := argVal.GetArray()
 
 			for _, v := range vars {
 				args = append(args, v.Get())

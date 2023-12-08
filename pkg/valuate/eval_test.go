@@ -123,7 +123,7 @@ func TestEvaluableExpression_Evaluate(t *testing.T) {
 	}
 
 	for _, td := range testData {
-		expr, err := NewExpression(td.input)
+		expr, err := Expression(td.input)
 		if err != nil {
 			t.Error(err)
 			return
@@ -134,7 +134,7 @@ func TestEvaluableExpression_Evaluate(t *testing.T) {
 			return
 		}
 		if er != nil {
-			t.Log(er)
+			t.Log("[info]", er)
 		}
 
 		// testing array value
@@ -318,7 +318,7 @@ func TestAccess(t *testing.T) {
 	}
 
 	for _, td := range testData {
-		expr, err := NewWithFunctions(td.input, td.functions)
+		expr, err := ExpressionWithFunctions(td.input, td.functions)
 		if err != nil {
 			t.Error(err)
 			return
@@ -330,7 +330,7 @@ func TestAccess(t *testing.T) {
 			return
 		}
 		if er != nil {
-			t.Log(er)
+			t.Log("[info] ", er)
 		}
 
 		if isArray(td.want) {

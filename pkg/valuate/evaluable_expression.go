@@ -23,12 +23,11 @@ type EvaluableExpression struct {
 	errorTrack *StageError
 }
 
-func NewExpression(input string) (*EvaluableExpression, error) {
-
-	return NewWithFunctions(input, nil)
+func Expression(input string) (*EvaluableExpression, error) {
+	return ExpressionWithFunctions(input, nil)
 }
 
-func NewWithFunctions(input string, fs map[string]ExpressionFunction) (ee *EvaluableExpression, err error) {
+func ExpressionWithFunctions(input string, fs map[string]ExpressionFunction) (ee *EvaluableExpression, err error) {
 	// lexer
 	stream := antlr.NewInputStream(input)
 	lexer := parser.NewValuateLexer(stream)
