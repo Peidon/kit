@@ -64,3 +64,11 @@ type ArrayIndexError struct {
 func (err ArrayIndexError) Error() string {
 	return "index " + strconv.Itoa(err.Index) + " out of range, array length is " + strconv.Itoa(err.ArrayLen)
 }
+
+type ParameterNotFound struct {
+	paramName string
+}
+
+func (pa ParameterNotFound) Error() string {
+	return "No parameter '" + pa.paramName + "' found."
+}

@@ -8,10 +8,6 @@
 
 package valuate
 
-import (
-	"errors"
-)
-
 type Parameters interface {
 	Get(name string) (Any, error)
 }
@@ -23,8 +19,9 @@ func (p MapParameters) Get(name string) (Any, error) {
 	value, found := p[name]
 
 	if !found {
-		errorMessage := "No parameter '" + name + "' found."
-		return nil, errors.New(errorMessage)
+		return nil, ParameterNotFound{
+			paramName: name,
+		}
 	}
 
 	return value, nil
