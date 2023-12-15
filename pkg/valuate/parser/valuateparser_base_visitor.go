@@ -12,6 +12,10 @@ func (v *BaseValuateParserVisitor) VisitPlan(ctx *PlanContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
+func (v *BaseValuateParserVisitor) VisitAssignment(ctx *AssignmentContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
 func (v *BaseValuateParserVisitor) VisitExpression(ctx *ExpressionContext) interface{} {
 	return v.VisitChildren(ctx)
 }

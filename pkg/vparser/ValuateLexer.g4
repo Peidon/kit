@@ -16,6 +16,7 @@ R_BRACKET              : ']';
 COMMA                  : ',';
 COLON                  : ':';
 DOT                    : '.';
+ASSIGN                 : '=';
 
 // Logical
 LOGICAL_OR             : '||';

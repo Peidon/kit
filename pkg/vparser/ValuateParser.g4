@@ -7,6 +7,10 @@ tokenVocab=ValuateLexer;
 
 plan: expression EOF;
 
+assignment
+    :  variate (DOT IDENTIFIER)* '=' expression EOF
+    ;
+
 expression
     : primaryExpr
     | unaryExpr

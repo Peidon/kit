@@ -45,10 +45,7 @@ func ExpressionWithFunctions(input string, fs map[string]ExpressionFunction) (ee
 	}
 
 	// plan stages
-	stageInf := plan.Accept(ee)
-	if stage, ok := stageInf.(evaluationStage); ok {
-		ee.stage = &stage
-	}
+	_ = plan.Accept(ee)
 	if ee.stage == nil {
 		err = ee.errorTrack
 	}
@@ -61,7 +58,30 @@ func (eval *EvaluableExpression) String() string {
 
 func (eval *EvaluableExpression) VisitPlan(ctx *parser.PlanContext) interface{} {
 	if expr := ctx.Expression(); expr != nil {
-		return expr.Accept(eval)
+		stageInf := expr.Accept(eval)
+		if stage, ok := stageInf.(evaluationStage); ok {
+			eval.stage = &stage
+		}
+	}
+	return nil
+}
+
+func (eval *EvaluableExpression) VisitAssignment(ctx *parser.AssignmentContext) interface{} {
+	var subField string
+	for _, id := range ctx.AllIDENTIFIER() {
+		subField += id.GetText()
+	}
+	if v, expr := ctx.Variate(), ctx.Expression(); v != nil && expr != nil {
+		stageInf := expr.Accept(eval)
+		if stage, ok := stageInf.(evaluationStage); ok {
+			eval.stage = &stage
+		}
+		return &Assignment{
+			Variable:   v.GetText(),
+			Expression: expr.GetText(),
+			Accessor:   subField,
+			Eval:       eval,
+		}
 	}
 	return nil
 }

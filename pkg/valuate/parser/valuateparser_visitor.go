@@ -11,6 +11,9 @@ type ValuateParserVisitor interface {
 	// Visit a parse tree produced by ValuateParser#plan.
 	VisitPlan(ctx *PlanContext) interface{}
 
+	// Visit a parse tree produced by ValuateParser#assignment.
+	VisitAssignment(ctx *AssignmentContext) interface{}
+
 	// Visit a parse tree produced by ValuateParser#expression.
 	VisitExpression(ctx *ExpressionContext) interface{}
 
