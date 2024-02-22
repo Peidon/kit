@@ -72,3 +72,9 @@ type ParameterNotFound struct {
 func (pa ParameterNotFound) Error() string {
 	return "No parameter '" + pa.paramName + "' found."
 }
+
+type ErrorStrategy func(err error) (interface{}, error)
+
+func defaultStrategy(err error) (interface{}, error) {
+	return nil, err
+}

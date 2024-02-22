@@ -181,7 +181,7 @@ func (s Values) Values() []Value {
 }
 
 func (s Values) Get() Any {
-	var ret []interface{}
+	ret := make([]interface{}, 0)
 
 	for _, v := range s {
 		ret = append(ret, v.Get())

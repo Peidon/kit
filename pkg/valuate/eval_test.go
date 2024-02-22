@@ -22,6 +22,8 @@ func TestEvaluableExpression_Evaluate(t *testing.T) {
 		params MapParameters
 
 		hasError bool
+
+		OmitError bool
 	}{
 		{
 			input: "1+2.1",
@@ -30,6 +32,12 @@ func TestEvaluableExpression_Evaluate(t *testing.T) {
 		{
 			input: "nil",
 			want:  nil,
+		},
+		{
+			input:     "a == 0",
+			params:    MapParameters(map[string]Any{"abc": 3}),
+			want:      true,
+			OmitError: true,
 		},
 		{
 			input:    "a == nil",
@@ -128,6 +136,9 @@ func TestEvaluableExpression_Evaluate(t *testing.T) {
 			t.Error(err)
 			return
 		}
+		if td.OmitError {
+			expr.CatchError(omitError)
+		}
 		got, er := expr.Evaluate(td.params)
 		if er != nil && !td.hasError {
 			t.Error(er)
@@ -160,6 +171,11 @@ func TestEvaluableExpression_Evaluate(t *testing.T) {
 			t.Error("got: ", got, "\n got type", reflect.TypeOf(got).String(), "\nwant: ", td.want)
 		}
 	}
+}
+
+func omitError(err error) (interface{}, error) {
+	print(err)
+	return 0, nil
 }
 
 type abc struct{}

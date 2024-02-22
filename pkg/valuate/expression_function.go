@@ -8,13 +8,54 @@
 
 package valuate
 
-import "reflect"
+import (
+	"encoding/json"
+	"reflect"
+	"time"
+)
 
 type ExpressionFunction func(arguments ...Any) (Any, error)
 
 var (
 	// builtin functions
 	builtin = map[string]ExpressionFunction{
+		"json_marshal": func(args ...interface{}) (interface{}, error) {
+			if len(args) == 0 || len(args) > 1 {
+				return nil, FnArgsNumberError
+			}
+			b, e := json.Marshal(args[0])
+			if e != nil {
+				return nil, e
+			}
+			return string(b), nil
+		},
+		"json_unmarshal": func(args ...interface{}) (interface{}, error) {
+			if len(args) != 2 {
+				return nil, FnArgsNumberError
+			}
+			a := args[0]
+			v, ok := a.(string)
+			if !ok {
+				return nil, FnArgTypeError
+			}
+			b := []byte(v)
+			err := json.Unmarshal(b, args[1])
+			return args[1], err
+		},
+		"unix_timestamp": func(args ...interface{}) (interface{}, error) {
+			if len(args) != 1 {
+				return nil, FnArgsNumberError
+			}
+			a := args[0]
+			switch val := a.(type) {
+			case time.Time:
+				return val.Unix(), nil
+			case *time.Time:
+				return val.Unix(), nil
+			}
+
+			return nil, FnArgTypeError
+		},
 		"len": length,
 	}
 )

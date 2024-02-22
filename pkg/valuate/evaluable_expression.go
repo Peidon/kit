@@ -20,7 +20,8 @@ type EvaluableExpression struct {
 	stage     *evaluationStage
 	functions map[string]ExpressionFunction
 
-	errorTrack *StageError
+	errorTrack   *StageError
+	errorHandler ErrorStrategy
 }
 
 func Expression(input string) (*EvaluableExpression, error) {
@@ -42,6 +43,8 @@ func ExpressionWithFunctions(input string, fs map[string]ExpressionFunction) (ee
 		text:       input,
 		errorTrack: &StageError{},
 		functions:  fs,
+
+		errorHandler: defaultStrategy,
 	}
 
 	// plan stages
@@ -514,6 +517,11 @@ func (eval *EvaluableExpression) VisitIndex(ctx *parser.IndexContext) interface{
 	}
 }
 
+func (eval *EvaluableExpression) CatchError(strategy ErrorStrategy) *EvaluableExpression {
+	eval.errorHandler = strategy
+	return eval
+}
+
 func (eval *EvaluableExpression) Evaluate(parameters map[string]interface{}) (interface{}, error) {
 	if parameters == nil {
 		return eval.Eval(nil)
@@ -559,7 +567,11 @@ func (eval *EvaluableExpression) evaluateStage(stage *evaluationStage, parameter
 		return nil, err
 	}
 
-	return stage.operator(parameters, args...)
+	ret, err := stage.operator(parameters, args...)
+	if err != nil {
+		return eval.errorHandler(err)
+	}
+	return ret, nil
 }
 
 func checkOperatorType(stage *evaluationStage) error {
