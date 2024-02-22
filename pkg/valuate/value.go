@@ -460,12 +460,19 @@ func DurationValue(val time.Duration) Value {
 	}
 }
 
-type Comparable interface {
-	Equal(other Comparable) bool
-	Greater(other Comparable) bool
+type Modifier interface {
+	Add(other interface{}) (interface{}, error)
+	Sub(other interface{}) (interface{}, error)
+	Div(other interface{}) (interface{}, error)
+	Mul(other interface{}) (interface{}, error)
 }
 
-func (v Value) Equal(other Comparable) bool {
+type Comparable interface {
+	Equal(other interface{}) bool
+	Greater(other interface{}) bool
+}
+
+func (v Value) Equal(other interface{}) bool {
 	if ot, ok := other.(Value); ok {
 		if (ot.Type == IntType || ot.Type == UintType || ot.Type == DurationType ||
 			ot.Type == FloatType || ot.Type == PtrType || ot.Type == BoolType) &&
@@ -502,7 +509,7 @@ func (v Value) Equal(other Comparable) bool {
 	return false
 }
 
-func (v Value) Greater(other Comparable) bool {
+func (v Value) Greater(other interface{}) bool {
 	ot, ok := other.(Value)
 	if !ok {
 		return false

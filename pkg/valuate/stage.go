@@ -97,6 +97,15 @@ func isComparable(obj Any) bool {
 	return false
 }
 
+// isModifier
+func isModifier(obj Any) bool {
+	switch obj.(type) {
+	case Modifier:
+		return true
+	}
+	return false
+}
+
 // comparable operators check
 func comparableCheck(arguments ...Any) error {
 	for _, arg := range arguments {
@@ -169,12 +178,20 @@ func equalStage(_ Parameters, arguments ...Any) (Any, error) {
 		return lv.Sub(rv) == 0, nil
 	}
 
-	if isComparable(l) && isComparable(r) {
-		a := l.(Comparable)
-		b := r.(Comparable)
-		return a.Equal(b), nil
+	if isComparable(l) || isComparable(r) {
+		return compareEqual(l, r), nil
 	}
 	return boolInterface(reflect.DeepEqual(l, r)), nil
+}
+
+func compareEqual(l, r interface{}) bool {
+	if isComparable(l) {
+		return l.(Comparable).Equal(r)
+	}
+	if isComparable(r) {
+		return r.(Comparable).Equal(l)
+	}
+	return false
 }
 
 // notEqualStage symbol !=
@@ -196,10 +213,8 @@ func notEqualStage(_ Parameters, arguments ...Any) (Any, error) {
 		return lv.Sub(rv) != 0, nil
 	}
 
-	if isComparable(l) && isComparable(r) {
-		a := l.(Comparable)
-		b := r.(Comparable)
-		return !a.Equal(b), nil
+	if isComparable(l) || isComparable(r) {
+		return !compareEqual(l, r), nil
 	}
 	return boolInterface(!reflect.DeepEqual(l, r)), nil
 }
@@ -216,10 +231,13 @@ func gtStage(_ Parameters, arguments ...Any) (Any, error) {
 		lv, rv := toTime(l), toTime(r)
 		return lv.After(rv), nil
 	}
-	if isComparable(l) && isComparable(r) {
+	if isComparable(l) {
 		a := l.(Comparable)
+		return a.Greater(r), nil
+	}
+	if isComparable(r) {
 		b := r.(Comparable)
-		return a.Greater(b), nil
+		return !b.Greater(l) && !b.Equal(l), nil
 	}
 	return nil, ArgumentTypeError
 }
@@ -236,10 +254,13 @@ func ltStage(_ Parameters, arguments ...Any) (Any, error) {
 		lv, rv := toTime(l), toTime(r)
 		return lv.Before(rv), nil
 	}
-	if isComparable(l) && isComparable(r) {
+	if isComparable(l) {
 		a := l.(Comparable)
+		return !a.Greater(r) && !a.Equal(r), nil
+	}
+	if isComparable(r) {
 		b := r.(Comparable)
-		return !a.Greater(b) && !a.Equal(b), nil
+		return b.Greater(l), nil
 	}
 	return nil, ArgumentTypeError
 }
@@ -256,10 +277,13 @@ func gteStage(_ Parameters, arguments ...Any) (Any, error) {
 		lv, rv := toTime(l), toTime(r)
 		return !lv.Before(rv), nil
 	}
-	if isComparable(l) && isComparable(r) {
+	if isComparable(l) {
 		a := l.(Comparable)
+		return a.Greater(r) && a.Equal(r), nil
+	}
+	if isComparable(r) {
 		b := r.(Comparable)
-		return a.Greater(b) || a.Equal(b), nil
+		return !b.Greater(l), nil
 	}
 	return nil, ArgumentTypeError
 }
@@ -276,10 +300,13 @@ func lteStage(_ Parameters, arguments ...Any) (Any, error) {
 		lv, rv := toTime(l), toTime(r)
 		return !lv.After(rv), nil
 	}
-	if isComparable(l) && isComparable(r) {
+	if isComparable(l) {
 		a := l.(Comparable)
+		return !a.Greater(r), nil
+	}
+	if isComparable(r) {
 		b := r.(Comparable)
-		return !a.Greater(b), nil
+		return b.Greater(l), nil
 	}
 	return nil, ArgumentTypeError
 }
@@ -309,6 +336,15 @@ func addStage(_ Parameters, arguments ...Any) (Any, error) {
 	arguments = getAnyList(arguments)
 	l, r := arguments[left], arguments[right]
 
+	if isModifier(l) {
+		a := l.(Modifier)
+		return a.Add(r), nil
+	}
+	if isModifier(r) {
+		b := r.(Modifier)
+		return b.Add(l), nil
+	}
+
 	if isFloat(l) || isFloat(r) {
 		return toFloat64(l) + toFloat64(r), nil
 	}
@@ -319,6 +355,12 @@ func addStage(_ Parameters, arguments ...Any) (Any, error) {
 func divideStage(_ Parameters, arguments ...Any) (Any, error) {
 	arguments = getAnyList(arguments)
 	l, r := arguments[left], arguments[right]
+
+	if isModifier(l) && isModifier(r) {
+		a := l.(Modifier)
+		b := r.(Modifier)
+		return a.Div(b)
+	}
 
 	if isInt(l) && isInt(r) {
 		rv := toInt(r)
@@ -340,6 +382,15 @@ func divideStage(_ Parameters, arguments ...Any) (Any, error) {
 func multipleStage(_ Parameters, arguments ...Any) (Any, error) {
 	arguments = getAnyList(arguments)
 	l, r := arguments[left], arguments[right]
+
+	if isModifier(l) {
+		a := l.(Modifier)
+		return a.Mul(r), nil
+	}
+	if isModifier(r) {
+		b := r.(Modifier)
+		return b.Mul(l), nil
+	}
 
 	if isInt(l) && isInt(r) {
 		return toInt(l) * toInt(r), nil
@@ -371,6 +422,12 @@ func modulusStage(_ Parameters, arguments ...Any) (Any, error) {
 func subtractStage(_ Parameters, arguments ...Any) (Any, error) {
 	arguments = getAnyList(arguments)
 	l, r := arguments[left], arguments[right]
+
+	if isModifier(l) && isModifier(r) {
+		a := l.(Modifier)
+		b := r.(Modifier)
+		return a.Sub(b)
+	}
 
 	if isFloat(l) || isFloat(r) {
 		return toFloat64(l) - toFloat64(r), nil

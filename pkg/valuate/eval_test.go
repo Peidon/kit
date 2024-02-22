@@ -36,7 +36,7 @@ func TestEvaluableExpression_Evaluate(t *testing.T) {
 		{
 			input:     "a == 0",
 			params:    MapParameters(map[string]Any{"abc": 3}),
-			want:      true,
+			want:      true, // error has been caught
 			OmitError: true,
 		},
 		{
@@ -173,9 +173,82 @@ func TestEvaluableExpression_Evaluate(t *testing.T) {
 	}
 }
 
-func omitError(err error) (interface{}, error) {
-	print(err)
+func omitError(_ error) (interface{}, error) {
 	return 0, nil
+}
+
+type param struct {
+	IntValue int
+	StrValue string
+	BooValue bool
+	IsEmpty  bool
+}
+
+func (p *param) Equal(other interface{}) bool {
+	if o, ok := other.(*param); ok {
+		return p.IntValue == o.IntValue && p.StrValue == o.StrValue && p.BooValue == o.BooValue
+	}
+	return false
+}
+
+func (p *param) Greater(other interface{}) bool {
+	if o, ok := other.(*param); ok {
+		return p.IntValue > o.IntValue
+	}
+	return false
+}
+
+func TestOverwrite(t *testing.T) {
+
+	testData := []struct {
+		input  string
+		want   interface{}
+		params MapParameters
+	}{
+		{
+			input: "a < b",
+			want:  true,
+			params: MapParameters{
+				"a": &param{
+					IntValue: 1,
+				},
+				"b": &param{
+					IntValue: 2,
+				},
+			},
+		},
+		{
+			input: "a == b",
+			want:  true,
+			params: MapParameters{
+				"a": &param{
+					StrValue: "abc",
+				},
+				"b": &param{
+					StrValue: "abc",
+				},
+			},
+		},
+	}
+
+	for _, td := range testData {
+		expr, err := Expression(td.input)
+		if err != nil {
+			t.Error(err)
+			return
+		}
+
+		got, er := expr.Evaluate(td.params)
+		if er != nil {
+			t.Log("[info] ", er)
+		}
+
+		if got != td.want {
+			t.Error("eval failed: <"+td.input+"> got: ", got, "\n"+
+				"got type", reflect.TypeOf(got).String(), "\n"+
+				"want: ", td.want)
+		}
+	}
 }
 
 type abc struct{}
