@@ -72,7 +72,8 @@ func (v Value) Get() Any {
 	case DurationType:
 		return v.GetDuration()
 	case ArrayType:
-		return v.GetArray()
+		a := v.GetArray()
+		return getAny(a)
 	case StructType:
 		return v.GetStruct()
 	case TimeType, TimeFullType:
