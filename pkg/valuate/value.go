@@ -460,16 +460,18 @@ func DurationValue(val time.Duration) Value {
 	}
 }
 
-type Modifier interface {
-	Add(other interface{}) (interface{}, error)
-	Sub(other interface{}) (interface{}, error)
-	Div(other interface{}) (interface{}, error)
-	Mul(other interface{}) (interface{}, error)
+type Number interface {
+	ToInt() int
+	ToFloat() float64
 }
 
 type Comparable interface {
 	Equal(other interface{}) bool
 	Greater(other interface{}) bool
+}
+
+type Modifier interface {
+	Modify(string, interface{}) (interface{}, error)
 }
 
 func (v Value) Equal(other interface{}) bool {

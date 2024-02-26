@@ -184,18 +184,53 @@ type param struct {
 	IsEmpty  bool
 }
 
-func (p *param) Equal(other interface{}) bool {
+func (p param) Equal(other interface{}) bool {
 	if o, ok := other.(*param); ok {
 		return p.IntValue == o.IntValue && p.StrValue == o.StrValue && p.BooValue == o.BooValue
+	}
+	if o, ok := other.(int); ok {
+		return p.IntValue == o
 	}
 	return false
 }
 
-func (p *param) Greater(other interface{}) bool {
+func (p param) Greater(other interface{}) bool {
 	if o, ok := other.(*param); ok {
 		return p.IntValue > o.IntValue
 	}
+	if o, ok := other.(int); ok {
+		return p.IntValue > o
+	}
 	return false
+}
+
+func (p param) ToInt() int {
+	return p.IntValue
+}
+
+func (p param) ToFloat() float64 {
+	return float64(p.IntValue)
+}
+
+type emptyParam struct{}
+
+func (empty emptyParam) Modify(op string, other interface{}) (interface{}, error) {
+	if op == "+" {
+		return 0, nil
+	}
+	if op == "==" {
+		return false, nil
+	}
+
+	return nil, nil
+}
+
+func emptyError(err error) (interface{}, error) {
+	switch err.(type) {
+	case ParameterNotFound:
+		return emptyParam{}, nil
+	}
+	return nil, err
 }
 
 func TestOverwrite(t *testing.T) {
@@ -218,6 +253,16 @@ func TestOverwrite(t *testing.T) {
 			},
 		},
 		{
+			input: "a < b",
+			want:  true,
+			params: MapParameters{
+				"a": &param{
+					IntValue: 1,
+				},
+				"b": 2,
+			},
+		},
+		{
 			input: "a == b",
 			want:  true,
 			params: MapParameters{
@@ -226,6 +271,57 @@ func TestOverwrite(t *testing.T) {
 				},
 				"b": &param{
 					StrValue: "abc",
+				},
+			},
+		},
+		{
+			input: "a > b",
+			want:  true,
+			params: MapParameters{
+				"a": 3,
+				"b": &param{
+					IntValue: 2,
+				},
+			},
+		},
+		{
+			input: "a + b",
+			want:  5.0,
+			params: MapParameters{
+				"a": 3,
+				"b": &param{
+					IntValue: 2,
+				},
+			},
+		},
+		{
+			input: "a - b",
+			want:  1.0,
+			params: MapParameters{
+				"a": 3,
+				"b": &param{
+					IntValue: 2,
+				},
+			},
+		},
+		{
+			input: "a + b",
+			want:  0, // catch empty error
+			params: MapParameters{
+				"b": &param{
+					IntValue: 2,
+				},
+			},
+		},
+		{
+			input: "a * b",
+			want:  6,
+			params: MapParameters{
+				"a": &param{
+					IntValue: 3,
+				},
+				"b": &param{
+					IntValue: 2,
 				},
 			},
 		},
@@ -238,7 +334,7 @@ func TestOverwrite(t *testing.T) {
 			return
 		}
 
-		got, er := expr.Evaluate(td.params)
+		got, er := expr.CatchError(emptyError).Evaluate(td.params)
 		if er != nil {
 			t.Log("[info] ", er)
 		}
