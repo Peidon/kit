@@ -461,7 +461,6 @@ func DurationValue(val time.Duration) Value {
 }
 
 type Number interface {
-	ToInt() int
 	ToFloat() float64
 }
 

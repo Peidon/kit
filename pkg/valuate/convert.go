@@ -39,7 +39,8 @@ func toInt(v interface{}) int {
 	case uint:
 		return int(s)
 	case Number:
-		return s.ToInt()
+		f := s.ToFloat()
+		return int(f)
 	}
 	return -1
 }

@@ -559,6 +559,12 @@ func (eval *EvaluableExpression) evaluateStage(stage *evaluationStage, parameter
 		if err != nil {
 			return nil, err
 		}
+		if stage.symbol == AND && isBool(arg) && !arg.(bool) {
+			return false, nil
+		}
+		if stage.symbol == OR && isBool(arg) && arg.(bool) {
+			return true, nil
+		}
 		args = append(args, arg)
 	}
 

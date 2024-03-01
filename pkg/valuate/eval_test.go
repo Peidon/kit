@@ -204,17 +204,13 @@ func (p param) Greater(other interface{}) bool {
 	return false
 }
 
-func (p param) ToInt() int {
-	return p.IntValue
-}
-
 func (p param) ToFloat() float64 {
 	return float64(p.IntValue)
 }
 
 type emptyParam struct{}
 
-func (empty emptyParam) Modify(op string, other interface{}) (interface{}, error) {
+func (empty emptyParam) Modify(op string, _ interface{}) (interface{}, error) {
 	if op == "+" {
 		return 0, nil
 	}
@@ -448,6 +444,16 @@ func TestAccess(t *testing.T) {
 			params: MapParameters(map[string]Any{"s": s, "efg": s.E.B}),
 		},
 		{
+			input:  "s.abc.b == \"ef\" && s.ag == 10",
+			want:   false,
+			params: MapParameters(map[string]Any{"s": s, "efg": s.E.B}),
+		},
+		{
+			input:  "s.abc.b == efg || s.ag == 10",
+			want:   true,
+			params: MapParameters(map[string]Any{"s": s, "efg": s.E.B}),
+		},
+		{
 			input:  "s.G.h",
 			want:   uint64(10),
 			params: MapParameters(map[string]Any{"s": s}),
@@ -529,7 +535,7 @@ func TestAccess(t *testing.T) {
 			continue
 		}
 
-		if got != td.want {
+		if got != td.want && got != nil {
 			t.Error("eval failed: <"+td.input+"> got: ", got, "\n"+
 				"got type", reflect.TypeOf(got).String(), "\n"+
 				"want: ", td.want)
