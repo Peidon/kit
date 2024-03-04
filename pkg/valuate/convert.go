@@ -15,6 +15,13 @@ import (
 )
 
 func toInt(v interface{}) int {
+	switch s := v.(type) {
+	case Number:
+		f := s.ToFloat()
+		return int(f)
+	case nil:
+		return 0
+	}
 	v = indirect(v)
 
 	switch s := v.(type) {
@@ -46,6 +53,13 @@ func toInt(v interface{}) int {
 }
 
 func toFloat64(v interface{}) float64 {
+	switch s := v.(type) {
+	case Number:
+		return s.ToFloat()
+	case nil:
+		return 0
+	}
+
 	v = indirect(v)
 
 	switch s := v.(type) {

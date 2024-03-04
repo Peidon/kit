@@ -185,7 +185,7 @@ type param struct {
 	IsEmpty  bool
 }
 
-func (p param) Equal(other interface{}) bool {
+func (p *param) Equal(other interface{}) bool {
 	if o, ok := other.(*param); ok {
 		return p.IntValue == o.IntValue && p.StrValue == o.StrValue && p.BooValue == o.BooValue
 	}
@@ -195,7 +195,7 @@ func (p param) Equal(other interface{}) bool {
 	return false
 }
 
-func (p param) Greater(other interface{}) bool {
+func (p *param) Greater(other interface{}) bool {
 	if o, ok := other.(*param); ok {
 		return p.IntValue > o.IntValue
 	}
@@ -205,7 +205,7 @@ func (p param) Greater(other interface{}) bool {
 	return false
 }
 
-func (p param) ToFloat() float64 {
+func (p *param) ToFloat() float64 {
 	return float64(p.IntValue)
 }
 
