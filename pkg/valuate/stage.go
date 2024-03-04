@@ -166,11 +166,7 @@ func equalStage(p Parameters, arguments ...Any) (Any, error) {
 	arguments = getAnyList(arguments)
 	l, r := arguments[left], arguments[right]
 
-	ctx := context.Background()
-	ctxPart, existsErr := p.Get(contextParam)
-	if c, valid := ctxPart.(context.Context); valid && existsErr == nil {
-		ctx = c
-	}
+	ctx := p.GetContext()
 
 	if isModifier(l) {
 		return l.(Modifier).Modify(ctx, "==", r)
@@ -209,11 +205,7 @@ func notEqualStage(p Parameters, arguments ...Any) (Any, error) {
 	arguments = getAnyList(arguments)
 	l, r := arguments[left], arguments[right]
 
-	ctx := context.Background()
-	ctxPart, existsErr := p.Get(contextParam)
-	if c, valid := ctxPart.(context.Context); valid && existsErr == nil {
-		ctx = c
-	}
+	ctx := p.GetContext()
 
 	if isModifier(l) {
 		return l.(Modifier).Modify(ctx, "!=", r)
@@ -253,11 +245,7 @@ func gtStage(p Parameters, arguments ...Any) (Any, error) {
 	arguments = getAnyList(arguments)
 	l, r := arguments[left], arguments[right]
 
-	ctx := context.Background()
-	ctxPart, existsErr := p.Get(contextParam)
-	if c, valid := ctxPart.(context.Context); valid && existsErr == nil {
-		ctx = c
-	}
+	ctx := p.GetContext()
 
 	if isModifier(l) {
 		return l.(Modifier).Modify(ctx, ">", r)
@@ -290,11 +278,7 @@ func ltStage(p Parameters, arguments ...Any) (Any, error) {
 	arguments = getAnyList(arguments)
 	l, r := arguments[left], arguments[right]
 
-	ctx := context.Background()
-	ctxPart, existsErr := p.Get(contextParam)
-	if c, valid := ctxPart.(context.Context); valid && existsErr == nil {
-		ctx = c
-	}
+	ctx := p.GetContext()
 
 	if isModifier(l) {
 		return l.(Modifier).Modify(ctx, "<", r)
@@ -329,11 +313,7 @@ func gteStage(p Parameters, arguments ...Any) (Any, error) {
 	arguments = getAnyList(arguments)
 	l, r := arguments[left], arguments[right]
 
-	ctx := context.Background()
-	ctxPart, existsErr := p.Get(contextParam)
-	if c, valid := ctxPart.(context.Context); valid && existsErr == nil {
-		ctx = c
-	}
+	ctx := p.GetContext()
 
 	if isModifier(l) {
 		return l.(Modifier).Modify(ctx, ">=", r)
@@ -366,11 +346,7 @@ func lteStage(p Parameters, arguments ...Any) (Any, error) {
 	arguments = getAnyList(arguments)
 	l, r := arguments[left], arguments[right]
 
-	ctx := context.Background()
-	ctxPart, existsErr := p.Get(contextParam)
-	if c, valid := ctxPart.(context.Context); valid && existsErr == nil {
-		ctx = c
-	}
+	ctx := p.GetContext()
 
 	if isModifier(l) {
 		return l.(Modifier).Modify(ctx, "<=", r)
@@ -422,11 +398,7 @@ func addStage(p Parameters, arguments ...Any) (Any, error) {
 	arguments = getAnyList(arguments)
 	l, r := arguments[left], arguments[right]
 
-	ctx := context.Background()
-	ctxPart, existsErr := p.Get(contextParam)
-	if c, valid := ctxPart.(context.Context); valid && existsErr == nil {
-		ctx = c
-	}
+	ctx := p.GetContext()
 
 	if isModifier(l) {
 		return l.(Modifier).Modify(ctx, "+", r)
@@ -448,11 +420,7 @@ func divideStage(p Parameters, arguments ...Any) (Any, error) {
 	arguments = getAnyList(arguments)
 	l, r := arguments[left], arguments[right]
 
-	ctx := context.Background()
-	ctxPart, existsErr := p.Get(contextParam)
-	if c, valid := ctxPart.(context.Context); valid && existsErr == nil {
-		ctx = c
-	}
+	ctx := p.GetContext()
 
 	if isModifier(l) {
 		return l.(Modifier).Modify(ctx, "/", r)
@@ -482,11 +450,7 @@ func multipleStage(p Parameters, arguments ...Any) (Any, error) {
 	arguments = getAnyList(arguments)
 	l, r := arguments[left], arguments[right]
 
-	ctx := context.Background()
-	ctxPart, existsErr := p.Get(contextParam)
-	if c, valid := ctxPart.(context.Context); valid && existsErr == nil {
-		ctx = c
-	}
+	ctx := p.GetContext()
 
 	if isModifier(l) {
 		return l.(Modifier).Modify(ctx, "*", r)
@@ -526,11 +490,7 @@ func subtractStage(p Parameters, arguments ...Any) (Any, error) {
 	arguments = getAnyList(arguments)
 	l, r := arguments[left], arguments[right]
 
-	ctx := context.Background()
-	ctxPart, existsErr := p.Get(contextParam)
-	if c, valid := ctxPart.(context.Context); valid && existsErr == nil {
-		ctx = c
-	}
+	ctx := p.GetContext()
 
 	if isModifier(l) {
 		return l.(Modifier).Modify(ctx, "-", r)

@@ -8,8 +8,13 @@
 
 package valuate
 
+import (
+	"context"
+)
+
 type Parameters interface {
 	Get(name string) (Any, error)
+	GetContext() context.Context
 }
 
 type MapParameters map[string]Any
@@ -25,6 +30,14 @@ func (p MapParameters) Get(name string) (Any, error) {
 	}
 
 	return value, nil
+}
+
+func (p MapParameters) GetContext() context.Context {
+	ctxPart, existsErr := p.Get(contextParam)
+	if c, valid := ctxPart.(context.Context); valid && existsErr == nil {
+		return c
+	}
+	return context.Background()
 }
 
 var DummyParameters = MapParameters(map[string]Any{})
