@@ -9,6 +9,7 @@
 package valuate
 
 import (
+	"context"
 	"encoding/json"
 	"reflect"
 	"testing"
@@ -383,13 +384,19 @@ func TestAccess(t *testing.T) {
 	}
 
 	fs := map[string]ExpressionFunction{
-		"json_marshal": func(args ...interface{}) (interface{}, error) {
+		"context_value": func(c context.Context, args ...interface{}) (interface{}, error) {
+			if len(args) == 0 || len(args) > 1 {
+				return nil, FnArgsNumberError
+			}
+			return c.Value(args[0]), nil
+		},
+		"json_marshal": func(_ context.Context, args ...interface{}) (interface{}, error) {
 			if len(args) == 0 || len(args) > 1 {
 				return nil, FnArgsNumberError
 			}
 			return json.Marshal(args[0])
 		},
-		"bytes_to_string": func(args ...interface{}) (interface{}, error) {
+		"bytes_to_string": func(_ context.Context, args ...interface{}) (interface{}, error) {
 			if len(args) == 0 || len(args) > 1 {
 				return nil, FnArgsNumberError
 			}
@@ -401,7 +408,7 @@ func TestAccess(t *testing.T) {
 
 			return string(v), nil
 		},
-		"json_unmarshal": func(args ...interface{}) (interface{}, error) {
+		"json_unmarshal": func(_ context.Context, args ...interface{}) (interface{}, error) {
 			if len(args) != 2 {
 				return nil, FnArgsNumberError
 			}
@@ -414,7 +421,7 @@ func TestAccess(t *testing.T) {
 			err := json.Unmarshal(b, args[1])
 			return args[1], err
 		},
-		"time_stamp": func(args ...interface{}) (interface{}, error) {
+		"time_stamp": func(_ context.Context, args ...interface{}) (interface{}, error) {
 			if len(args) != 1 {
 				return nil, FnArgsNumberError
 			}
@@ -486,6 +493,12 @@ func TestAccess(t *testing.T) {
 			params:   MapParameters(map[string]Any{"s": s}),
 		},
 		{
+			input:     "context_value(s)",
+			want:      "a",
+			params:    MapParameters(map[string]Any{"s": "a"}),
+			functions: fs,
+		},
+		{
 			input:     "len(json_marshal(s.abc)) > 0",
 			params:    MapParameters(map[string]Any{"s": s}),
 			want:      true,
@@ -515,7 +528,8 @@ func TestAccess(t *testing.T) {
 			return
 		}
 
-		got, er := expr.Evaluate(td.params)
+		ctx := context.WithValue(context.Background(), "a", "a")
+		got, er := expr.WithContext(ctx).Evaluate(td.params)
 		if er != nil && !td.hasError {
 			t.Error(er)
 			return

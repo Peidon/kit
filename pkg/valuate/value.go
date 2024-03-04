@@ -44,7 +44,8 @@ const (
 	TimeFullType
 	PtrType
 
-	trueValue = 1
+	trueValue    = 1
+	contextParam = "context-U3ZdDmBkg0" // 使用一个随机字符串防止与已有参数冲突
 )
 
 var (

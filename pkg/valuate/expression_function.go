@@ -9,17 +9,18 @@
 package valuate
 
 import (
+	"context"
 	"encoding/json"
 	"reflect"
 	"time"
 )
 
-type ExpressionFunction func(arguments ...Any) (Any, error)
+type ExpressionFunction func(ctx context.Context, arguments ...Any) (Any, error)
 
 var (
 	// builtin functions
 	builtin = map[string]ExpressionFunction{
-		"json_marshal": func(args ...interface{}) (interface{}, error) {
+		"json_marshal": func(_ context.Context, args ...interface{}) (interface{}, error) {
 			if len(args) == 0 || len(args) > 1 {
 				return nil, FnArgsNumberError
 			}
@@ -29,7 +30,7 @@ var (
 			}
 			return string(b), nil
 		},
-		"json_unmarshal": func(args ...interface{}) (interface{}, error) {
+		"json_unmarshal": func(_ context.Context, args ...interface{}) (interface{}, error) {
 			if len(args) != 2 {
 				return nil, FnArgsNumberError
 			}
@@ -42,7 +43,7 @@ var (
 			err := json.Unmarshal(b, args[1])
 			return args[1], err
 		},
-		"unix_timestamp": func(args ...interface{}) (interface{}, error) {
+		"unix_timestamp": func(_ context.Context, args ...interface{}) (interface{}, error) {
 			if len(args) != 1 {
 				return nil, FnArgsNumberError
 			}
@@ -60,7 +61,7 @@ var (
 	}
 )
 
-func length(args ...Any) (interface{}, error) {
+func length(_ context.Context, args ...Any) (interface{}, error) {
 	if len(args) == 0 || len(args) > 1 {
 		return nil, FnArgsNumberError
 	}

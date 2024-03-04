@@ -9,6 +9,7 @@
 package valuate
 
 import (
+	"context"
 	"github.com/antlr/antlr4/runtime/Go/antlr"
 	"kit/pkg/valuate/parser"
 )
@@ -22,6 +23,8 @@ type EvaluableExpression struct {
 
 	errorTrack   *StageError
 	errorHandler ErrorStrategy
+
+	ctx context.Context
 }
 
 func Expression(input string) (*EvaluableExpression, error) {
@@ -527,6 +530,7 @@ func (eval *EvaluableExpression) Evaluate(parameters map[string]interface{}) (in
 		return eval.Eval(nil)
 	}
 
+	parameters[contextParam] = eval.ctx
 	return eval.Eval(MapParameters(parameters))
 }
 
@@ -541,6 +545,11 @@ func (eval *EvaluableExpression) Eval(parameters Parameters) (interface{}, error
 
 	v, err := eval.evaluateStage(eval.stage, parameters)
 	return getAny(v), err
+}
+
+func (eval *EvaluableExpression) WithContext(ctx context.Context) *EvaluableExpression {
+	eval.ctx = ctx
+	return eval
 }
 
 func (eval *EvaluableExpression) evaluateStage(stage *evaluationStage, parameters Parameters) (interface{}, error) {

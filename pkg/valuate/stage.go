@@ -9,6 +9,7 @@
 package valuate
 
 import (
+	"context"
 	"errors"
 	"reflect"
 	"strconv"
@@ -576,7 +577,13 @@ func makeFuncStage(funcName string, fs map[string]ExpressionFunction) evaluation
 			return nil, errors.New("function " + funcName + " not exists")
 		}
 
-		ret, err = fn(args...)
+		ctx := context.Background()
+		ctxPart, existsErr := parameters.Get(contextParam)
+		if c, valid := ctxPart.(context.Context); valid && existsErr == nil {
+			ctx = c
+		}
+
+		ret, err = fn(ctx, args...)
 		switch err {
 		case FnArgTypeError:
 			ts := argTypes(args...)

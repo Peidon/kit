@@ -1,11 +1,14 @@
 # kit
 Golang Coder 的框架和工具
 ## valuate  
-基于ANTLR4的 github.com/govaluate
+基于ANTLR4的表达式计算框架，类似github.com/govaluate
 
-语法上做了调整和定制，功能更完善，比如对Accessor进行了补充
+和govaluate不同的是，语法上做了调整和定制，减少歧义；
+功能更加强大，比如对Accessor进行了补充，支持数组下标，支持Catch Error, 自定义错误处理，支持操作符重载等等；
 
-更健壮，解析过程是基于ANTLR4生成的语法树，而代价是性能更差，不过可以优化
+```go
+
+```
 
 测试环境
 --
