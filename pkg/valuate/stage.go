@@ -162,15 +162,21 @@ func makeParameterStage(parameterName string) evaluationOperator {
 
 // equalStage symbol ==
 // @param arguments left right
-func equalStage(_ Parameters, arguments ...Any) (Any, error) {
+func equalStage(p Parameters, arguments ...Any) (Any, error) {
 	arguments = getAnyList(arguments)
 	l, r := arguments[left], arguments[right]
 
+	ctx := context.Background()
+	ctxPart, existsErr := p.Get(contextParam)
+	if c, valid := ctxPart.(context.Context); valid && existsErr == nil {
+		ctx = c
+	}
+
 	if isModifier(l) {
-		return l.(Modifier).Modify("==", r)
+		return l.(Modifier).Modify(ctx, "==", r)
 	}
 	if isModifier(r) {
-		return r.(Modifier).Modify("==", l)
+		return r.(Modifier).Modify(ctx, "==", l)
 	}
 
 	if isNumber(l) && isNumber(r) {
@@ -199,15 +205,21 @@ func equalStage(_ Parameters, arguments ...Any) (Any, error) {
 
 // notEqualStage symbol !=
 // @param arguments left right
-func notEqualStage(_ Parameters, arguments ...Any) (Any, error) {
+func notEqualStage(p Parameters, arguments ...Any) (Any, error) {
 	arguments = getAnyList(arguments)
 	l, r := arguments[left], arguments[right]
 
+	ctx := context.Background()
+	ctxPart, existsErr := p.Get(contextParam)
+	if c, valid := ctxPart.(context.Context); valid && existsErr == nil {
+		ctx = c
+	}
+
 	if isModifier(l) {
-		return l.(Modifier).Modify("!=", r)
+		return l.(Modifier).Modify(ctx, "!=", r)
 	}
 	if isModifier(r) {
-		return r.(Modifier).Modify("!=", l)
+		return r.(Modifier).Modify(ctx, "!=", l)
 	}
 
 	if isNumber(l) && isNumber(r) {
@@ -237,15 +249,21 @@ func notEqualStage(_ Parameters, arguments ...Any) (Any, error) {
 
 // gtStage symbol '>'
 // greater than
-func gtStage(_ Parameters, arguments ...Any) (Any, error) {
+func gtStage(p Parameters, arguments ...Any) (Any, error) {
 	arguments = getAnyList(arguments)
 	l, r := arguments[left], arguments[right]
 
+	ctx := context.Background()
+	ctxPart, existsErr := p.Get(contextParam)
+	if c, valid := ctxPart.(context.Context); valid && existsErr == nil {
+		ctx = c
+	}
+
 	if isModifier(l) {
-		return l.(Modifier).Modify(">", r)
+		return l.(Modifier).Modify(ctx, ">", r)
 	}
 	if isModifier(r) {
-		return r.(Modifier).Modify("<", l)
+		return r.(Modifier).Modify(ctx, "<", l)
 	}
 
 	if isNumber(l) && isNumber(r) {
@@ -268,15 +286,21 @@ func gtStage(_ Parameters, arguments ...Any) (Any, error) {
 
 // ltStage symbol '<'
 // less than
-func ltStage(_ Parameters, arguments ...Any) (Any, error) {
+func ltStage(p Parameters, arguments ...Any) (Any, error) {
 	arguments = getAnyList(arguments)
 	l, r := arguments[left], arguments[right]
 
+	ctx := context.Background()
+	ctxPart, existsErr := p.Get(contextParam)
+	if c, valid := ctxPart.(context.Context); valid && existsErr == nil {
+		ctx = c
+	}
+
 	if isModifier(l) {
-		return l.(Modifier).Modify("<", r)
+		return l.(Modifier).Modify(ctx, "<", r)
 	}
 	if isModifier(r) {
-		return r.(Modifier).Modify(">", l)
+		return r.(Modifier).Modify(ctx, ">", l)
 	}
 
 	if isNumber(l) && isNumber(r) {
@@ -301,15 +325,21 @@ func ltStage(_ Parameters, arguments ...Any) (Any, error) {
 
 // gteStage symbol '>='
 // greater or equal
-func gteStage(_ Parameters, arguments ...Any) (Any, error) {
+func gteStage(p Parameters, arguments ...Any) (Any, error) {
 	arguments = getAnyList(arguments)
 	l, r := arguments[left], arguments[right]
 
+	ctx := context.Background()
+	ctxPart, existsErr := p.Get(contextParam)
+	if c, valid := ctxPart.(context.Context); valid && existsErr == nil {
+		ctx = c
+	}
+
 	if isModifier(l) {
-		return l.(Modifier).Modify(">=", r)
+		return l.(Modifier).Modify(ctx, ">=", r)
 	}
 	if isModifier(r) {
-		return r.(Modifier).Modify("<=", l)
+		return r.(Modifier).Modify(ctx, "<=", l)
 	}
 
 	if isNumber(l) && isNumber(r) {
@@ -332,15 +362,21 @@ func gteStage(_ Parameters, arguments ...Any) (Any, error) {
 
 // lteStage symbol '<='
 // less or equal
-func lteStage(_ Parameters, arguments ...Any) (Any, error) {
+func lteStage(p Parameters, arguments ...Any) (Any, error) {
 	arguments = getAnyList(arguments)
 	l, r := arguments[left], arguments[right]
 
+	ctx := context.Background()
+	ctxPart, existsErr := p.Get(contextParam)
+	if c, valid := ctxPart.(context.Context); valid && existsErr == nil {
+		ctx = c
+	}
+
 	if isModifier(l) {
-		return l.(Modifier).Modify("<=", r)
+		return l.(Modifier).Modify(ctx, "<=", r)
 	}
 	if isModifier(r) {
-		return r.(Modifier).Modify(">=", l)
+		return r.(Modifier).Modify(ctx, ">=", l)
 	}
 
 	if isNumber(l) && isNumber(r) {
@@ -382,15 +418,21 @@ func orStage(_ Parameters, arguments ...Any) (Any, error) {
 }
 
 // modify op '+'
-func addStage(_ Parameters, arguments ...Any) (Any, error) {
+func addStage(p Parameters, arguments ...Any) (Any, error) {
 	arguments = getAnyList(arguments)
 	l, r := arguments[left], arguments[right]
 
+	ctx := context.Background()
+	ctxPart, existsErr := p.Get(contextParam)
+	if c, valid := ctxPart.(context.Context); valid && existsErr == nil {
+		ctx = c
+	}
+
 	if isModifier(l) {
-		return l.(Modifier).Modify("+", r)
+		return l.(Modifier).Modify(ctx, "+", r)
 	}
 	if isModifier(r) {
-		return r.(Modifier).Modify("+", l)
+		return r.(Modifier).Modify(ctx, "+", l)
 	}
 
 	if isFloat(l) || isFloat(r) {
@@ -402,15 +444,21 @@ func addStage(_ Parameters, arguments ...Any) (Any, error) {
 }
 
 // modify op '/'
-func divideStage(_ Parameters, arguments ...Any) (Any, error) {
+func divideStage(p Parameters, arguments ...Any) (Any, error) {
 	arguments = getAnyList(arguments)
 	l, r := arguments[left], arguments[right]
 
+	ctx := context.Background()
+	ctxPart, existsErr := p.Get(contextParam)
+	if c, valid := ctxPart.(context.Context); valid && existsErr == nil {
+		ctx = c
+	}
+
 	if isModifier(l) {
-		return l.(Modifier).Modify("/", r)
+		return l.(Modifier).Modify(ctx, "/", r)
 	}
 	if isModifier(r) {
-		return r.(Modifier).Modify("1/", l)
+		return r.(Modifier).Modify(ctx, "1/", l)
 	}
 
 	if isInt(l) && isInt(r) {
@@ -430,15 +478,21 @@ func divideStage(_ Parameters, arguments ...Any) (Any, error) {
 }
 
 // modify op '*'
-func multipleStage(_ Parameters, arguments ...Any) (Any, error) {
+func multipleStage(p Parameters, arguments ...Any) (Any, error) {
 	arguments = getAnyList(arguments)
 	l, r := arguments[left], arguments[right]
 
+	ctx := context.Background()
+	ctxPart, existsErr := p.Get(contextParam)
+	if c, valid := ctxPart.(context.Context); valid && existsErr == nil {
+		ctx = c
+	}
+
 	if isModifier(l) {
-		return l.(Modifier).Modify("*", r)
+		return l.(Modifier).Modify(ctx, "*", r)
 	}
 	if isModifier(r) {
-		return r.(Modifier).Modify("*", l)
+		return r.(Modifier).Modify(ctx, "*", l)
 	}
 
 	if isInt(l) && isInt(r) {
@@ -468,14 +522,21 @@ func modulusStage(_ Parameters, arguments ...Any) (Any, error) {
 }
 
 // modify op '-'
-func subtractStage(_ Parameters, arguments ...Any) (Any, error) {
+func subtractStage(p Parameters, arguments ...Any) (Any, error) {
 	arguments = getAnyList(arguments)
 	l, r := arguments[left], arguments[right]
+
+	ctx := context.Background()
+	ctxPart, existsErr := p.Get(contextParam)
+	if c, valid := ctxPart.(context.Context); valid && existsErr == nil {
+		ctx = c
+	}
+
 	if isModifier(l) {
-		return l.(Modifier).Modify("-", r)
+		return l.(Modifier).Modify(ctx, "-", r)
 	}
 	if isModifier(r) {
-		return r.(Modifier).Modify("1-", l)
+		return r.(Modifier).Modify(ctx, "1-", l)
 	}
 
 	if isFloat(l) || isFloat(r) {

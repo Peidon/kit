@@ -211,7 +211,7 @@ func (p *param) ToFloat() float64 {
 
 type emptyParam struct{}
 
-func (empty emptyParam) Modify(op string, _ interface{}) (interface{}, error) {
+func (empty emptyParam) Modify(_ context.Context, op string, _ interface{}) (interface{}, error) {
 	if op == "+" {
 		return 0, nil
 	}

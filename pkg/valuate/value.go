@@ -9,6 +9,7 @@
 package valuate
 
 import (
+	"context"
 	"math"
 	"reflect"
 	"time"
@@ -471,7 +472,7 @@ type Comparable interface {
 }
 
 type Modifier interface {
-	Modify(string, interface{}) (interface{}, error)
+	Modify(context.Context, string, interface{}) (interface{}, error)
 }
 
 func (v Value) Equal(other interface{}) bool {
