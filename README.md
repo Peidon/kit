@@ -1,14 +1,56 @@
 # kit
 Golang Coder 的框架和工具
-## valuate  
-基于ANTLR4的表达式计算框架，类似github.com/govaluate
+1. valuate
+2. code generator
 
-和govaluate不同的是，语法上做了调整和定制，减少歧义；
-功能更加强大，比如对Accessor进行了补充，支持数组下标，支持Catch Error, 自定义错误处理，支持操作符重载等等；
+## valuate
+
+基于ANTLR4的表达式计算框架
+
+特点
+--
+
+* 支持自定义函数;
+* 支持Accessor功能，可用数组下标取值;
+* 支持Catch Error，可自定义错误处理;
+* 支持操作符重载，可自定义操作符含义;
+
+How do I use it?
+--
+
+You create a new EvaluableExpression, then call "Evaluate" on it.
 
 ```go
-
+    expression, err := valuate.Expression("10 > 0");
+    result, err := expression.Evaluate(nil);
+    // result is now set to "true", the bool value.
 ```
+
+Cool, but how about with parameters?
+
+```go
+	expression, err := valuate.Expression("foo > 0");
+
+	parameters := make(map[string]interface{}, 8)
+	parameters["foo"] = -1;
+
+	result, err := expression.Evaluate(parameters);
+	// result is now set to "false", the bool value.
+```
+
+What operators and types does this support?
+--
+
+* Modifiers: `+` `-` `/` `*`
+* Comparators: `>` `>=` `<` `<=` `==` `!=`
+* Logical ops: `||` `&&`
+* Numeric constants, as 64-bit floating point (`12345.678`), as 64-bit int (`123`)
+* String constants (double quotes: `"foobar"`)
+* Boolean constants: `true` `false`
+* Nil constants: `nil`
+* Parenthesis to control order of evaluation `(` `)`
+* Arrays (anything separated by `,` within parenthesis: `[1, 2, 3]`)
+* Prefixes: `!` `-`
 
 测试环境
 --
@@ -103,11 +145,3 @@ kit -ddl-file /Users/peidongxu/kit/tmp/sql \
     -repo-tpl /Users/peidongxu/kit/tmp/tpl \  
     -repo-output /Users/peidongxu/home/
 ```
-
-## parser
-
-### ast
-Generate regular
-
-### udf
-Execute script
