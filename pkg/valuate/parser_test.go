@@ -19,13 +19,20 @@ func TestAST(t *testing.T) {
 		"abc(x)",
 		"1+2.0",
 		"acb.b[0].x",
+		"!abc",
+		"-1",
+		"0",
+		"true",
+		"false",
+		"nil",
+		`!in(${abc}, "YY")`,
 	}
 	for _, td := range testsData {
 		eval, err := Expression(td)
 		t.Log(eval)
 		if err != nil {
-			//t.Error(err)
-			//return
+			t.Error(err)
+			return
 		}
 	}
 }

@@ -512,7 +512,7 @@ func negateStage(_ Parameters, arguments ...Any) (Any, error) {
 	if isInt(u) {
 		return -toInt(u), nil
 	}
-	if isFloat(u) {
+	if isFloat(u) || isNumber(u) {
 		return -toFloat64(u), nil
 	}
 	return nil, ArgumentTypeError

@@ -22,8 +22,7 @@ expression
     ;
 
 primaryExpr
-    : variate
-    | operand
+    : operand
     | primaryExpr ( DOT IDENTIFIER
                   | index)
     | IDENTIFIER arguments
@@ -49,6 +48,7 @@ variate
 
 operand
     : basicLit
+    | variate
     | LP expression RP
     ;
 

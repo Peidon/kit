@@ -101,6 +101,10 @@ func (eval *EvaluableExpression) VisitExpression(ctx *parser.ExpressionContext) 
 		return expr.Accept(eval)
 	}
 
+	if expr := ctx.UnaryExpr(); expr != nil {
+		return expr.Accept(eval)
+	}
+
 	for _, expr := range ctx.AllExpression() {
 		stageInf := expr.Accept(eval)
 		if stageInf == nil {
@@ -234,9 +238,7 @@ func (eval *EvaluableExpression) VisitExpression(ctx *parser.ExpressionContext) 
 }
 
 func (eval *EvaluableExpression) VisitPrimaryExpr(ctx *parser.PrimaryExprContext) interface{} {
-	if varID := ctx.Variate(); varID != nil {
-		return varID.Accept(eval)
-	}
+
 	if operand := ctx.Operand(); operand != nil {
 		return operand.Accept(eval)
 	}
@@ -377,6 +379,9 @@ func (eval *EvaluableExpression) VisitExpressionList(ctx *parser.ExpressionListC
 func (eval *EvaluableExpression) VisitOperand(ctx *parser.OperandContext) interface{} {
 	if basicLit := ctx.BasicLit(); basicLit != nil {
 		return basicLit.Accept(eval)
+	}
+	if varID := ctx.Variate(); varID != nil {
+		return varID.Accept(eval)
 	}
 	if expr := ctx.Expression(); expr != nil {
 		return expr.Accept(eval)

@@ -12,6 +12,7 @@ import (
 	"context"
 	"encoding/json"
 	"reflect"
+	"strings"
 	"testing"
 	"time"
 )
@@ -33,6 +34,16 @@ func TestEvaluableExpression_Evaluate(t *testing.T) {
 		{
 			input: "nil",
 			want:  nil,
+		},
+		{
+			input:  "!a",
+			params: MapParameters(map[string]Any{"a": false}),
+			want:   true,
+		},
+		{
+			input:  "-a",
+			params: MapParameters(map[string]Any{"a": 1}),
+			want:   -1,
 		},
 		{
 			input:     "a == 0",
@@ -445,6 +456,30 @@ func TestAccess(t *testing.T) {
 
 		functions map[string]ExpressionFunction
 	}{
+		{
+			input:  "!in(${abc}, \"ab\")",
+			params: MapParameters(map[string]Any{"abc": "abc"}),
+			want:   false,
+			functions: map[string]ExpressionFunction{
+				"in": func(ctx context.Context, args ...Any) (Any, error) {
+					if len(args) != 2 {
+						return nil, FnArgsNumberError
+					}
+					a := args[0]
+					b := args[1]
+					v, ok := a.(string)
+					if !ok {
+						return nil, FnArgTypeError
+					}
+					k, pass := b.(string)
+					if !pass {
+						return nil, FnArgTypeError
+					}
+
+					return strings.Contains(v, k), nil
+				},
+			},
+		},
 		{
 			input:  "s.abc.b == efg",
 			want:   true,

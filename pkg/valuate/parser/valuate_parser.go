@@ -59,11 +59,11 @@ func valuateparserParserInit() {
 		1, 1, 1, 5, 1, 35, 8, 1, 10, 1, 12, 1, 38, 9, 1, 1, 1, 1, 1, 1, 1, 1, 1,
 		1, 2, 1, 2, 1, 2, 3, 2, 47, 8, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1,
 		2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 5, 2, 64, 8, 2, 10,
-		2, 12, 2, 67, 9, 2, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 3, 3, 74, 8, 3, 1, 3,
-		1, 3, 1, 3, 1, 3, 3, 3, 80, 8, 3, 5, 3, 82, 8, 3, 10, 3, 12, 3, 85, 9,
-		3, 1, 4, 1, 4, 1, 4, 1, 5, 1, 5, 3, 5, 92, 8, 5, 1, 5, 1, 5, 1, 6, 1, 6,
-		1, 6, 5, 6, 99, 8, 6, 10, 6, 12, 6, 102, 9, 6, 1, 7, 1, 7, 1, 7, 1, 7,
-		3, 7, 108, 8, 7, 1, 8, 1, 8, 1, 8, 1, 8, 1, 8, 3, 8, 115, 8, 8, 1, 9, 1,
+		2, 12, 2, 67, 9, 2, 1, 3, 1, 3, 1, 3, 1, 3, 3, 3, 73, 8, 3, 1, 3, 1, 3,
+		1, 3, 1, 3, 3, 3, 79, 8, 3, 5, 3, 81, 8, 3, 10, 3, 12, 3, 84, 9, 3, 1,
+		4, 1, 4, 1, 4, 1, 5, 1, 5, 3, 5, 91, 8, 5, 1, 5, 1, 5, 1, 6, 1, 6, 1, 6,
+		5, 6, 98, 8, 6, 10, 6, 12, 6, 101, 9, 6, 1, 7, 1, 7, 1, 7, 1, 7, 3, 7,
+		107, 8, 7, 1, 8, 1, 8, 1, 8, 1, 8, 1, 8, 1, 8, 3, 8, 115, 8, 8, 1, 9, 1,
 		9, 1, 9, 1, 9, 1, 9, 1, 9, 1, 9, 1, 9, 3, 9, 125, 8, 9, 1, 10, 1, 10, 1,
 		10, 1, 10, 5, 10, 131, 8, 10, 10, 10, 12, 10, 134, 9, 10, 1, 10, 1, 10,
 		1, 10, 1, 10, 3, 10, 140, 8, 10, 1, 11, 1, 11, 1, 11, 1, 11, 1, 12, 1,
@@ -71,9 +71,9 @@ func valuateparserParserInit() {
 		1, 12, 1, 12, 1, 12, 3, 12, 159, 8, 12, 1, 13, 1, 13, 1, 13, 1, 13, 1,
 		13, 0, 2, 4, 6, 14, 0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26,
 		0, 4, 2, 0, 23, 23, 26, 27, 1, 0, 24, 25, 1, 0, 16, 21, 2, 0, 22, 22, 25,
-		25, 176, 0, 28, 1, 0, 0, 0, 2, 31, 1, 0, 0, 0, 4, 46, 1, 0, 0, 0, 6, 73,
-		1, 0, 0, 0, 8, 86, 1, 0, 0, 0, 10, 89, 1, 0, 0, 0, 12, 95, 1, 0, 0, 0,
-		14, 107, 1, 0, 0, 0, 16, 114, 1, 0, 0, 0, 18, 124, 1, 0, 0, 0, 20, 139,
+		25, 176, 0, 28, 1, 0, 0, 0, 2, 31, 1, 0, 0, 0, 4, 46, 1, 0, 0, 0, 6, 72,
+		1, 0, 0, 0, 8, 85, 1, 0, 0, 0, 10, 88, 1, 0, 0, 0, 12, 94, 1, 0, 0, 0,
+		14, 106, 1, 0, 0, 0, 16, 114, 1, 0, 0, 0, 18, 124, 1, 0, 0, 0, 20, 139,
 		1, 0, 0, 0, 22, 141, 1, 0, 0, 0, 24, 158, 1, 0, 0, 0, 26, 160, 1, 0, 0,
 		0, 28, 29, 3, 4, 2, 0, 29, 30, 5, 0, 0, 1, 30, 1, 1, 0, 0, 0, 31, 36, 3,
 		14, 7, 0, 32, 33, 5, 12, 0, 0, 33, 35, 5, 30, 0, 0, 34, 32, 1, 0, 0, 0,
@@ -88,22 +88,22 @@ func valuateparserParserInit() {
 		0, 0, 62, 64, 3, 4, 2, 2, 63, 48, 1, 0, 0, 0, 63, 51, 1, 0, 0, 0, 63, 54,
 		1, 0, 0, 0, 63, 57, 1, 0, 0, 0, 63, 60, 1, 0, 0, 0, 64, 67, 1, 0, 0, 0,
 		65, 63, 1, 0, 0, 0, 65, 66, 1, 0, 0, 0, 66, 5, 1, 0, 0, 0, 67, 65, 1, 0,
-		0, 0, 68, 69, 6, 3, -1, 0, 69, 74, 3, 14, 7, 0, 70, 74, 3, 16, 8, 0, 71,
-		72, 5, 30, 0, 0, 72, 74, 3, 10, 5, 0, 73, 68, 1, 0, 0, 0, 73, 70, 1, 0,
-		0, 0, 73, 71, 1, 0, 0, 0, 74, 83, 1, 0, 0, 0, 75, 79, 10, 2, 0, 0, 76,
-		77, 5, 12, 0, 0, 77, 80, 5, 30, 0, 0, 78, 80, 3, 26, 13, 0, 79, 76, 1,
-		0, 0, 0, 79, 78, 1, 0, 0, 0, 80, 82, 1, 0, 0, 0, 81, 75, 1, 0, 0, 0, 82,
-		85, 1, 0, 0, 0, 83, 81, 1, 0, 0, 0, 83, 84, 1, 0, 0, 0, 84, 7, 1, 0, 0,
-		0, 85, 83, 1, 0, 0, 0, 86, 87, 7, 3, 0, 0, 87, 88, 3, 4, 2, 0, 88, 9, 1,
-		0, 0, 0, 89, 91, 5, 4, 0, 0, 90, 92, 3, 12, 6, 0, 91, 90, 1, 0, 0, 0, 91,
-		92, 1, 0, 0, 0, 92, 93, 1, 0, 0, 0, 93, 94, 5, 5, 0, 0, 94, 11, 1, 0, 0,
-		0, 95, 100, 3, 4, 2, 0, 96, 97, 5, 10, 0, 0, 97, 99, 3, 4, 2, 0, 98, 96,
-		1, 0, 0, 0, 99, 102, 1, 0, 0, 0, 100, 98, 1, 0, 0, 0, 100, 101, 1, 0, 0,
-		0, 101, 13, 1, 0, 0, 0, 102, 100, 1, 0, 0, 0, 103, 104, 5, 31, 0, 0, 104,
-		105, 5, 38, 0, 0, 105, 108, 5, 39, 0, 0, 106, 108, 5, 30, 0, 0, 107, 103,
-		1, 0, 0, 0, 107, 106, 1, 0, 0, 0, 108, 15, 1, 0, 0, 0, 109, 115, 3, 18,
-		9, 0, 110, 111, 5, 4, 0, 0, 111, 112, 3, 4, 2, 0, 112, 113, 5, 5, 0, 0,
-		113, 115, 1, 0, 0, 0, 114, 109, 1, 0, 0, 0, 114, 110, 1, 0, 0, 0, 115,
+		0, 0, 68, 69, 6, 3, -1, 0, 69, 73, 3, 16, 8, 0, 70, 71, 5, 30, 0, 0, 71,
+		73, 3, 10, 5, 0, 72, 68, 1, 0, 0, 0, 72, 70, 1, 0, 0, 0, 73, 82, 1, 0,
+		0, 0, 74, 78, 10, 2, 0, 0, 75, 76, 5, 12, 0, 0, 76, 79, 5, 30, 0, 0, 77,
+		79, 3, 26, 13, 0, 78, 75, 1, 0, 0, 0, 78, 77, 1, 0, 0, 0, 79, 81, 1, 0,
+		0, 0, 80, 74, 1, 0, 0, 0, 81, 84, 1, 0, 0, 0, 82, 80, 1, 0, 0, 0, 82, 83,
+		1, 0, 0, 0, 83, 7, 1, 0, 0, 0, 84, 82, 1, 0, 0, 0, 85, 86, 7, 3, 0, 0,
+		86, 87, 3, 4, 2, 0, 87, 9, 1, 0, 0, 0, 88, 90, 5, 4, 0, 0, 89, 91, 3, 12,
+		6, 0, 90, 89, 1, 0, 0, 0, 90, 91, 1, 0, 0, 0, 91, 92, 1, 0, 0, 0, 92, 93,
+		5, 5, 0, 0, 93, 11, 1, 0, 0, 0, 94, 99, 3, 4, 2, 0, 95, 96, 5, 10, 0, 0,
+		96, 98, 3, 4, 2, 0, 97, 95, 1, 0, 0, 0, 98, 101, 1, 0, 0, 0, 99, 97, 1,
+		0, 0, 0, 99, 100, 1, 0, 0, 0, 100, 13, 1, 0, 0, 0, 101, 99, 1, 0, 0, 0,
+		102, 103, 5, 31, 0, 0, 103, 104, 5, 38, 0, 0, 104, 107, 5, 39, 0, 0, 105,
+		107, 5, 30, 0, 0, 106, 102, 1, 0, 0, 0, 106, 105, 1, 0, 0, 0, 107, 15,
+		1, 0, 0, 0, 108, 115, 3, 18, 9, 0, 109, 115, 3, 14, 7, 0, 110, 111, 5,
+		4, 0, 0, 111, 112, 3, 4, 2, 0, 112, 113, 5, 5, 0, 0, 113, 115, 1, 0, 0,
+		0, 114, 108, 1, 0, 0, 0, 114, 109, 1, 0, 0, 0, 114, 110, 1, 0, 0, 0, 115,
 		17, 1, 0, 0, 0, 116, 125, 5, 32, 0, 0, 117, 125, 5, 35, 0, 0, 118, 125,
 		5, 37, 0, 0, 119, 125, 3, 20, 10, 0, 120, 125, 3, 24, 12, 0, 121, 125,
 		5, 1, 0, 0, 122, 125, 5, 2, 0, 0, 123, 125, 5, 3, 0, 0, 124, 116, 1, 0,
@@ -122,8 +122,8 @@ func valuateparserParserInit() {
 		0, 0, 154, 155, 5, 9, 0, 0, 155, 159, 1, 0, 0, 0, 156, 157, 5, 8, 0, 0,
 		157, 159, 5, 9, 0, 0, 158, 145, 1, 0, 0, 0, 158, 156, 1, 0, 0, 0, 159,
 		25, 1, 0, 0, 0, 160, 161, 5, 8, 0, 0, 161, 162, 3, 4, 2, 0, 162, 163, 5,
-		9, 0, 0, 163, 27, 1, 0, 0, 0, 16, 36, 46, 63, 65, 73, 79, 83, 91, 100,
-		107, 114, 124, 132, 139, 151, 158,
+		9, 0, 0, 163, 27, 1, 0, 0, 0, 16, 36, 46, 63, 65, 72, 78, 82, 90, 99, 106,
+		114, 124, 132, 139, 151, 158,
 	}
 	deserializer := antlr.NewATNDeserializer(nil)
 	staticData.atn = deserializer.Deserialize(staticData.serializedATN)
@@ -913,22 +913,6 @@ func NewPrimaryExprContext(parser antlr.Parser, parent antlr.ParserRuleContext, 
 
 func (s *PrimaryExprContext) GetParser() antlr.Parser { return s.parser }
 
-func (s *PrimaryExprContext) Variate() IVariateContext {
-	var t antlr.RuleContext
-	for _, ctx := range s.GetChildren() {
-		if _, ok := ctx.(IVariateContext); ok {
-			t = ctx.(antlr.RuleContext)
-			break
-		}
-	}
-
-	if t == nil {
-		return nil
-	}
-
-	return t.(IVariateContext)
-}
-
 func (s *PrimaryExprContext) Operand() IOperandContext {
 	var t antlr.RuleContext
 	for _, ctx := range s.GetChildren() {
@@ -1054,34 +1038,28 @@ func (p *ValuateParser) primaryExpr(_p int) (localctx IPrimaryExprContext) {
 	var _alt int
 
 	p.EnterOuterAlt(localctx, 1)
-	p.SetState(73)
+	p.SetState(72)
 	p.GetErrorHandler().Sync(p)
 	switch p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), 4, p.GetParserRuleContext()) {
 	case 1:
 		{
 			p.SetState(69)
-			p.Variate()
+			p.Operand()
 		}
 
 	case 2:
 		{
 			p.SetState(70)
-			p.Operand()
-		}
-
-	case 3:
-		{
-			p.SetState(71)
 			p.Match(ValuateParserIDENTIFIER)
 		}
 		{
-			p.SetState(72)
+			p.SetState(71)
 			p.Arguments()
 		}
 
 	}
 	p.GetParserRuleContext().SetStop(p.GetTokenStream().LT(-1))
-	p.SetState(83)
+	p.SetState(82)
 	p.GetErrorHandler().Sync(p)
 	_alt = p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), 6, p.GetParserRuleContext())
 
@@ -1093,28 +1071,28 @@ func (p *ValuateParser) primaryExpr(_p int) (localctx IPrimaryExprContext) {
 			_prevctx = localctx
 			localctx = NewPrimaryExprContext(p, _parentctx, _parentState)
 			p.PushNewRecursionContext(localctx, _startState, ValuateParserRULE_primaryExpr)
-			p.SetState(75)
+			p.SetState(74)
 
 			if !(p.Precpred(p.GetParserRuleContext(), 2)) {
 				panic(antlr.NewFailedPredicateException(p, "p.Precpred(p.GetParserRuleContext(), 2)", ""))
 			}
-			p.SetState(79)
+			p.SetState(78)
 			p.GetErrorHandler().Sync(p)
 
 			switch p.GetTokenStream().LA(1) {
 			case ValuateParserDOT:
 				{
-					p.SetState(76)
+					p.SetState(75)
 					p.Match(ValuateParserDOT)
 				}
 				{
-					p.SetState(77)
+					p.SetState(76)
 					p.Match(ValuateParserIDENTIFIER)
 				}
 
 			case ValuateParserL_BRACKET:
 				{
-					p.SetState(78)
+					p.SetState(77)
 					p.Index()
 				}
 
@@ -1123,7 +1101,7 @@ func (p *ValuateParser) primaryExpr(_p int) (localctx IPrimaryExprContext) {
 			}
 
 		}
-		p.SetState(85)
+		p.SetState(84)
 		p.GetErrorHandler().Sync(p)
 		_alt = p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), 6, p.GetParserRuleContext())
 	}
@@ -1237,7 +1215,7 @@ func (p *ValuateParser) UnaryExpr() (localctx IUnaryExprContext) {
 
 	p.EnterOuterAlt(localctx, 1)
 	{
-		p.SetState(86)
+		p.SetState(85)
 		_la = p.GetTokenStream().LA(1)
 
 		if !(_la == ValuateParserEXCLAMATION || _la == ValuateParserMINUS) {
@@ -1248,7 +1226,7 @@ func (p *ValuateParser) UnaryExpr() (localctx IUnaryExprContext) {
 		}
 	}
 	{
-		p.SetState(87)
+		p.SetState(86)
 		p.expression(0)
 	}
 
@@ -1361,22 +1339,22 @@ func (p *ValuateParser) Arguments() (localctx IArgumentsContext) {
 
 	p.EnterOuterAlt(localctx, 1)
 	{
-		p.SetState(89)
+		p.SetState(88)
 		p.Match(ValuateParserLP)
 	}
-	p.SetState(91)
+	p.SetState(90)
 	p.GetErrorHandler().Sync(p)
 	_la = p.GetTokenStream().LA(1)
 
 	if (((_la)&-(0x1f+1)) == 0 && ((1<<uint(_la))&((1<<ValuateParserTRUE)|(1<<ValuateParserFALSE)|(1<<ValuateParserNIL_LIT)|(1<<ValuateParserLP)|(1<<ValuateParserL_CURLY)|(1<<ValuateParserL_BRACKET)|(1<<ValuateParserEXCLAMATION)|(1<<ValuateParserMINUS)|(1<<ValuateParserIDENTIFIER)|(1<<ValuateParserVARKEY_OPEN))) != 0) || (((_la-32)&-(0x1f+1)) == 0 && ((1<<uint((_la-32)))&((1<<(ValuateParserSTRING-32))|(1<<(ValuateParserINT-32))|(1<<(ValuateParserFLOAT_NUMBER-32)))) != 0) {
 		{
-			p.SetState(90)
+			p.SetState(89)
 			p.ExpressionList()
 		}
 
 	}
 	{
-		p.SetState(93)
+		p.SetState(92)
 		p.Match(ValuateParserRP)
 	}
 
@@ -1514,24 +1492,24 @@ func (p *ValuateParser) ExpressionList() (localctx IExpressionListContext) {
 
 	p.EnterOuterAlt(localctx, 1)
 	{
-		p.SetState(95)
+		p.SetState(94)
 		p.expression(0)
 	}
-	p.SetState(100)
+	p.SetState(99)
 	p.GetErrorHandler().Sync(p)
 	_la = p.GetTokenStream().LA(1)
 
 	for _la == ValuateParserCOMMA {
 		{
-			p.SetState(96)
+			p.SetState(95)
 			p.Match(ValuateParserCOMMA)
 		}
 		{
-			p.SetState(97)
+			p.SetState(96)
 			p.expression(0)
 		}
 
-		p.SetState(102)
+		p.SetState(101)
 		p.GetErrorHandler().Sync(p)
 		_la = p.GetTokenStream().LA(1)
 	}
@@ -1634,29 +1612,29 @@ func (p *ValuateParser) Variate() (localctx IVariateContext) {
 		}
 	}()
 
-	p.SetState(107)
+	p.SetState(106)
 	p.GetErrorHandler().Sync(p)
 
 	switch p.GetTokenStream().LA(1) {
 	case ValuateParserVARKEY_OPEN:
 		p.EnterOuterAlt(localctx, 1)
 		{
-			p.SetState(103)
+			p.SetState(102)
 			p.Match(ValuateParserVARKEY_OPEN)
 		}
 		{
-			p.SetState(104)
+			p.SetState(103)
 			p.Match(ValuateParserVARID)
 		}
 		{
-			p.SetState(105)
+			p.SetState(104)
 			p.Match(ValuateParserVARKEY_CLOSE)
 		}
 
 	case ValuateParserIDENTIFIER:
 		p.EnterOuterAlt(localctx, 2)
 		{
-			p.SetState(106)
+			p.SetState(105)
 			p.Match(ValuateParserIDENTIFIER)
 		}
 
@@ -1719,6 +1697,22 @@ func (s *OperandContext) BasicLit() IBasicLitContext {
 	}
 
 	return t.(IBasicLitContext)
+}
+
+func (s *OperandContext) Variate() IVariateContext {
+	var t antlr.RuleContext
+	for _, ctx := range s.GetChildren() {
+		if _, ok := ctx.(IVariateContext); ok {
+			t = ctx.(antlr.RuleContext)
+			break
+		}
+	}
+
+	if t == nil {
+		return nil
+	}
+
+	return t.(IVariateContext)
 }
 
 func (s *OperandContext) LP() antlr.TerminalNode {
@@ -1793,12 +1787,19 @@ func (p *ValuateParser) Operand() (localctx IOperandContext) {
 	case ValuateParserTRUE, ValuateParserFALSE, ValuateParserNIL_LIT, ValuateParserL_CURLY, ValuateParserL_BRACKET, ValuateParserSTRING, ValuateParserINT, ValuateParserFLOAT_NUMBER:
 		p.EnterOuterAlt(localctx, 1)
 		{
-			p.SetState(109)
+			p.SetState(108)
 			p.BasicLit()
 		}
 
-	case ValuateParserLP:
+	case ValuateParserIDENTIFIER, ValuateParserVARKEY_OPEN:
 		p.EnterOuterAlt(localctx, 2)
+		{
+			p.SetState(109)
+			p.Variate()
+		}
+
+	case ValuateParserLP:
+		p.EnterOuterAlt(localctx, 3)
 		{
 			p.SetState(110)
 			p.Match(ValuateParserLP)
