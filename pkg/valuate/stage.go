@@ -38,8 +38,13 @@ func (stage evaluationStage) argsTypeCheck(args ...Any) (err error) {
 	}
 
 	if err = stage.typeCheck(args...); err != nil {
-		tp := ""
+		tp := "nil"
 		for _, a := range args {
+
+			if a == nil {
+				break
+			}
+
 			reType := reflect.TypeOf(a)
 			tp = reType.String()
 			break
