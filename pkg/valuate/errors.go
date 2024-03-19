@@ -73,6 +73,10 @@ func (pa ParameterNotFound) Error() string {
 	return "No parameter '" + pa.paramName + "' found."
 }
 
+func (pa ParameterNotFound) KeyName() string {
+	return pa.paramName
+}
+
 type ErrorStrategy func(err error) (interface{}, error)
 
 func defaultStrategy(err error) (interface{}, error) {

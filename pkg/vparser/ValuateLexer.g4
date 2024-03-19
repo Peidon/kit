@@ -48,7 +48,7 @@ WHITESPACE
  : [ \r\n\t]+ -> skip
  ;
 
-IDENTIFIER : LETTER (LETTER | DIGIT)* ;
+IDENTIFIER : (DIGIT)* LETTER (LETTER | DIGIT)* ;
 
 VARKEY_OPEN
     : '${' -> pushMode(VAR)
