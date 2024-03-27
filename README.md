@@ -118,7 +118,7 @@ To use context, you need transfer the context like following:
 Functions can accept any number of arguments, correctly handles nested functions, and arguments can be of any type (even if none of this library's operators support evaluation of that type). For instance, each of these usages of functions in an expression are valid (assuming that the appropriate functions and parameters are given):
 
 ```go
-"sqrt(x1 ** y1, x2 ** y2)"
+"sqrt(x1 * y1, x2 + y2)"
 "max(someValue, abs(anotherValue), 10 * lastValue)"
 ```
 
@@ -126,7 +126,7 @@ Builtin functions:
 
 ```go
 "json_marshal(someStruct)" // return a string
-"json_unmarshal(jsonStr, b)" // jsonStr := `{"name": "foo"}`, b is a strcuct inference
+"json_unmarshal(jsonStr, b)" // jsonStr := `{"name": "foo"}`, b is a struct inference
 "unix_timestamp(t)" // the type of `t` must be time.Time or *time.Time
 "len(abc)" // the type of `abc` must be string, slice or array
 ```
