@@ -219,7 +219,7 @@ fragment HEX
 mode VAR;
 
 VARID
-    : IDENTIFIER (DOT IDENTIFIER)*
+    : IDENTIFIER (DOT (LETTER | DIGIT)*)*
     ;
 
 VARKEY_CLOSE

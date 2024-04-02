@@ -26,6 +26,7 @@ func TestAST(t *testing.T) {
 		"false",
 		"nil",
 		`!in(${abc}, "YY")`,
+		"${SOP9.abc}",
 	}
 	for _, td := range testsData {
 		eval, err := Expression(td)
