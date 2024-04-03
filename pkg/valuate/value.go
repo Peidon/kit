@@ -82,6 +82,8 @@ func (v Value) Get() Any {
 		return v.GetTime()
 	case PtrType:
 		return v.GetPtr()
+	case UnknownType:
+		return v.GetInterface()
 	}
 	return nil
 }
@@ -106,6 +108,10 @@ func getAny(v interface{}) Any {
 	}
 
 	return v
+}
+
+func (v Value) GetInterface() interface{} {
+	return v.inf
 }
 
 func (v Value) GetBytes() []byte {
@@ -172,7 +178,7 @@ func (v Value) GetStruct() StructMap {
 	return nil
 }
 
-func (v Value) GetArray() []Value {
+func (v Value) GetArray() Values {
 	if v.Type != ArrayType {
 		return nil
 	}
@@ -258,40 +264,59 @@ func AnyValue(any interface{}) Value {
 		return ArrayValue(Durations(val))
 	case []Value:
 		return ArrayValue(Values(val))
-	case reflect.Value:
-		// reflect
-		return reflectValue(val)
+	//case reflect.Value:
+	//return reflectValue(val)
 	default:
 		// ptr, struct or slice
-		return reflectValue(reflect.ValueOf(val))
+		return reflectValue(val)
 	}
 }
 
-func reflectValue(val reflect.Value) Value {
+// only reflect ptr, struct or slice
+func reflectValue(ori interface{}) Value {
+
+	noopValue := Value{
+		Type: UnknownType,
+	}
+	val, reflected := ori.(reflect.Value)
+
+	if reflected {
+		noopValue.str = val.Kind().String()
+		switch val.Kind() {
+		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+			return IntValue(val.Int())
+
+		case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+			return UintValue(val.Uint())
+
+		case reflect.String:
+			return StringValue(val.String())
+
+		case reflect.Bool:
+			return BoolValue(val.Bool())
+
+		case reflect.Float32, reflect.Float64:
+			return FloatValue(val.Float())
+
+		case reflect.Pointer | reflect.Ptr:
+			return AnyValue(val.Elem())
+
+		case reflect.Interface:
+			if val.CanInterface() {
+				return AnyValue(val.Interface())
+			}
+		}
+
+	} else {
+		val = reflect.ValueOf(ori)
+		noopValue.str = val.Kind().String()
+		noopValue.inf = ori
+	}
 
 	switch val.Kind() {
-	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-		return IntValue(val.Int())
 
-	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
-		return UintValue(val.Uint())
-
-	case reflect.String:
-		return StringValue(val.String())
-
-	case reflect.Bool:
-		return BoolValue(val.Bool())
-
-	case reflect.Float32, reflect.Float64:
-		return FloatValue(val.Float())
-
-	case reflect.Pointer:
+	case reflect.Pointer | reflect.Ptr:
 		return AnyValue(val.Elem())
-
-	case reflect.Interface:
-		if val.CanInterface() {
-			return AnyValue(val.Interface())
-		}
 
 	case reflect.Map:
 		s := StructMap{}
@@ -301,9 +326,14 @@ func reflectValue(val reflect.Value) Value {
 
 		for i := range keys {
 			k := keys[i]
-			v := val.MapIndex(k)
+			value := val.MapIndex(k)
+			key := k.String()
 
-			s[k.String()] = AnyValue(v).Get()
+			if value.IsValid() && value.CanInterface() {
+				s[key] = value.Interface()
+			} else {
+				s[key] = AnyValue(value).Get()
+			}
 		}
 
 		return StructValue(s, tp.String())
@@ -341,7 +371,12 @@ func reflectValue(val reflect.Value) Value {
 				continue
 			}
 
-			s[key] = AnyValue(value).Get()
+			if value.IsValid() && value.CanInterface() {
+				s[key] = value.Interface()
+			} else {
+				s[key] = AnyValue(value).Get()
+			}
+
 		}
 
 		return StructValue(s, tp.String())
@@ -358,13 +393,8 @@ func reflectValue(val reflect.Value) Value {
 			Type: ArrayType,
 			inf:  arr,
 		}
-
 	}
-	return Value{
-		Type: UnknownType,
-		str:  val.Kind().String(),
-		inf:  nil,
-	}
+	return noopValue
 }
 
 // StructMap 优先使用json tag 中的名字作为 key
@@ -503,7 +533,6 @@ func (v Value) Equal(other interface{}) bool {
 		}
 
 		if ot.Type == v.Type &&
-			ot.str == v.str &&
 			ot.integer == v.integer {
 			return reflect.DeepEqual(ot.inf, v.inf)
 		}

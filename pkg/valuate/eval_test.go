@@ -394,6 +394,20 @@ func TestAccess(t *testing.T) {
 		},
 	}
 
+	stu := struct {
+		A json.Number `json:"field_a"`
+		B string
+		C float64
+	}{
+		A: json.Number("567"),
+		B: "abc",
+		C: 2.5,
+	}
+	mma := map[string]interface{}{
+		"big_number":  json.Number("1234"),
+		"some_struct": stu,
+	}
+
 	fs := map[string]ExpressionFunction{
 		"context_value": func(c context.Context, args ...interface{}) (interface{}, error) {
 			if len(args) == 0 || len(args) > 1 {
@@ -457,6 +471,16 @@ func TestAccess(t *testing.T) {
 		functions map[string]ExpressionFunction
 	}{
 		{
+			input:  "m.some_struct",
+			params: map[string]Any{"m": mma},
+			want:   stu,
+		},
+		{
+			input:  "m.big_number",
+			params: map[string]Any{"m": mma},
+			want:   json.Number("1234"),
+		},
+		{
 			input:  "!in(${abc}, \"ab\")",
 			params: MapParameters(map[string]Any{"abc": "abc"}),
 			want:   false,
@@ -509,7 +533,7 @@ func TestAccess(t *testing.T) {
 		},
 		{
 			input:  "s.GgList[0].I",
-			want:   []interface{}{'i'},
+			want:   []byte{'i'},
 			params: MapParameters(map[string]Any{"s": s}),
 		},
 		{
@@ -542,7 +566,7 @@ func TestAccess(t *testing.T) {
 		{
 			input:     "bytes_to_string(json_marshal(s.abc))",
 			params:    MapParameters(map[string]Any{"s": s}),
-			want:      `{"G":{"I":[],"J":"0001-01-01T00:00:00Z","h":0},"GgList":[],"a":3,"abc":null,"b":"efg","c":false,"d":null,"f":0}`,
+			want:      `{"G":{"I":null,"J":"0001-01-01T00:00:00Z"},"GgList":null,"a":3,"abc":null,"b":"efg","c":false,"d":null,"f":0}`,
 			functions: fs,
 		},
 		{
@@ -584,7 +608,10 @@ func TestAccess(t *testing.T) {
 			continue
 		}
 
-		if got != td.want && got != nil {
+		w := AnyValue(td.want)
+		g := AnyValue(got)
+
+		if !g.Equal(w) {
 			t.Error("eval failed: <"+td.input+"> got: ", got, "\n"+
 				"got type", reflect.TypeOf(got).String(), "\n"+
 				"want: ", td.want)
