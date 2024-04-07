@@ -14,9 +14,9 @@ type Array interface {
 	Values() []Value
 }
 
-type Bools []bool
+type Booleans []bool
 
-func (b Bools) Values() (ret []Value) {
+func (b Booleans) Values() (ret []Value) {
 
 	for i := range b {
 
@@ -58,9 +58,9 @@ func (s Int32s) Values() (ret []Value) {
 	return
 }
 
-type Ints []int
+type Integers []int
 
-func (s Ints) Values() (ret []Value) {
+func (s Integers) Values() (ret []Value) {
 	for i := range s {
 
 		ret = append(ret, IntValue(int64(s[i])))

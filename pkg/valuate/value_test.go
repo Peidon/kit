@@ -9,6 +9,7 @@
 package valuate
 
 import (
+	"reflect"
 	"testing"
 	"time"
 )
@@ -72,6 +73,14 @@ func TestStructValue(t *testing.T) {
 		},
 
 		f: 1234.2345,
+
+		GgList: []*GG{
+			{
+				I: []byte{'a'},
+				h: 9,
+				J: time.Now(),
+			},
+		},
 	}
 
 	// testing struct value
@@ -144,6 +153,16 @@ func TestStructValue(t *testing.T) {
 		}
 	}
 
+	ggs := s.Field("GgList")
+	gg := ggs.GetArray()
+	gList := abc.GgList
+	for i, value := range gg.Values() {
+		gi := AnyValue(gList[i]).Get()
+		got := value.Get()
+		if !reflect.DeepEqual(gi, got) {
+			t.Error("struct array error")
+		}
+	}
 }
 
 type ABC struct {

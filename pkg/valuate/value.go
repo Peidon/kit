@@ -74,8 +74,7 @@ func (v Value) Get() Any {
 	case DurationType:
 		return v.GetDuration()
 	case ArrayType:
-		a := v.GetArray()
-		return getAny(a)
+		return v.GetInterface()
 	case StructType:
 		return v.GetStruct()
 	case TimeType, TimeFullType:
@@ -110,7 +109,7 @@ func getAny(v interface{}) Any {
 	return v
 }
 
-func (v Value) GetInterface() interface{} {
+func (v Value) GetInterface() Any {
 	return v.inf
 }
 
@@ -185,6 +184,20 @@ func (v Value) GetArray() Values {
 	if val, ok := v.inf.([]Value); ok {
 		return val
 	}
+
+	ref := reflect.ValueOf(v.inf)
+	switch ref.Kind() {
+	case reflect.Slice, reflect.Array:
+		arr := make([]Value, 0, ref.Len())
+
+		for i := 0; i < ref.Len(); i++ {
+			value := ref.Index(i)
+			arr = append(arr, AnyValue(value))
+		}
+
+		return arr
+	}
+
 	return nil
 }
 
@@ -230,42 +243,10 @@ func AnyValue(any interface{}) Value {
 		return TimeValue(val)
 	case time.Duration:
 		return DurationValue(val)
-	case []bool:
-		return ArrayValue(Bools(val))
-	case []float64:
-		return ArrayValue(Float64s(val))
-	case []float32:
-		return ArrayValue(Float32s(val))
-	case []int:
-		return ArrayValue(Ints(val))
-	case []int64:
-		return ArrayValue(Int64s(val))
-	case []int32:
-		return ArrayValue(Int32s(val))
-	case []int16:
-		return ArrayValue(Int16s(val))
-	case []int8:
-		return ArrayValue(Int8s(val))
-	case []string:
-		return ArrayValue(Strings(val))
-	case []uint:
-		return ArrayValue(Uints(val))
-	case []uint64:
-		return ArrayValue(Uint64s(val))
-	case []uint32:
-		return ArrayValue(Uint32s(val))
-	case []uint16:
-		return ArrayValue(Uint16s(val))
-	case []byte:
-		return ByteString(val)
-	case []uintptr:
-		return ArrayValue(UintPoints(val))
-	case []time.Duration:
-		return ArrayValue(Durations(val))
 	case []Value:
 		return ArrayValue(Values(val))
-	//case reflect.Value:
-	//return reflectValue(val)
+	case []byte:
+		return ByteString(val)
 	default:
 		// ptr, struct or slice
 		return reflectValue(val)
@@ -382,16 +363,10 @@ func reflectValue(ori interface{}) Value {
 		return StructValue(s, tp.String())
 
 	case reflect.Slice, reflect.Array:
-		arr := make([]Value, 0, val.Len())
-
-		for i := 0; i < val.Len(); i++ {
-			v := val.Index(i)
-			arr = append(arr, AnyValue(v))
-		}
 
 		return Value{
 			Type: ArrayType,
-			inf:  arr,
+			inf:  ori,
 		}
 	}
 	return noopValue
