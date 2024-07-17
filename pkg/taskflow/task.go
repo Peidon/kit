@@ -16,6 +16,7 @@ import (
 
 type Task interface {
 	Execute(ctx context.Context, input map[string]interface{}) (interface{}, error)
+	HandleError(context.Context, Runner, error)
 }
 
 type MockAPI struct {
@@ -36,10 +37,20 @@ func (api *MockAPI) Execute(_ context.Context, input map[string]interface{}) (in
 	return api.response, nil
 }
 
+func (api *MockAPI) HandleError(_ context.Context, flow Runner, err error) {
+	print("mock api ", err)
+	flow.Done()
+}
+
 type CalculateTask struct {
 	left  string
 	right string
 	op    string
+}
+
+func (c *CalculateTask) HandleError(_ context.Context, flow Runner, err error) {
+	print("calculate ", err)
+	flow.Done()
 }
 
 func (c *CalculateTask) Execute(_ context.Context, input map[string]interface{}) (interface{}, error) {

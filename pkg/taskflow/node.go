@@ -21,14 +21,13 @@ type Node struct {
 	stat State
 }
 
-// 对于一个节点
+// Ready 对于一个节点
 // 所有的依赖节点执行完成后
 // 把自己设置为Ready
 func (node *Node) Ready() bool {
 	for _, k := range node.needs {
 		f := node.flow
-		idx := f.Keys[k]
-		if f.Nodes[idx].stat != Terminated {
+		if f.Nodes[k].stat != Terminated {
 			return false
 		}
 	}
@@ -37,7 +36,6 @@ func (node *Node) Ready() bool {
 }
 
 // 在这里可以进行参数构造
-// 可以复用已有的api proxy 框架
 // 先简单实现一种
 // 后续可自定义取值逻辑
 func (node *Node) buildParams() map[string]interface{} {
@@ -94,7 +92,7 @@ var stateStrings = map[State]string{
 	Terminated: "Terminated",
 }
 
-// String reports a human readable string of status s.
+// String reports a human-readable string of status s.
 func (s State) String() string {
 	return stateStrings[s]
 }

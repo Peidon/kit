@@ -10,11 +10,12 @@ package taskflow
 
 import (
 	"context"
-	"errors"
 )
 
 type Runner interface {
-	Run(context.Context) Error
+	Run(context.Context) error
+	Done()
+	Terminated() bool
 }
 
 type FlowRunner struct {
@@ -30,39 +31,44 @@ type FlowRunner struct {
 	// transfer in the whole flow
 	params map[NodeKey]interface{}
 
-	Keys  map[NodeKey]int
-	Nodes []*Node
-
-	errs Error
+	Nodes map[NodeKey]*Node
 }
 
 func BuildFlow(nodes []*Node) *FlowRunner {
 
 	flow := &FlowRunner{
-		Keys:     map[NodeKey]int{},
+		Nodes:    map[NodeKey]*Node{},
 		params:   map[NodeKey]interface{}{},
 		nodeChan: make(chan *Node, len(nodes)),
-
-		Nodes: nodes,
 	}
-	for i, n := range nodes {
-		flow.Keys[n.key] = i
+	for _, n := range nodes {
+		flow.Nodes[n.key] = n
 		n.flow = flow
 	}
 	flow.markReady()
 	return flow
 }
 
-func (flow *FlowRunner) Run(ctx context.Context) Error {
+func (flow *FlowRunner) Run(ctx context.Context) error {
 	flow.ctx, flow.cancelFunc = context.WithCancel(ctx)
 	defer flow.cancelFunc()
-
-	flow.runLoop()
-
-	return flow.errs
+	return flow.runLoop(ctx)
 }
 
-func (flow *FlowRunner) runLoop() {
+func (flow *FlowRunner) executeNode(ctx context.Context, node *Node, params map[string]interface{}) {
+	var (
+		err error
+	)
+	withRecover(ctx, func(subCtx context.Context) {
+		node.result, err = node.inst.Execute(flow.ctx, params)
+		if err != nil {
+			node.inst.HandleError(ctx, flow, err)
+		}
+		flow.nodeChan <- node
+	})
+}
+
+func (flow *FlowRunner) runLoop(ctx context.Context) error {
 
 	for flow.Running() {
 		waiting := false
@@ -81,18 +87,7 @@ func (flow *FlowRunner) runLoop() {
 				// 后续可根据配置自定义构造方式
 				params := node.buildParams()
 
-				go func(node *Node, params map[string]interface{}) {
-					var err error
-					node.result, err = node.inst.Execute(flow.ctx, params)
-					if err != nil {
-						flow.addErr(ErrorMessage{
-							key: node.key,
-							err: err,
-						})
-					}
-
-					flow.nodeChan <- node
-				}(node, params)
+				go flow.executeNode(ctx, node, params)
 
 			case Running:
 				running = true
@@ -103,33 +98,31 @@ func (flow *FlowRunner) runLoop() {
 
 		}
 
-		if !running {
-			if waiting {
-				flow.addErr(ErrorMessage{
-					err: errors.New("dead lock"),
-				})
-			}
-			break
+		if !running && waiting {
+			return DeadLockError
 		}
 
 		select {
 		case <-flow.ctx.Done():
-			return
+			return TimeoutWithContext
+
 		case node := <-flow.nodeChan:
 			node.stat = Terminated
 
 			// 这里可以插入取值逻辑
 			flow.params[node.key] = node.result
 
-			if flow.Done() {
-				flow.done = true
-				return
+			if flow.Terminated() {
+				flow.Done()
+				return GraphCircuitError
 			}
 
 			flow.markReady()
 		}
 
 	}
+
+	return nil
 }
 
 func (flow *FlowRunner) markReady() {
@@ -141,10 +134,14 @@ func (flow *FlowRunner) markReady() {
 }
 
 func (flow *FlowRunner) Running() bool {
-	return !flow.done && flow.errs.Empty()
+	return !flow.done
 }
 
-func (flow *FlowRunner) Done() bool {
+func (flow *FlowRunner) Done() {
+	flow.done = true
+}
+
+func (flow *FlowRunner) Terminated() bool {
 	for _, node := range flow.Nodes {
 		if node.stat != Terminated {
 			return false
@@ -156,34 +153,4 @@ func (flow *FlowRunner) Done() bool {
 func (flow *FlowRunner) Result(k NodeKey) (interface{}, bool) {
 	v, exists := flow.params[k]
 	return v, exists
-}
-
-func (flow *FlowRunner) addErr(err ErrorMessage) {
-	flow.errs.Append(err)
-}
-
-// track each node error
-type Error struct {
-	errs []ErrorMessage
-}
-
-func (err Error) Error() string {
-	msg := ""
-	for _, m := range err.errs {
-		msg = " | " + string(m.key) + m.err.Error()
-	}
-	return msg
-}
-
-func (err Error) Empty() bool {
-	return len(err.errs) == 0
-}
-
-func (err *Error) Append(msg ErrorMessage) {
-	err.errs = append(err.errs, msg)
-}
-
-type ErrorMessage struct {
-	key NodeKey
-	err error
 }
