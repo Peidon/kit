@@ -51,11 +51,11 @@ func TestRun(t *testing.T) {
 	flow := BuildFlow([]*Node{&nodeA, &nodeB, &nodeC})
 
 	err := flow.Run(context.Background())
-	if err == nil {
-		t.Log(flow.Result("C"))
+	if err != nil {
+		t.Error(err)
 		return
 	}
-	t.Error(err)
+	t.Log(flow.ValueOf("C"))
 }
 
 func TestDep(t *testing.T) {
@@ -132,13 +132,13 @@ func TestDep(t *testing.T) {
 	flow := BuildFlow([]*Node{&nodeA, &nodeB, &nodeC, &nodeD, &nodeE})
 	err := flow.Run(ctx)
 	assert.True(t, err == nil)
-	cR, _ := flow.Result("C")
+	cR, _ := flow.ValueOf("C")
 	t.Log("C=", cR)
 
-	dR, _ := flow.Result("D")
+	dR, _ := flow.ValueOf("D")
 	t.Log("D=", dR)
 
-	eR, _ := flow.Result("E")
+	eR, _ := flow.ValueOf("E")
 	t.Log("E=", eR)
 }
 

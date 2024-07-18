@@ -10,6 +10,7 @@ package taskflow
 
 import (
 	"context"
+	"sync"
 )
 
 type Runner interface {
@@ -30,6 +31,7 @@ type FlowRunner struct {
 	// record each node execute output
 	// transfer in the whole flow
 	params map[NodeKey]interface{}
+	parMut sync.RWMutex
 
 	Nodes map[NodeKey]*Node
 }
@@ -98,6 +100,7 @@ func (flow *FlowRunner) runLoop(ctx context.Context) error {
 
 		}
 
+		// 所有节点都是waiting状态
 		if !running && waiting {
 			return DeadLockError
 		}
@@ -110,11 +113,11 @@ func (flow *FlowRunner) runLoop(ctx context.Context) error {
 			node.stat = Terminated
 
 			// 这里可以插入取值逻辑
-			flow.params[node.key] = node.result
+			flow.UpdateValue(node.key, node.result)
 
 			if flow.Terminated() {
 				flow.Done()
-				return GraphCircuitError
+				return nil
 			}
 
 			flow.markReady()
@@ -150,7 +153,15 @@ func (flow *FlowRunner) Terminated() bool {
 	return true
 }
 
-func (flow *FlowRunner) Result(k NodeKey) (interface{}, bool) {
+func (flow *FlowRunner) ValueOf(k NodeKey) (interface{}, bool) {
+	flow.parMut.Lock()
+	defer flow.parMut.Unlock()
 	v, exists := flow.params[k]
 	return v, exists
+}
+
+func (flow *FlowRunner) UpdateValue(k NodeKey, v interface{}) {
+	flow.parMut.Lock()
+	defer flow.parMut.Unlock()
+	flow.params[k] = v
 }

@@ -28,7 +28,7 @@ func (api *MockAPI) Execute(_ context.Context, input map[string]interface{}) (in
 
 	for k := range api.request {
 		if v, ok := input[k]; !ok || v == nil {
-			return nil, errors.New("missing param [" + k + "]")
+			return nil, errors.New("missing param '" + k + "'")
 		}
 	}
 

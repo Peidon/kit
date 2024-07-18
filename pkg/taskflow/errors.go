@@ -12,6 +12,6 @@ import "errors"
 
 var (
 	TimeoutWithContext = errors.New("timeout with context")
-	GraphCircuitError  = errors.New("graph circuit error")
 	DeadLockError      = errors.New("dead lock")
+	// GraphCircuitError  = errors.New("graph circuit error")
 )

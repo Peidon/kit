@@ -38,6 +38,7 @@ func (node *Node) Ready() bool {
 // 在这里可以进行参数构造
 // 先简单实现一种
 // 后续可自定义取值逻辑
+// 将所有前置节点的输出作为当前节点输入
 func (node *Node) buildParams() map[string]interface{} {
 	res := map[string]interface{}{}
 	for _, k := range node.needs {
