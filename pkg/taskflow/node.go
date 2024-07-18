@@ -27,7 +27,13 @@ type Node struct {
 func (node *Node) Ready() bool {
 	for _, k := range node.needs {
 		f := node.flow
-		if f.Nodes[k].stat != Terminated {
+		n, ok := f.Nodes[k]
+		if !ok {
+			// 构建flow时发生
+			// 让程序启动失败
+			panic("missing node " + k)
+		}
+		if n.stat != Terminated {
 			return false
 		}
 	}

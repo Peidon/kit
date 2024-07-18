@@ -144,11 +144,16 @@ func TestDep(t *testing.T) {
 
 func TestRunError(t *testing.T) {
 	/*
-	 E -> D -> A(missing)
+	 E -> D -> A
 	 \
 	  --> C -> B
 
 	* */
+
+	// api B
+	a := MockAPI{
+		response: 1,
+	}
 
 	// api B
 	b := MockAPI{
@@ -180,6 +185,11 @@ func TestRunError(t *testing.T) {
 	}
 
 	// config flow
+	nodeA := Node{
+		key:  "A",
+		inst: &a,
+	}
+
 	nodeB := Node{
 		key:  "B",
 		inst: &b,
@@ -208,8 +218,7 @@ func TestRunError(t *testing.T) {
 
 	//missing A
 	//D, E error
-	flow := BuildFlow([]*Node{&nodeB, &nodeC, &nodeD, &nodeE})
+	flow := BuildFlow([]*Node{&nodeA, &nodeB, &nodeC, &nodeD, &nodeE})
 	err := flow.Run(ctx)
-	assert.False(t, err == nil)
-	t.Log("flow err=", err)
+	assert.True(t, err == nil)
 }
