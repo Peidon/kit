@@ -11,7 +11,8 @@ package taskflow
 import "errors"
 
 var (
-	TimeoutWithContext = errors.New("timeout with context")
-	DeadLockError      = errors.New("dead lock")
+	TimeoutWithContext = errors.New("timeout with context. ")
+	DeadLockError      = errors.New("dead lock. ")
+	UnexpectedStopped  = errors.New("flow unexpected stopped. ")
 	// GraphCircuitError  = errors.New("graph circuit error")
 )

@@ -115,6 +115,10 @@ func (flow *FlowRunner) runLoop(ctx context.Context) error {
 			// 这里可以插入取值逻辑
 			flow.UpdateValue(node.key, node.result)
 
+			if !flow.Terminated() && flow.Stopped() {
+				return UnexpectedStopped
+			}
+
 			if flow.Terminated() {
 				flow.Done()
 				return nil
@@ -138,6 +142,10 @@ func (flow *FlowRunner) markReady() {
 
 func (flow *FlowRunner) Running() bool {
 	return !flow.done
+}
+
+func (flow *FlowRunner) Stopped() bool {
+	return flow.done
 }
 
 func (flow *FlowRunner) Done() {

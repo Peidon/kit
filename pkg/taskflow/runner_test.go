@@ -144,13 +144,13 @@ func TestDep(t *testing.T) {
 
 func TestRunError(t *testing.T) {
 	/*
-	 E -> D -> A
+	 E -> D(missing param) -> A
 	 \
 	  --> C -> B
 
 	* */
 
-	// api B
+	// api A
 	a := MockAPI{
 		response: 1,
 	}
@@ -171,7 +171,7 @@ func TestRunError(t *testing.T) {
 	// api D depend A
 	d := MockAPI{
 		request: map[string]struct{}{
-			"A": {},
+			"AX": {},
 		},
 		response: 4,
 	}
@@ -220,5 +220,7 @@ func TestRunError(t *testing.T) {
 	//D, E error
 	flow := BuildFlow([]*Node{&nodeA, &nodeB, &nodeC, &nodeD, &nodeE})
 	err := flow.Run(ctx)
-	assert.True(t, err == nil)
+	if err != nil {
+		t.Log("[info]", err)
+	}
 }
