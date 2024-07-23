@@ -12,7 +12,8 @@ import "errors"
 
 var (
 	TimeoutWithContext = errors.New("timeout with context. ")
-	DeadLockError      = errors.New("dead lock. ")
+	DeadLockError      = errors.New("task flow dead lock. ")
 	UnexpectedStopped  = errors.New("flow unexpected stopped. ")
+	ValueNotExists     = errors.New("value not exists")
 	// GraphCircuitError  = errors.New("graph circuit error")
 )

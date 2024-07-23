@@ -22,6 +22,7 @@ var (
 	PlanStageError    = errors.New("plan stage error")
 	FnArgsNumberError = errors.New("function arguments number error")
 	FnArgTypeError    = errors.New("function argument type error")
+	ArrayIsNilError   = errors.New("array is nil")
 )
 
 // StageError track errors when plan stages

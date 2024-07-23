@@ -30,6 +30,9 @@ type evaluationStage struct {
 
 	// ensures values type are appropriate for this stage
 	typeCheck stageCombinedTypeCheck
+
+	// parallel runtime identification
+	id string
 }
 
 func (stage evaluationStage) argsTypeCheck(args ...Any) (err error) {
@@ -67,6 +70,9 @@ func arrayTypeCheck(arguments ...Any) error {
 	idxInf := arguments[right]
 
 	arrType := reflect.TypeOf(arrInf)
+	if arrType == nil {
+		return ArrayIsNilError
+	}
 	if arrType.Kind() != reflect.Slice && arrType.Kind() != reflect.Array && !isInt(idxInf) {
 		return ArgumentTypeError
 	}

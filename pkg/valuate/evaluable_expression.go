@@ -25,6 +25,8 @@ type EvaluableExpression struct {
 	errorHandler ErrorStrategy
 
 	ctx context.Context
+
+	isParallel bool
 }
 
 func Expression(input string) (*EvaluableExpression, error) {
@@ -548,8 +550,10 @@ func (eval *EvaluableExpression) Eval(parameters Parameters) (interface{}, error
 		parameters = DummyParameters
 	}
 
-	v, err := eval.evaluateStage(eval.stage, parameters)
-	return getAny(v), err
+	if eval.isParallel {
+		return eval.stageParallel(eval.stage, parameters)
+	}
+	return eval.evaluateStage(eval.stage, parameters)
 }
 
 func (eval *EvaluableExpression) WithContext(ctx context.Context) *EvaluableExpression {
@@ -591,7 +595,7 @@ func (eval *EvaluableExpression) evaluateStage(stage *evaluationStage, parameter
 	if err != nil {
 		return eval.errorHandler(err)
 	}
-	return ret, nil
+	return getAny(ret), nil
 }
 
 func checkOperatorType(stage *evaluationStage) error {

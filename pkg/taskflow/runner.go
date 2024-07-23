@@ -17,11 +17,13 @@ type Runner interface {
 	Run(context.Context) error
 	Done()
 	Terminated() bool
+	CatchError(context.Context, error)
 }
 
 type FlowRunner struct {
 	ctx        context.Context
 	cancelFunc context.CancelFunc
+	handler    handleError
 
 	// use for Parallelization
 	// update node status
@@ -62,9 +64,9 @@ func (flow *FlowRunner) executeNode(ctx context.Context, node *Node, params map[
 		err error
 	)
 	withRecover(ctx, func(subCtx context.Context) {
-		node.result, err = node.inst.Execute(flow.ctx, params)
+		node.result, err = node.inst.Execute(subCtx, params)
 		if err != nil {
-			node.inst.HandleError(ctx, flow, err)
+			flow.CatchError(subCtx, err)
 		}
 		flow.nodeChan <- node
 	})
@@ -161,11 +163,27 @@ func (flow *FlowRunner) Terminated() bool {
 	return true
 }
 
-func (flow *FlowRunner) ValueOf(k NodeKey) (interface{}, bool) {
+func (flow *FlowRunner) CatchError(ctx context.Context, err error) {
+	if flow.handler != nil {
+		flow.handler(ctx, err)
+	}
+}
+
+type handleError func(context.Context, error)
+
+func (flow *FlowRunner) SetErrorHandler(h handleError) Runner {
+	flow.handler = h
+	return flow
+}
+
+func (flow *FlowRunner) GetValue(k string) (interface{}, error) {
 	flow.parMut.Lock()
 	defer flow.parMut.Unlock()
-	v, exists := flow.params[k]
-	return v, exists
+	v, exists := flow.params[NodeKey(k)]
+	if !exists {
+		return nil, ValueNotExists
+	}
+	return v, nil
 }
 
 func (flow *FlowRunner) UpdateValue(k NodeKey, v interface{}) {

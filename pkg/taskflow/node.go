@@ -21,6 +21,14 @@ type Node struct {
 	stat State
 }
 
+func NewNode(k string, ins Task, needs []NodeKey) *Node {
+	return &Node{
+		key:   NodeKey(k),
+		inst:  ins,
+		needs: needs,
+	}
+}
+
 // Ready 对于一个节点
 // 所有的依赖节点执行完成后
 // 把自己设置为Ready

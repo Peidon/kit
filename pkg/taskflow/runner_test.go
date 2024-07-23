@@ -55,7 +55,7 @@ func TestRun(t *testing.T) {
 		t.Error(err)
 		return
 	}
-	t.Log(flow.ValueOf("C"))
+	t.Log(flow.GetValue("C"))
 }
 
 func TestDep(t *testing.T) {
@@ -132,13 +132,13 @@ func TestDep(t *testing.T) {
 	flow := BuildFlow([]*Node{&nodeA, &nodeB, &nodeC, &nodeD, &nodeE})
 	err := flow.Run(ctx)
 	assert.True(t, err == nil)
-	cR, _ := flow.ValueOf("C")
+	cR, _ := flow.GetValue("C")
 	t.Log("C=", cR)
 
-	dR, _ := flow.ValueOf("D")
+	dR, _ := flow.GetValue("D")
 	t.Log("D=", dR)
 
-	eR, _ := flow.ValueOf("E")
+	eR, _ := flow.GetValue("E")
 	t.Log("E=", eR)
 }
 
@@ -219,7 +219,10 @@ func TestRunError(t *testing.T) {
 	//missing A
 	//D, E error
 	flow := BuildFlow([]*Node{&nodeA, &nodeB, &nodeC, &nodeD, &nodeE})
-	err := flow.Run(ctx)
+	err := flow.SetErrorHandler(func(ctx context.Context, err error) {
+		t.Log(ctx, "original error ", err, "\n")
+		flow.Done()
+	}).Run(ctx)
 	if err != nil {
 		t.Log("[info]", err)
 	}
