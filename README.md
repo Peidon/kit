@@ -228,6 +228,22 @@ result, _ = expression.Evaluate(parameters)
 // result is now 0
 ```
 
+Parallelization
+--
+
+Sometimes operator or function are time-costly, 
+
+    "get_result(call_api(api_a, request_of_a), query_db())"
+
+`call_api` and `query_db` could execute at the same time.
+
+You can use `parallelization` mode like following:
+
+```go
+expression, err := valuate.Expression("get_result(call_api(api_a, request_of_a), query_db())")
+expr.Parallel()
+```
+
 ### 测试环境
 
 ```
