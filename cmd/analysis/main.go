@@ -168,7 +168,13 @@ func (v *visitor) handleExpression(expr ast.Expr) []ast.Expr {
 			return nil
 		}
 
-		if strings.Contains(buf.String(), v.fName) {
+		access := strings.Split(buf.String(), ".")
+		funcName := v.fName
+		if len(access) > 1 {
+			funcName = access[0] + "." + funcName
+		}
+
+		if buf.String() == funcName {
 
 			p := v.fPath
 			i := strings.Index(v.fPath, "src")
@@ -237,7 +243,7 @@ func listGoFiles(dir string) ([]string, error) {
 			return err
 		}
 
-		excludes := []string{"vendor", "gen", "doc", `.run`, `go.mod`, "tools", "test", "log", `.git`, "config", "pb", "antlr", "model", "dao"}
+		excludes := []string{"vendor", "gen", "doc", `.run`, `go.mod`, "tools", "test", "log", `.git`, "config", "pb", "antlr", "model", "dao", "common", "spex"}
 
 		if info.IsDir() {
 			for _, name := range excludes {
