@@ -35,6 +35,7 @@ func main() {
 		}
 
 		for _, filePath := range files {
+			v.fPath = filePath
 			f, pErr := parser.ParseFile(v.fset, filePath, nil, 0)
 			if pErr != nil {
 				log.Fatalf("Failed to parse file %s: %s", filePath, pErr)
@@ -49,6 +50,7 @@ type visitor struct {
 	fset *token.FileSet
 
 	fName string
+	fPath string
 }
 
 func (v *visitor) SetFuncName(name string) {
@@ -72,6 +74,10 @@ func (v *visitor) Visit(node ast.Node) ast.Visitor {
 	//fmt.Println("function called list: ")
 	name := funcDecl.Name.String()
 	v.SetFuncName(name)
+
+	if funcDecl.Body == nil {
+		return nil
+	}
 	expressions := v.scanStatements(funcDecl.Body.List)
 	for _, expr := range expressions {
 		callExpr, cal := expr.(*ast.CallExpr)
@@ -163,7 +169,14 @@ func (v *visitor) handleExpression(expr ast.Expr) []ast.Expr {
 		}
 
 		if strings.Contains(buf.String(), v.fName) {
-			fmt.Printf("%v \n", buf.String())
+
+			p := v.fPath
+			i := strings.Index(v.fPath, "src")
+			if i > 0 {
+				p = v.fPath[i:]
+			}
+
+			fmt.Printf("%s | %s\n", buf.String(), p)
 		}
 
 	default:
@@ -223,8 +236,16 @@ func listGoFiles(dir string) ([]string, error) {
 		if err != nil {
 			return err
 		}
-		if info.IsDir() && info.Name() == "vendor" {
-			return nil
+
+		excludes := []string{"vendor", "gen", "doc", `.run`, `go.mod`, "tools", "test", "log", `.git`, "config", "pb", "antlr", "model", "dao"}
+
+		if info.IsDir() {
+			for _, name := range excludes {
+
+				if name == info.Name() {
+					return filepath.SkipDir
+				}
+			}
 		}
 
 		if !info.IsDir() && strings.HasSuffix(path, ".go") && !strings.HasSuffix(path, "_test.go") {
