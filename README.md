@@ -1,18 +1,30 @@
-# kit
-框架和工具
-1. valuate
-2. code generator
+**框架和工具**
 
-## valuate
+<!-- TOC -->
+
+- [1. valuate](#1-valuate)
+- [2. code generator](#2-code-generator)
+- [3. static analysis](#3-static-analysis)
+
+<!-- /TOC -->
+
+# 1. valuate
 
 以表达式的形式、可自定义算子的、高性能、可扩展的值计算框架
 
-### 特点
+A high performance、 scalable programming framework, supporting client define functions and use expression to execute a rule.
+
+## 代码
+
+pkg/valuate
+
+## 特点
 
 * 支持自定义函数(算子)，且函数中自动传入context，无须在表达式中显式传递;
-* 支持Accessor功能，可用数组下标取值;
+* 支持Accessor功能，可从对象中导出字段值，可从映射中根据键取值，可用数组下标取值;
 * 支持Catch Error，可自定义错误处理;
 * 支持操作符重载，可自定义操作符含义;
+* 支持算子并行执行;
 
 How do I use it?
 --
@@ -235,7 +247,7 @@ Sometimes operator or function are time-costly,
 
     "get_result(call_api(api_a, request_of_a), query_db())"
 
-`call_api` and `query_db` could execute at the same time.
+`call_api` and `query_db` will be executed at the same time.
 
 You can use `parallelization` mode like following:
 
@@ -244,7 +256,7 @@ expression, err := valuate.Expression("get_result(call_api(api_a, request_of_a),
 expr.Parallel()
 ```
 
-### 测试环境
+## 测试环境
 
 ```
 goos: darwin
@@ -252,7 +264,7 @@ goarch: amd64
 cpu: Intel(R) Core(TM) i9-9880H CPU @ 2.30GHz
 ```
 
-### 性能对比
+## 性能对比
 
 pkg: github.com/govaluate
 
@@ -304,12 +316,14 @@ ok      kit/pkg/valuate 21.734s
 
 ### 优化思路
 
-尽量少调用Parse，复用Expression对象，用对象池复用已经申请过的内存。
+尽量少调用Parse，可以从以下几个方面入手：
+* 复用Expression对象，用对象池复用已经申请过的内存；
+* 语法树缓存，引入变量槽，将输入映射到变量槽；
 
-## code generator
+# 2. code generator
 基于ddl生成对应的golang struct
 
-### usage
+## usage
 
 1. go install
 2. kit --help
@@ -336,3 +350,11 @@ kit -ddl-file /Users/peidongxu/kit/tmp/sql \
     -repo-tpl /Users/peidongxu/kit/tmp/tpl \  
     -repo-output /Users/peidongxu/home/
 ```
+
+# 3. static analysis
+
+Golang 代码静态检查
+
+## recursive calls
+
+checkout all the recursive calls
