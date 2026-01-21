@@ -161,7 +161,7 @@ func (stack *stageStack) Pop() *evaluationStage {
 	if stack.peek < 0 {
 		return nil
 	}
-	if len(stack.elem) < 0 {
+	if len(stack.elem) == 0 {
 		return nil
 	}
 	peek := stack.elem[stack.peek]

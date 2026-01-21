@@ -93,8 +93,8 @@ type TokenSymbol string
 
 const (
 	NIL    TokenSymbol = "nil"
-	Bool               = "bool"
-	String             = "str"
-	Int                = "int"
-	Float              = "float"
+	Bool   TokenSymbol = "bool"
+	String TokenSymbol = "str"
+	Int    TokenSymbol = "int"
+	Float  TokenSymbol = "float"
 )

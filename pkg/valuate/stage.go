@@ -50,7 +50,6 @@ func (stage evaluationStage) argsTypeCheck(args ...Any) (err error) {
 
 			reType := reflect.TypeOf(a)
 			tp = reType.String()
-			break
 		}
 
 		return TypeError{
