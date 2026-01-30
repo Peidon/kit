@@ -14,17 +14,17 @@
 
 A high performance、 scalable programming framework, supporting client define functions and use expression to execute a rule.
 
-## 代码
+## Code
 
 pkg/valuate
 
-## 特点
+## Features
 
-* 支持自定义函数(算子)，且函数中自动传入context，无须在表达式中显式传递;
-* 支持Accessor功能，可从对象中导出字段值，可从映射中根据键取值，可用数组下标取值;
-* 支持Catch Error，可自定义错误处理;
-* 支持操作符重载，可自定义操作符含义;
-* 支持算子并行执行;
+* Supports custom functions (operators), with context automatically injected into functions, no need to explicitly pass it in expressions;
+* Supports accessor functionality, allowing field extraction from objects, value lookup from maps by key, and access by array index;
+* Supports error catching with customizable error handling;
+* Supports operator overloading, enabling custom operator semantics;
+* Supports parallel execution of operators;
 
 How do I use it?
 --
