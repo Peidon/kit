@@ -1,10 +1,11 @@
 import json
+import uuid
 from datetime import datetime
 
 from django.db import transaction
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_http_methods
 
 from .models import Education, Experience, UserProfile
 
@@ -47,9 +48,75 @@ def _parse_date(value, field_name):
         raise ValueError(f"{field_name} must use DD-MM-YYYY format") from exc
 
 
+def _format_date(value):
+    if value is None:
+        return None
+    return value.strftime(DATE_FORMAT)
+
+
+def _serialize_user_info(profile):
+    return {
+        "profile": {
+            "firstname": profile.firstname,
+            "lastname": profile.lastname,
+            "email": profile.email,
+            "phone": profile.phone,
+            "location": profile.location,
+            "city": profile.city,
+            "country": profile.country,
+            "linkedin": profile.linkedin,
+        },
+        "educations": [
+            {
+                "school": education.school,
+                "field": education.field,
+                "degree": education.degree,
+                "startDate": _format_date(education.start_date),
+                "endDate": _format_date(education.end_date),
+            }
+            for education in profile.educations.all().order_by("created_at")
+        ],
+        "experiences": [
+            {
+                "company": experience.company,
+                "title": experience.title,
+                "startDate": _format_date(experience.start_date),
+                "endDate": _format_date(experience.end_date),
+                "description": experience.description,
+            }
+            for experience in profile.experiences.all().order_by(
+                "created_at", "company"
+            )
+        ],
+    }
+
+
 @csrf_exempt
-@require_POST
-def save_user_info(request):
+@require_http_methods(["GET", "POST"])
+def user_info(request):
+    if request.method == "GET":
+        user_id = request.GET.get("user_id")
+        if not user_id:
+            return JsonResponse(
+                {"error": "user_id query parameter is required."},
+                status=400,
+            )
+
+        try:
+            parsed_user_id = uuid.UUID(user_id)
+        except ValueError:
+            return JsonResponse({"error": "user_id must be a valid UUID."}, status=400)
+
+        profile = (
+            UserProfile.objects.prefetch_related("educations", "experiences")
+            .filter(id=parsed_user_id)
+            .first()
+        )
+        if profile is None:
+            return JsonResponse({"error": "User not found."}, status=404)
+
+        return JsonResponse(_serialize_user_info(profile), status=200)
+
     try:
         payload = json.loads(request.body)
     except json.JSONDecodeError:
@@ -158,7 +225,7 @@ def save_user_info(request):
     return JsonResponse(
         {
             "message": "User info saved successfully.",
-            "userId": profile.id,
+            "userId": str(profile.id),
             "educationCount": len(educations_data),
             "experienceCount": len(experiences_data),
         },
