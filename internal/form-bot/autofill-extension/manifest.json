@@ -5,8 +5,12 @@
     "permissions": [
         "storage",
         "activeTab",
-        "scripting"
+        "scripting",
+        "cookies"
     ],
+    "background": {
+        "service_worker": "background.js"
+    },
     "action": {
         "default_popup": "popup.html"
     },
@@ -19,5 +23,8 @@
                 "content.js"
             ]
         }
+    ],
+    "host_permissions": [
+        "http://localhost:8000/*"
     ]
 }

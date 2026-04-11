@@ -1,36 +1,3 @@
-const profile = {
-    firstname: "Peidong",
-    familyname: "Xu",
-    email: "peidong.xu94@gmail.com",
-    phone: "0417909812",
-    location: "11 Hillcrest Ave, Epping, NSW 2121",
-    city: "Sydney",
-    country: "Australia",
-    linkedin: "https://www.linkedin.com/in/peidong-xu-9aab4414b/"
-};
-
-const educations = [{
-    school: "Nanjing University",
-    field: "Software Engineering",
-    degree: "Master",
-    endDate: "10-06-2020",
-    startDate: "10-09-2017"
-}, {
-    school: "East China Institute of Geology",
-    field: "Embedded Systems",
-    degree: "Bachelor",
-    endDate: "10-06-2017",
-    startDate: "01-09-2013"
-}];
-
-const experiences = [{
-    company: "Shopee",
-    title: "Software Engineer",
-    startDate: "17-06-2020",
-    endDate: "18-06-2025",
-    description: "I mainly worked on the Chatbot platform, focused on high-traffic backend systems and large-scale data processing, achieving significant performance improvements."
-}];
-
 function fillExperiences(experiences) {
     const section = findSectionByKeyword('experience');
     if (!section || !Array.isArray(experiences) || experiences.length === 0) {
@@ -255,8 +222,8 @@ function matchField(input, profile) {
 
     if (label.includes("email")) return profile.email;
     if (label.includes("first name")) return profile.firstname;
-    if (label.includes("last name")) return profile.familyname;
-    if (label.includes("full name")) return profile.firstname + " " + profile.familyname;
+    if (label.includes("last name")) return profile.lastname;
+    if (label.includes("full name")) return profile.firstname + " " + profile.lastname;
     if (label.includes("phone")) return profile.phone;
     if (label.includes("location") || label.includes("address")) return profile.location;
     if (label.includes("city")) return profile.city;
@@ -266,7 +233,52 @@ function matchField(input, profile) {
     return null;
 }
 
-function fillForm() {
+async function extensionApiFetch(path, options = {}) {
+    return new Promise((resolve, reject) => {
+        chrome.runtime.sendMessage(
+            {
+                action: 'API_FETCH',
+                path,
+                options
+            },
+            (response) => {
+                if (chrome.runtime.lastError) {
+                    reject(new Error(chrome.runtime.lastError.message));
+                    return;
+                }
+
+                if (!response?.ok) {
+                    reject(new Error(response?.error || 'Extension API request failed'));
+                    return;
+                }
+
+                resolve(response.data);
+            }
+        );
+    });
+}
+
+/**
+ * 
+ * @param {string} userId user ID
+ * @returns {object} user information from API
+ */
+async function fetchInfo(userId) {
+    const data = await extensionApiFetch(
+        `/user_info?user_id=${encodeURIComponent(userId)}`,
+        {
+            method: 'GET'
+        }
+    );
+    console.log('Fetched user info:', data);
+    return {
+        profile: data.profile,
+        educations: data.educations,
+        experiences: data.experiences
+    };
+}
+
+function fillProfile(profile) {
     const inputs = document.querySelectorAll("input, textarea");
 
     inputs.forEach((input) => {
@@ -278,9 +290,19 @@ function fillForm() {
             input.dispatchEvent(new Event("change", { bubbles: true }));
         }
     });
+}
 
-    fillEducations(educations);
-    // fillExperiences(experiences);
+function fillForm() {
+
+    const userId = "e865c637-aabf-4d80-ab58-423f6904805c";
+
+    fetchInfo(userId).then(({ profile, educations }) => {
+        fillProfile(profile);
+        fillEducations(educations);
+        // fillExperiences(experiences);
+    }).catch((error) => {
+        console.error("Failed to fetch user info:", error);
+    });
 }
 
 chrome.runtime.onMessage.addListener((msg) => {
