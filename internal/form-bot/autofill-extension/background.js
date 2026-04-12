@@ -2,6 +2,12 @@ const API_BASE_URL = 'http://localhost:8000';
 const CSRF_COOKIE_NAME = 'csrftoken';
 const CSRF_SAFE_METHODS = new Set(['GET', 'HEAD', 'OPTIONS']);
 
+/**
+ * Get Cookie retrieves the value of a cookie by token name for a given URL.
+ * @param {string} url 
+ * @param {string} name of token
+ * @returns 
+ */
 function getCookie(url, name) {
     return new Promise((resolve) => {
         chrome.cookies.get({ url, name }, (cookie) => {

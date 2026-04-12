@@ -179,6 +179,65 @@ function normalize(text) {
     return text.toLowerCase().replace(/[^a-z0-9]/g, " ");
 }
 
+function handleDropdown(labelText, value) {
+    const elements = document.querySelectorAll("div");
+
+    elements.forEach(el => {
+        if (!(el.innerText && el.innerText.includes(labelText))) {
+            return;
+        }
+        el.click();
+        setTimeout(() => {
+            const options = document.querySelectorAll("div[role='option']");
+            options.forEach(opt => {
+                if (opt.innerText.includes(value)) {
+                    opt.click();
+                }
+            });
+        }, 500);
+    });
+}
+
+function detectLabel(input) {
+    // 1. Standard label
+    if (input.id) {
+        const label = document.querySelector(`label[for="${input.id}"]`);
+        if (label) return label.innerText;
+    }
+
+    // 2. aria-label
+    const aria = input.getAttribute("aria-label");
+    if (aria) return aria;
+
+    // 3. Walk up DOM and find nearby text
+    let el = input;
+    for (let i = 0; i < 3; i++) {
+        if (!el) break;
+
+        const textNodes = Array.from(el.parentElement?.childNodes || [])
+            .filter(n => n.nodeType === Node.TEXT_NODE)
+            .map(n => n.textContent.trim())
+            .join(" ");
+
+        if (textNodes.length > 0 && textNodes.length < 100) {
+            return textNodes;
+        }
+
+        el = el.parentElement;
+    }
+
+    // 4. Look for preceding sibling text
+    let prev = input.previousElementSibling;
+    while (prev) {
+        if (prev.innerText && prev.innerText.length < 100) {
+            return prev.innerText;
+        }
+        prev = prev.previousElementSibling;
+    }
+
+    return input.placeholder || input.name || "";
+}
+
 function getLabel(input) {
     // 1. label[for=id]
     if (input.id) {
@@ -286,6 +345,7 @@ function fillProfile(profile) {
         if (value) {
             input.focus();
             input.value = value;
+            input.style.backgroundColor = "#e6ffed";
             input.dispatchEvent(new Event("input", { bubbles: true }));
             input.dispatchEvent(new Event("change", { bubbles: true }));
         }
@@ -304,6 +364,15 @@ function fillForm() {
         console.error("Failed to fetch user info:", error);
     });
 }
+
+// const observer = new MutationObserver(() => {
+//     fillForm(); // re-run when DOM changes
+// });
+
+// observer.observe(document.body, {
+//     childList: true,
+//     subtree: true
+// });
 
 chrome.runtime.onMessage.addListener((msg) => {
     if (msg.action === "FILL_FORM") {

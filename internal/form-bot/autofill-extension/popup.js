@@ -3,7 +3,6 @@ document.getElementById("fill").addEventListener("click", async () => {
     const loadingElement = document.createElement("span");
     loadingElement.className = "loading";
     loadingElement.textContent = " Loading...";
-    
     fillButton.disabled = true;
     fillButton.appendChild(loadingElement);
     fillButton.blur();
