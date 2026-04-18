@@ -152,6 +152,9 @@ function fillEducations(educations) {
 
 function findSectionByKeyword(keyword) {
     const lower = keyword.toLowerCase();
+    // First try direct matches on id and class for better performance
+    // Using case-insensitive attribute selector
+    // This will match any element whose id or class contains the keyword, ignoring case
     const query = `[id*="${keyword}" i], [class*="${keyword}" i]`;
     const direct = document.querySelector(query);
     if (direct) {
@@ -169,16 +172,18 @@ function findButtonByKeyword(container, keyword) {
     const candidates = Array.from(container.querySelectorAll('button, [role="button"], input[type="button"], input[type="submit"]'));
     return candidates.find((el) => {
         const text = (el.innerText || el.value || el.getAttribute('aria-label') || el.getAttribute('title') || '').toLowerCase();
-        const attrs = `${el.id || ''} ${el.className || ''} ${el.getAttribute('data-testid') || ''} ${el.getAttribute('name') || ''}`.toLowerCase();
+        const attrs = `${el.id || ''} ${el.className || ''} ${el.getAttribute('name') || ''}`.toLowerCase();
         return text.includes(lower) || attrs.includes(lower);
     }) || null;
 }
 
 
 function normalize(text) {
+    // convert to lowercase and remove non-alphanumeric characters for better matching
     return text.toLowerCase().replace(/[^a-z0-9]/g, " ");
 }
 
+// Example function to handle dropdowns - this is highly dependent on the specific implementation of the dropdown in the target website
 function handleDropdown(labelText, value) {
     const elements = document.querySelectorAll("div");
 
@@ -329,7 +334,7 @@ async function fetchInfo(userId) {
             method: 'GET'
         }
     );
-    console.log('Fetched user info:', data);
+    
     return {
         profile: data.profile,
         educations: data.educations,
