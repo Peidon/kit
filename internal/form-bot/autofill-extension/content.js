@@ -1,3 +1,65 @@
+class Field {
+    /**
+     * 
+     * @param {string} label 
+     * @param {string} value 
+     * @param {string} category 
+     */
+    constructor(label, value, category) {
+        this.label = label;
+        this.value = value;
+        this.category = category;
+    }
+}
+
+
+function allFieldsInfo() {
+    const groupedInputs = groupBySection(document.querySelectorAll("input, textarea"));
+    const fields = [];
+
+    groupedInputs.forEach((sectionInputs, category) => {
+        sectionInputs.forEach((input) => {
+            const label = detectLabel(input);
+            const value = input.value;
+            if (label && value) {
+                fields.push(new Field(label, value, category));
+            }
+        });
+    });
+    return fields;
+}
+
+async function getMemory() {
+    return new Promise((resolve) => {
+        // Retrieve the memory object from chrome.storage.local
+        chrome.storage.local.get(["memory"], (result) => {
+            // If there's an error, resolve with an empty object
+            if (chrome.runtime.lastError) {
+                console.error("Error retrieving memory:", chrome.runtime.lastError);
+                resolve({});
+                return;
+            }
+            // Resolve with the retrieved memory or an empty object if it doesn't exist
+            resolve(result.memory || {});
+        });
+    });
+}
+
+async function saveMemory(memory) {
+    return new Promise((resolve) => {
+        // Save the memory object to chrome.storage.local
+        // This will overwrite the existing memory with the new one provided
+        chrome.storage.local.set({ memory }, () => {
+            if (chrome.runtime.lastError) {
+                console.error("Error saving memory:", chrome.runtime.lastError);
+                resolve(false);
+            } else {
+                resolve(true);
+            }
+        });
+    });
+}
+
 function fillExperiences(experiences) {
     const section = findSectionByKeyword('experience');
     if (!section || !Array.isArray(experiences) || experiences.length === 0) {
@@ -203,6 +265,18 @@ function handleDropdown(labelText, value) {
     });
 }
 
+/**
+ * Determines the category of a given input element
+ * @param {Node []} the input element list 
+ * @returns {Map<string, Node[]>} A map where keys are categories and values are arrays of input elements belonging to each category
+ */
+function groupBySection(inputs) {
+    // step 1: find the closest section element that contains the input
+    // step 2: group inputs by the section they belong to
+    // step 3: find the category text, which is usually in the header or title of the section, or the above nearby elements innerText
+    
+}
+
 function detectLabel(input) {
     // 1. Standard label
     if (input.id) {
@@ -219,6 +293,8 @@ function detectLabel(input) {
     for (let i = 0; i < 3; i++) {
         if (!el) break;
 
+        // Check for text nodes directly under the parent element
+        // This is important for modern UIs where labels are often siblings rather than parents
         const textNodes = Array.from(el.parentElement?.childNodes || [])
             .filter(n => n.nodeType === Node.TEXT_NODE)
             .map(n => n.textContent.trim())
@@ -334,7 +410,7 @@ async function fetchInfo(userId) {
             method: 'GET'
         }
     );
-    
+
     return {
         profile: data.profile,
         educations: data.educations,
@@ -382,5 +458,10 @@ function fillForm() {
 chrome.runtime.onMessage.addListener((msg) => {
     if (msg.action === "FILL_FORM") {
         fillForm();
+    }
+    if (msg.action === "LIST_FIELDS") {
+        const info = allFieldsInfo();
+        console.log("All detected fields:", info);
+        // alert("Detected fields:\n" + Object.entries(info).map(([k, v]) => `${k}: ${v}`).join("\n"));
     }
 });
