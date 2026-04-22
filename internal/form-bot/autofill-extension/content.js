@@ -1,32 +1,67 @@
 class Field {
     /**
      * 
-     * @param {string} label 
-     * @param {string} value 
-     * @param {string} category 
+     * @param {string} title The title of the field, e.g. "first name", "email", "company"
+     * @param {string} value The value of the field, e.g. "John", "Acme Inc."
+     * @param {number} rank The importance rank of the field, used for prioritization when filling forms. Lower is more important. Default is 0.
      */
-    constructor(label, value, category) {
-        this.label = label;
+    constructor(title, value, rank = 0) {
+        this.title = title;
         this.value = value;
-        this.category = category;
+        this.rank = rank;
     }
 }
 
 
-function allFieldsInfo() {
-    const groupedInputs = groupBySection(document.querySelectorAll("input, textarea"));
-    const fields = [];
+function fetchInputsLabels(inputs) {
+    const fieldsList = [];
+    inputs.forEach((input) => {
 
-    groupedInputs.forEach((sectionInputs, category) => {
-        sectionInputs.forEach((input) => {
-            const label = detectLabel(input);
-            const value = input.value;
-            if (label && value) {
-                fields.push(new Field(label, value, category));
-            }
+        const f_id = normalize(field_id(input));
+        if (!f_id) {
+            return;
+        }
+
+        labels = collectLabels(input);
+        if (labels.length === 0) {
+            return;
+        }
+
+        fieldsList.push({
+            id: f_id,
+            labels: labels
         });
     });
-    return fields;
+
+    detectFieldsMean(fieldsList).then(({ result }) => {
+        console.log("Detected field meanings:", result);
+        return result;
+    }).catch((error) => {
+        console.error("Failed to detect field meanings:", error);
+    });
+    return {};
+}
+
+function allFieldsInfo() {
+    const inputs = document.querySelectorAll("input, textarea");
+    const fieldsDict = new Map();
+    const labelMap = fetchInputsLabels(inputs);
+    inputs.forEach((input) => {
+        const f_id = normalize(field_id(input));
+        if (!f_id) {
+            return;
+        }
+
+        const title = labelMap.get(f_id) || f_id;
+        const value = input.value;
+        if (fieldsDict.has(f_id)) {
+            const existing = fieldsDict.get(f_id);
+            existing.push(new Field(title, value, existing[existing.length - 1].rank + 1)); // increase rank for duplicates
+            return;
+        }
+        fieldsDict.set(f_id, [new Field(title, value)]);
+    });
+    return fieldsDict.values();
 }
 
 async function getMemory() {
@@ -239,8 +274,16 @@ function findButtonByKeyword(container, keyword) {
     }) || null;
 }
 
+function splitHumpWord(word) {
+    if (!word) {
+        return "";
+    }
+    const parts = word.split(/(?=[A-Z])/g); // split before uppercase letters
+    return parts.join(' ');
+}
 
 function normalize(text) {
+    text = splitHumpWord(text);
     // convert to lowercase and remove non-alphanumeric characters for better matching
     return text.toLowerCase().replace(/[^a-z0-9]/g, " ");
 }
@@ -265,28 +308,36 @@ function handleDropdown(labelText, value) {
     });
 }
 
-/**
- * Determines the category of a given input element
- * @param {Node []} the input element list 
- * @returns {Map<string, Node[]>} A map where keys are categories and values are arrays of input elements belonging to each category
- */
-function groupBySection(inputs) {
-    // step 1: find the closest section element that contains the input
-    // step 2: group inputs by the section they belong to
-    // step 3: find the category text, which is usually in the header or title of the section, or the above nearby elements innerText
-    
+function field_id(input) {
+    return input.name || input.id || "";
 }
 
-function detectLabel(input) {
+function collectLabels(input) {
+
+    const labels = [];
+
+    const placeholder = normalize(input.placeholder);
+    if (placeholder) {
+        labels.push(placeholder);
+    }
+
+    const name = normalize(input.name);
+    if (name) {
+        labels.push(name);
+    }
+
     // 1. Standard label
     if (input.id) {
         const label = document.querySelector(`label[for="${input.id}"]`);
-        if (label) return label.innerText;
+        const labelValue = normalize(label?.innerText);
+        if (labelValue) {
+            labels.push(labelValue);
+        }
     }
 
     // 2. aria-label
-    const aria = input.getAttribute("aria-label");
-    if (aria) return aria;
+    const aria = normalize(input.getAttribute("aria-label"));
+    if (aria) labels.push(aria);
 
     // 3. Walk up DOM and find nearby text
     let el = input;
@@ -301,7 +352,7 @@ function detectLabel(input) {
             .join(" ");
 
         if (textNodes.length > 0 && textNodes.length < 100) {
-            return textNodes;
+            labels.push(normalize(textNodes));
         }
 
         el = el.parentElement;
@@ -311,12 +362,21 @@ function detectLabel(input) {
     let prev = input.previousElementSibling;
     while (prev) {
         if (prev.innerText && prev.innerText.length < 100) {
-            return prev.innerText;
+            labels.push(normalize(prev.innerText));
         }
         prev = prev.previousElementSibling;
     }
 
-    return input.placeholder || input.name || "";
+    // 5. nearby text (very important for modern UIs)
+    const parent = input.parentElement;
+    if (parent) {
+        const text = parent.innerText;
+        if (text && text.length < 100) {
+            labels.push(normalize(text));
+        }
+    }
+
+    return labels;
 }
 
 function getLabel(input) {
@@ -399,6 +459,23 @@ async function extensionApiFetch(path, options = {}) {
 }
 
 /**
+ * Detect the meaning of form fields by sending their labels to the API
+ * @param {array} fields_labels An array of field labels to be detected
+ * @returns {object} A mapping of field labels to their detected meanings
+ */
+async function detectFieldsMean(fields_labels) {
+    const detected = await extensionApiFetch(
+        `/detect_fields`,
+        {
+            method: 'POST',
+            body: JSON.stringify({ "fields": fields_labels })
+        }
+    );
+
+    return detected.result;
+}
+
+/**
  * 
  * @param {string} userId user ID
  * @returns {object} user information from API
@@ -460,7 +537,7 @@ chrome.runtime.onMessage.addListener((msg) => {
         fillForm();
     }
     if (msg.action === "LIST_FIELDS") {
-        const info = allFieldsInfo();
+        allFieldsInfo();
         console.log("All detected fields:", info);
         // alert("Detected fields:\n" + Object.entries(info).map(([k, v]) => `${k}: ${v}`).join("\n"));
     }
