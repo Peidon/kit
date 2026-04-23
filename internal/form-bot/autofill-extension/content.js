@@ -12,8 +12,106 @@ class Field {
     }
 }
 
+class FormBot {
+    constructor() {
+        // Mapping of field labels to Field arrays
+        this.states = new Map();
+        // Set to track seen field IDs for quick lookup
+        this.seen = new Set();
+    }
 
-function fetchInputsLabels(inputs) {
+    async getMemory() {
+        return new Promise((resolve) => {
+            // Retrieve the memory object from chrome.storage.local
+            chrome.storage.local.get(["memory"], (result) => {
+                // If there's an error, resolve with an empty object
+                if (chrome.runtime.lastError) {
+                    console.error("Error retrieving memory:", chrome.runtime.lastError);
+                    resolve({});
+                    return;
+                }
+                // Resolve with the retrieved memory or an empty object if it doesn't exist
+                resolve(result.memory || []);
+            });
+        });
+    }
+
+    async saveMemory(memory) {
+        return new Promise((resolve) => {
+            // Save the memory object to chrome.storage.local
+            // This will overwrite the existing memory with the new one provided
+            chrome.storage.local.set({ memory }, () => {
+                if (chrome.runtime.lastError) {
+                    console.error("Error saving memory:", chrome.runtime.lastError);
+                    resolve(false);
+                } else {
+                    resolve(true);
+                }
+            });
+        });
+    }
+
+    buildDetectRequestBody(inputs) {
+        const params = [];
+        inputs.forEach((input) => {
+
+            const f_id = normalize(field_id(input));
+            if (!f_id || this.seen.has(f_id)) {
+                return;
+            }
+            this.seen.add(f_id);
+
+            const labels = collectLabels(input);
+            if (labels.length === 0) {
+                return;
+            }
+
+            params.push({
+                id: f_id,
+                labels: labels
+            });
+        });
+
+        return params;
+    }
+
+    async learn() {
+        // memory is a array of fields
+        const memory = await this.getMemory();
+        // filter inputs whose value is not empty
+        const inputs = document.querySelectorAll("input, textarea").filter(input => { input.value?.length > 0 });
+        const params = this.buildDetectRequestBody(inputs);
+        detectFieldsMean(params).then(({ result }) => {
+            const titles = new Map(Object.entries(result));
+            inputs.forEach((input) => {
+                const f_id = normalize(field_id(input));
+                if (!f_id) {
+                    return;
+                }
+                const title = titles.get(f_id) || f_id;
+                const value = input.value;
+                if (this.states.has(f_id)) {
+                    const existing = this.states.get(f_id);
+                    newField = new Field(title, value, existing[existing.length - 1].rank + 1)
+                    existing.push(newField); // increase rank for duplicates
+                    memory.push(newField);
+                    return;
+                }
+                newField = new Field(title, value);
+                memory.push(newField);
+                this.states.set(f_id, [newField]);
+            });
+        }).catch((error) => {
+            console.error("Failed to detect field meanings:", error);
+        });
+
+        await this.saveMemory(memory);
+    }
+}
+
+
+function fetchInputsLabels() {
+    const inputs = document.querySelectorAll("input, textarea");
     const fieldsList = [];
     inputs.forEach((input) => {
 
@@ -22,7 +120,7 @@ function fetchInputsLabels(inputs) {
             return;
         }
 
-        labels = collectLabels(input);
+        const labels = collectLabels(input);
         if (labels.length === 0) {
             return;
         }
@@ -35,17 +133,15 @@ function fetchInputsLabels(inputs) {
 
     detectFieldsMean(fieldsList).then(({ result }) => {
         console.log("Detected field meanings:", result);
-        return result;
+        const labelMap = new Map(Object.entries(result));
+        allFieldsInfo(inputs, labelMap);
     }).catch((error) => {
         console.error("Failed to detect field meanings:", error);
     });
-    return {};
 }
 
-function allFieldsInfo() {
-    const inputs = document.querySelectorAll("input, textarea");
+function allFieldsInfo(inputs, labelMap) {
     const fieldsDict = new Map();
-    const labelMap = fetchInputsLabels(inputs);
     inputs.forEach((input) => {
         const f_id = normalize(field_id(input));
         if (!f_id) {
@@ -61,6 +157,7 @@ function allFieldsInfo() {
         }
         fieldsDict.set(f_id, [new Field(title, value)]);
     });
+    console.log("All fields info:", fieldsDict.values());
     return fieldsDict.values();
 }
 
@@ -93,6 +190,16 @@ async function saveMemory(memory) {
             }
         });
     });
+}
+
+async function learn(label, value) {
+    const memory = await getMemory();
+
+    const key = normalize(label);
+
+    memory[key] = value;
+
+    await saveMemory(memory);
 }
 
 function fillExperiences(experiences) {
@@ -285,7 +392,7 @@ function splitHumpWord(word) {
 function normalize(text) {
     text = splitHumpWord(text);
     // convert to lowercase and remove non-alphanumeric characters for better matching
-    return text.toLowerCase().replace(/[^a-z0-9]/g, " ");
+    return text.toLowerCase().replace(/[^a-z0-9]/g, " ").trim();
 }
 
 // Example function to handle dropdowns - this is highly dependent on the specific implementation of the dropdown in the target website
@@ -472,7 +579,7 @@ async function detectFieldsMean(fields_labels) {
         }
     );
 
-    return detected.result;
+    return detected;
 }
 
 /**
@@ -537,8 +644,8 @@ chrome.runtime.onMessage.addListener((msg) => {
         fillForm();
     }
     if (msg.action === "LIST_FIELDS") {
-        allFieldsInfo();
-        console.log("All detected fields:", info);
+        fetchInputsLabels();
+        // console.log("All detected fields:", info);
         // alert("Detected fields:\n" + Object.entries(info).map(([k, v]) => `${k}: ${v}`).join("\n"));
     }
 });
