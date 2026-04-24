@@ -14,25 +14,18 @@ class Field {
 
 class FormBot {
     constructor() {
-        // Mapping of field labels to Field arrays
-        this.states = new Map();
+        // Mapping of field titles to Field arrays
+        this.memoryStates = new Map();
         // Set to track seen field IDs for quick lookup
         this.seen = new Set();
+        // Track learned field IDs to avoid redundant learning
+        this.learned = new Set();
     }
 
     async getMemory() {
         return new Promise((resolve) => {
             // Retrieve the memory object from chrome.storage.local
-            chrome.storage.local.get(["memory"], (result) => {
-                // If there's an error, resolve with an empty object
-                if (chrome.runtime.lastError) {
-                    console.error("Error retrieving memory:", chrome.runtime.lastError);
-                    resolve({});
-                    return;
-                }
-                // Resolve with the retrieved memory or an empty object if it doesn't exist
-                resolve(result.memory || []);
-            });
+            chrome.storage.local.get(["memory"], (result) => { resolve(result.memory); });
         });
     }
 
@@ -40,14 +33,7 @@ class FormBot {
         return new Promise((resolve) => {
             // Save the memory object to chrome.storage.local
             // This will overwrite the existing memory with the new one provided
-            chrome.storage.local.set({ memory }, () => {
-                if (chrome.runtime.lastError) {
-                    console.error("Error saving memory:", chrome.runtime.lastError);
-                    resolve(false);
-                } else {
-                    resolve(true);
-                }
-            });
+            chrome.storage.local.set({ memory }, resolve);
         });
     }
 
@@ -55,7 +41,7 @@ class FormBot {
         const params = [];
         inputs.forEach((input) => {
 
-            const f_id = normalize(field_id(input));
+            const f_id = field_id(input);
             if (!f_id || this.seen.has(f_id)) {
                 return;
             }
@@ -75,208 +61,45 @@ class FormBot {
         return params;
     }
 
-    async learn() {
-        // memory is a array of fields
-        const memory = await this.getMemory();
-        // filter inputs whose value is not empty
-        const inputs = document.querySelectorAll("input, textarea").filter(input => { input.value?.length > 0 });
+    learn() {
+        const inputs = Array.from(document.querySelectorAll("input, textarea"));
         const params = this.buildDetectRequestBody(inputs);
         detectFieldsMean(params).then(({ result }) => {
-            const titles = new Map(Object.entries(result));
-            inputs.forEach((input) => {
-                const f_id = normalize(field_id(input));
-                if (!f_id) {
+            inputs.filter(input => { return input.value.trim() !== ""; }).forEach((input) => {
+                const titles = new Map(Object.entries(result));
+                const f_id = field_id(input);
+                if (!f_id || this.learned.has(f_id)) {
                     return;
                 }
                 const title = titles.get(f_id) || f_id;
                 const value = input.value;
-                if (this.states.has(f_id)) {
-                    const existing = this.states.get(f_id);
-                    newField = new Field(title, value, existing[existing.length - 1].rank + 1)
-                    existing.push(newField); // increase rank for duplicates
-                    memory.push(newField);
+                if (this.memoryStates.has(title)) {
+                    const existing = this.memoryStates.get(title);
+                    const newField = new Field(title, value, existing[existing.length - 1].rank + 1)
+                    existing.push(newField);
                     return;
                 }
-                newField = new Field(title, value);
-                memory.push(newField);
-                this.states.set(f_id, [newField]);
+                const newField = new Field(title, value);
+                this.memoryStates.set(title, [newField]);
+                this.learned.add(f_id);
             });
         }).catch((error) => {
-            console.error("Failed to detect field meanings:", error);
-        });
+            console.error("Failed to detect field:", error);
+        }).then(async () => {
+            
+            console.log("Memory states before saving:", this.memoryStates.keys());
+            const memoryObjs = [];
+            this.memoryStates.forEach((fields) => {
+                memoryObjs.push(...fields);
+            });
 
-        await this.saveMemory(memory);
+            await this.saveMemory(memoryObjs);
+            console.log("Memory states after learning:", memoryObjs);
+        });
     }
 }
 
-
-function fetchInputsLabels() {
-    const inputs = document.querySelectorAll("input, textarea");
-    const fieldsList = [];
-    inputs.forEach((input) => {
-
-        const f_id = normalize(field_id(input));
-        if (!f_id) {
-            return;
-        }
-
-        const labels = collectLabels(input);
-        if (labels.length === 0) {
-            return;
-        }
-
-        fieldsList.push({
-            id: f_id,
-            labels: labels
-        });
-    });
-
-    detectFieldsMean(fieldsList).then(({ result }) => {
-        console.log("Detected field meanings:", result);
-        const labelMap = new Map(Object.entries(result));
-        allFieldsInfo(inputs, labelMap);
-    }).catch((error) => {
-        console.error("Failed to detect field meanings:", error);
-    });
-}
-
-function allFieldsInfo(inputs, labelMap) {
-    const fieldsDict = new Map();
-    inputs.forEach((input) => {
-        const f_id = normalize(field_id(input));
-        if (!f_id) {
-            return;
-        }
-
-        const title = labelMap.get(f_id) || f_id;
-        const value = input.value;
-        if (fieldsDict.has(f_id)) {
-            const existing = fieldsDict.get(f_id);
-            existing.push(new Field(title, value, existing[existing.length - 1].rank + 1)); // increase rank for duplicates
-            return;
-        }
-        fieldsDict.set(f_id, [new Field(title, value)]);
-    });
-    console.log("All fields info:", fieldsDict.values());
-    return fieldsDict.values();
-}
-
-async function getMemory() {
-    return new Promise((resolve) => {
-        // Retrieve the memory object from chrome.storage.local
-        chrome.storage.local.get(["memory"], (result) => {
-            // If there's an error, resolve with an empty object
-            if (chrome.runtime.lastError) {
-                console.error("Error retrieving memory:", chrome.runtime.lastError);
-                resolve({});
-                return;
-            }
-            // Resolve with the retrieved memory or an empty object if it doesn't exist
-            resolve(result.memory || {});
-        });
-    });
-}
-
-async function saveMemory(memory) {
-    return new Promise((resolve) => {
-        // Save the memory object to chrome.storage.local
-        // This will overwrite the existing memory with the new one provided
-        chrome.storage.local.set({ memory }, () => {
-            if (chrome.runtime.lastError) {
-                console.error("Error saving memory:", chrome.runtime.lastError);
-                resolve(false);
-            } else {
-                resolve(true);
-            }
-        });
-    });
-}
-
-async function learn(label, value) {
-    const memory = await getMemory();
-
-    const key = normalize(label);
-
-    memory[key] = value;
-
-    await saveMemory(memory);
-}
-
-function fillExperiences(experiences) {
-    const section = findSectionByKeyword('experience');
-    if (!section || !Array.isArray(experiences) || experiences.length === 0) {
-        return;
-    }
-
-    const addButton = findButtonByKeyword(section, 'add');
-
-    const getExperienceForm = () => {
-        return section.querySelector('form') || section;
-    };
-
-    const matchExperienceField = (input, experience) => {
-        const label = normalize(getLabel(input));
-
-        if (label.includes('company')) return experience.company || '';
-        if (label.includes('title') || label.includes('position')) return experience.title || '';
-        if (label.includes('start date') || label.includes('from')) return experience.startDate || '';
-        if (label.includes('end date') || label.includes('to')) return experience.endDate || '';
-        if (label.includes('description') || label.includes('detail')) return experience.description || '';
-        return null;
-    };
-
-    const fillExperienceForm = (experience) => {
-        const form = getExperienceForm();
-        const inputs = form.querySelectorAll('input, textarea');
-
-        inputs.forEach((input) => {
-            const value = matchExperienceField(input, experience);
-            if (!value) return;
-            input.focus();
-            input.value = value;
-            input.dispatchEvent(new Event('input', { bubbles: true }));
-            input.dispatchEvent(new Event('change', { bubbles: true }));
-        });
-    };
-
-    experiences.forEach((experience) => {
-
-        if (!addButton.disabled) {
-            addButton.focus();
-            addButton.click();
-        }
-
-        if (!addButton.disabled) {
-            // retry click until button disabled
-            let clickCount = 0;
-            const maxClicks = 5;
-            const clickInterval = setInterval(() => {
-                if (addButton.disabled || clickCount >= maxClicks) {
-                    clearInterval(clickInterval);
-                } else {
-                    addButton.click();
-                    clickCount++;
-                }
-            }, 300);
-        }
-
-        fillExperienceForm(experience);
-
-        const saveButton = findButtonByKeyword(section, 'save');
-        if (saveButton && !saveButton.disabled) {
-            saveButton.focus();
-            saveButton.click();
-            // Check if save button still exists and retry
-            setTimeout(() => {
-                const retryButton = findButtonByKeyword(section, 'save');
-                if (retryButton && !retryButton.disabled && document.contains(retryButton)) {
-                    retryButton.focus();
-                    retryButton.click();
-                }
-            }, 300);
-        }
-    });
-}
+bot = new FormBot();
 
 /**
  * Implementation for filling education details
@@ -416,7 +239,25 @@ function handleDropdown(labelText, value) {
 }
 
 function field_id(input) {
-    return input.name || input.id || "";
+    if (input.id == "" && input.name == "") {
+        return null;
+    }
+    // input unique identifier based on its attributes and position in the DOM
+    // parent element index is used to differentiate between multiple similar fields (e.g. multiple "email" fields for different purposes)
+    const parts = [];
+    let el = input.parentElement;
+    let levels = 10; // limit how far up the DOM we go to avoid overly long identifiers
+    while (el && el.parentElement && levels > 0) {
+        const siblings = Array.from(el.parentElement.children);
+        if (siblings.length > 1 && siblings.length < 5) { // only include index if there are multiple similar siblings, and not too many to avoid noise
+            const index = siblings.indexOf(el);
+            parts.unshift(`${levels}.${index}`);
+        }
+        el = el.parentElement;
+        levels--;
+    }
+    parts.unshift(input.id || input.name || "");
+    return parts.join("_").trim();
 }
 
 function collectLabels(input) {
@@ -624,7 +465,6 @@ function fillForm() {
     fetchInfo(userId).then(({ profile, educations }) => {
         fillProfile(profile);
         fillEducations(educations);
-        // fillExperiences(experiences);
     }).catch((error) => {
         console.error("Failed to fetch user info:", error);
     });
@@ -642,10 +482,11 @@ function fillForm() {
 chrome.runtime.onMessage.addListener((msg) => {
     if (msg.action === "FILL_FORM") {
         fillForm();
+        bot.getMemory().then((memory) => {
+            console.log("Current memory retrieved from storage:", memory);
+        });
     }
-    if (msg.action === "LIST_FIELDS") {
-        fetchInputsLabels();
-        // console.log("All detected fields:", info);
-        // alert("Detected fields:\n" + Object.entries(info).map(([k, v]) => `${k}: ${v}`).join("\n"));
+    if (msg.action === "LEARN") {
+        bot.learn();
     }
 });
