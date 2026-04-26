@@ -16,10 +16,49 @@ class FormBot {
     constructor() {
         // Mapping of field titles to Field arrays
         this.memoryStates = new Map();
-        // Set to track seen field IDs for quick lookup
-        this.seen = new Set();
+        // Map to track seen field IDs for titles quick lookup
+        this.seen = new Map();
         // Track learned field IDs to avoid redundant learning
         this.learned = new Set();
+        // to track which fields have been filled on the current page
+        this.fillStates = new Map();
+
+        this.init();
+    }
+
+    init() {
+        // initialize memory states from storage
+        this.getMemory().then((memory) => {
+            
+            if (!memory || !Array.isArray(memory)) {
+                console.warn("No valid memory found in storage, starting with empty memory.");
+                return;
+            }
+            memory.forEach((field) => {
+                if (field.title && field.value) {
+                    if (!this.fillStates.has(field.title)) {
+                        // initialize fill state for each title to 0 (index of the value to use for filling)
+                        this.fillStates.set(field.title, 0);
+                    }
+                    if (this.memoryStates.has(field.title)) {
+                        this.memoryStates.get(field.title).push(new Field(field.title, field.value, field.rank));
+                    } else {
+                        this.memoryStates.set(field.title, [new Field(field.title, field.value, field.rank)]);
+                    }
+                }
+            });
+            this.memoryStates.forEach((fields) => {
+                if (Array.isArray(fields)) {
+                    // sort by rank for prioritization
+                    fields.sort((a, b) => a.rank - b.rank);
+                } else {
+                    console.warn("Invalid field entry in memory states:", fields);
+                }
+            });
+
+            console.log("Memory states initialized:", this.memoryStates);
+
+        });
     }
 
     async getMemory() {
@@ -45,7 +84,6 @@ class FormBot {
             if (!f_id || this.seen.has(f_id)) {
                 return;
             }
-            this.seen.add(f_id);
 
             const labels = collectLabels(input);
             if (labels.length === 0) {
@@ -61,20 +99,61 @@ class FormBot {
         return params;
     }
 
+    fill() {
+        const inputs = Array.from(document.querySelectorAll("input, textarea"));
+        const params = this.buildDetectRequestBody(inputs);
+        detectFieldsMean(params).then((titles) => {
+            inputs.filter(input => { return input.value.trim() == ""; }).forEach((input) => {
+                const f_id = field_id(input);
+                if (!f_id) {
+                    return;
+                }
+                if (!this.seen.has(f_id)) {
+                    const title = titles.get(f_id) || f_id;
+                    this.seen.set(f_id, title);
+                }
+                const title = this.seen.get(f_id) || f_id;
+                if (!this.memoryStates.has(title)) {
+                    return;
+                }
+                const fields = this.memoryStates.get(title);
+                const fillIndex = this.fillStates.get(title) || 0;
+                if (fillIndex >= fields.length) {
+                    return; // no more values to fill for this title
+                }
+                const fieldToFill = fields[fillIndex];
+                input.focus();
+                input.value = fieldToFill.value;
+                input.style.backgroundColor = "#e6ffed";
+                input.dispatchEvent(new Event("input", { bubbles: true }));
+                input.dispatchEvent(new Event("change", { bubbles: true }));
+                this.fillStates.set(title, fillIndex + 1); // move to next value for next time
+            });
+        }).catch((error) => {
+            console.error("Failed to detect field:", error);
+        });
+    }
+
     learn() {
         const inputs = Array.from(document.querySelectorAll("input, textarea"));
         const params = this.buildDetectRequestBody(inputs);
-        detectFieldsMean(params).then(({ result }) => {
+        detectFieldsMean(params).then((titles) => {
             inputs.filter(input => { return input.value.trim() !== ""; }).forEach((input) => {
-                const titles = new Map(Object.entries(result));
                 const f_id = field_id(input);
                 if (!f_id || this.learned.has(f_id)) {
                     return;
                 }
-                const title = titles.get(f_id) || f_id;
+                if (!this.seen.has(f_id)) {
+                    const title = titles.get(f_id) || f_id;
+                    this.seen.set(f_id, title);
+                }
+                const title = this.seen.get(f_id) || f_id;
                 const value = input.value;
                 if (this.memoryStates.has(title)) {
                     const existing = this.memoryStates.get(title);
+                    if (existing.some(field => field.value === value)) {
+                        return; // already have this value for the title, skip
+                    }
                     const newField = new Field(title, value, existing[existing.length - 1].rank + 1)
                     existing.push(newField);
                     return;
@@ -86,7 +165,7 @@ class FormBot {
         }).catch((error) => {
             console.error("Failed to detect field:", error);
         }).then(async () => {
-            
+
             console.log("Memory states before saving:", this.memoryStates.keys());
             const memoryObjs = [];
             this.memoryStates.forEach((fields) => {
@@ -249,7 +328,7 @@ function field_id(input) {
     let levels = 10; // limit how far up the DOM we go to avoid overly long identifiers
     while (el && el.parentElement && levels > 0) {
         const siblings = Array.from(el.parentElement.children);
-        if (siblings.length > 1 && siblings.length < 5) { // only include index if there are multiple similar siblings, and not too many to avoid noise
+        if (siblings.length > 1 && siblings.length < 10) { // only include index if there are multiple similar siblings, and not too many to avoid noise
             const index = siblings.indexOf(el);
             parts.unshift(`${levels}.${index}`);
         }
@@ -412,6 +491,9 @@ async function extensionApiFetch(path, options = {}) {
  * @returns {object} A mapping of field labels to their detected meanings
  */
 async function detectFieldsMean(fields_labels) {
+    if (!Array.isArray(fields_labels) || fields_labels.length === 0) {
+        return new Map();
+    }
     const detected = await extensionApiFetch(
         `/detect_fields`,
         {
@@ -420,7 +502,7 @@ async function detectFieldsMean(fields_labels) {
         }
     );
 
-    return detected;
+    return new Map(Object.entries(detected.result));
 }
 
 /**
@@ -470,21 +552,9 @@ function fillForm() {
     });
 }
 
-// const observer = new MutationObserver(() => {
-//     fillForm(); // re-run when DOM changes
-// });
-
-// observer.observe(document.body, {
-//     childList: true,
-//     subtree: true
-// });
-
 chrome.runtime.onMessage.addListener((msg) => {
     if (msg.action === "FILL_FORM") {
-        fillForm();
-        bot.getMemory().then((memory) => {
-            console.log("Current memory retrieved from storage:", memory);
-        });
+        bot.fill();
     }
     if (msg.action === "LEARN") {
         bot.learn();
