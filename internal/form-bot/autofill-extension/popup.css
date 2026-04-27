@@ -14,20 +14,20 @@ body {
     box-sizing: border-box;
     width: 100%;
     min-height: 160px;
-    padding: 22px 26px 28px;
+    padding: 20px 22px 18px;
     background: #ffffff;
 }
 
 .brand {
     display: flex;
     align-items: flex-start;
-    gap: 18px;
+    gap: 10px;
     margin-bottom: 24px;
 }
 
 .brand__icon {
     width: 136px;
-    height: 136px;
+    height: 96px;
     object-fit: contain;
     flex: 0 0 auto;
 }
@@ -101,11 +101,11 @@ body {
     align-items: baseline;
     gap: 8px;
     color: #8d8d8d;
-    font-size: 0.875rem;
+    font-size: 0.75rem;
     font-weight: 400;
 }
 
 .version-box__label,
 .version-box__value {
-    font-size: 0.875rem;
+    font-size: 0.75rem;
 }
