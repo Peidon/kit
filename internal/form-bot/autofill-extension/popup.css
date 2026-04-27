@@ -26,8 +26,8 @@ body {
 }
 
 .brand__icon {
-    width: 136px;
-    height: 96px;
+    width: 96px;
+    height: 64px;
     object-fit: contain;
     flex: 0 0 auto;
 }
