@@ -1,33 +1,66 @@
-document.getElementById("fill").addEventListener("click", async () => {
-    const fillButton = document.getElementById("fill");
+const versionElement = document.getElementById("version");
+const manifest = chrome.runtime.getManifest();
+
+if (versionElement && manifest?.version) {
+    versionElement.textContent = manifest.version;
+}
+
+async function withLoading(buttonId, action) {
+    const button = document.getElementById(buttonId);
+
+    if (!button) {
+        return;
+    }
+
+    const originalLabel = button.textContent;
     const loadingElement = document.createElement("span");
     loadingElement.className = "loading";
-    loadingElement.textContent = "ing...";
-    fillButton.disabled = true;
-    fillButton.appendChild(loadingElement);
-    fillButton.blur();
+    loadingElement.textContent = "...";
 
+    button.disabled = true;
+    button.appendChild(loadingElement);
+    button.blur();
+
+    try {
+        await action();
+    } finally {
+        loadingElement.remove();
+        button.disabled = false;
+        button.textContent = originalLabel;
+    }
+}
+
+async function sendAction(actionName) {
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
 
-    chrome.tabs.sendMessage(tab.id, { action: "FILL_FORM" }, () => {
-        fillButton.removeChild(loadingElement);
-        fillButton.disabled = false;
-    });
+    if (!tab?.id) {
+        return;
+    }
+
+    await chrome.tabs.sendMessage(tab.id, { action: actionName });
+}
+
+document.getElementById("fill")?.addEventListener("click", async () => {
+    await withLoading("fill", () => sendAction("FILL_FORM"));
 });
 
-document.getElementById("learn").addEventListener("click", async () => {
-    const listButton = document.getElementById("learn");
-    const loadingElement = document.createElement("span");
-    loadingElement.className = "loading";
-    loadingElement.textContent = "ing...";
-    listButton.disabled = true;
-    listButton.appendChild(loadingElement);
-    listButton.blur();
+document.getElementById("learn")?.addEventListener("click", async () => {
+    await withLoading("learn", () => sendAction("LEARN"));
+});
 
-    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+document.getElementById("review")?.addEventListener("click", async () => {
+    const reviewButton = document.getElementById("review");
 
-    chrome.tabs.sendMessage(tab.id, { action: "LEARN" }, () => {
-        listButton.removeChild(loadingElement);
-        listButton.disabled = false;
-    });
+    if (!reviewButton) {
+        return;
+    }
+
+    const originalLabel = reviewButton.textContent;
+    reviewButton.textContent = "Coming Soon";
+    reviewButton.disabled = true;
+
+    window.setTimeout(() => {
+        reviewButton.textContent = originalLabel;
+        reviewButton.disabled = false;
+    }, 1200);
 });

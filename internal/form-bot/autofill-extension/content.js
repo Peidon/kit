@@ -128,6 +128,7 @@ class FormBot {
                 input.dispatchEvent(new Event("input", { bubbles: true }));
                 input.dispatchEvent(new Event("change", { bubbles: true }));
                 this.fillStates.set(title, fillIndex + 1); // move to next value for next time
+                input.blur();
             });
         }).catch((error) => {
             console.error("Failed to detect field:", error);

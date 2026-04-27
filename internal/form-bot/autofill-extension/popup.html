@@ -1,13 +1,28 @@
 <!DOCTYPE html>
 <html>
-<link rel="stylesheet" type="text/css" href="popup.css">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="popup.css">
+</head>
 <body>
     <div id="panel">
-        <h4>Aubot</h4>
-        <button id="fill">Auto Fill</button>
-        <button id="learn">Learn</button>
-        <script src="popup.js"></script> 
-    </div>
-</body>
+        <header class="brand">
+            <img class="brand__icon" src="icons/aubot.svg" alt="Aubot icon">
+        </header>
 
+        <main class="actions">
+            <button id="fill" class="action-button action-button--blue">Auto Fill</button>
+            <button id="learn" class="action-button action-button--yellow">Learn</button>
+            <button id="review" class="action-button action-button--red">Review</button>
+        </main>
+
+        <div class="version-box">
+            <span class="version-box__label">version</span>
+            <span id="version" class="version-box__value">1.0.0</span>
+        </div>
+    </div>
+
+    <script src="popup.js"></script>
+</body>
 </html>
