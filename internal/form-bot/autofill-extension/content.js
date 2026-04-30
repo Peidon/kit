@@ -99,22 +99,56 @@ class FormBot {
         return params;
     }
 
+    async linkTitles(fieldsLabels) {
+        const targetTitles = Array.from(this.memoryStates.keys());
+        const linked = await extensionApiFetch(
+            `/link_titles`,
+            {
+                method: 'POST',
+                body: JSON.stringify({ "source": fieldsLabels, "target": targetTitles })
+            }
+        );
+
+        if (!linked || !linked.result) {
+            throw new Error("Invalid response from link_titles API");
+        }
+
+        return new Map(Object.entries(linked.result));
+    }
+
+    titleFromSeen(fieldId, titles) {
+        if (this.seen.has(fieldId)) {
+            return this.seen.get(fieldId);
+        }
+        const title = titles.get(fieldId) || fieldId;
+        this.seen.set(fieldId, title);
+        return title;
+    }
+
+    fillText(input, value) {
+        input.focus();
+        input.value = value;
+        input.style.backgroundColor = "#e6ffed";
+        input.dispatchEvent(new Event("input", { bubbles: true }));
+        input.dispatchEvent(new Event("change", { bubbles: true }));
+        input.blur();
+    }
+
     fill() {
         const inputs = Array.from(document.querySelectorAll("input, textarea"));
         const params = this.buildDetectRequestBody(inputs);
-        detectFieldsMean(params).then((titles) => {
+        this.linkTitles(params).then((titles) => {
             inputs.filter(input => { return input.value.trim() == ""; }).forEach((input) => {
                 const f_id = field_id(input);
                 if (!f_id) {
                     return;
                 }
-                if (!this.seen.has(f_id)) {
-                    const title = titles.get(f_id) || f_id;
-                    this.seen.set(f_id, title);
-                }
-                const title = this.seen.get(f_id) || f_id;
+                const title = this.titleFromSeen(f_id, titles);
                 if (!this.memoryStates.has(title)) {
                     return;
+                }
+                if (!this.memoryStates.has(title) || this.memoryStates.get(title).length === 0) {
+                    return; // no known values for this title
                 }
                 const fields = this.memoryStates.get(title);
                 const fillIndex = this.fillStates.get(title) || 0;
@@ -122,33 +156,26 @@ class FormBot {
                     return; // no more values to fill for this title
                 }
                 const fieldToFill = fields[fillIndex];
-                input.focus();
-                input.value = fieldToFill.value;
-                input.style.backgroundColor = "#e6ffed";
-                input.dispatchEvent(new Event("input", { bubbles: true }));
-                input.dispatchEvent(new Event("change", { bubbles: true }));
+                this.fillText(input, fieldToFill.value);
                 this.fillStates.set(title, fillIndex + 1); // move to next value for next time
-                input.blur();
             });
         }).catch((error) => {
             console.error("Failed to detect field:", error);
+        }).then(()=>{
+            console.log("seen inputs: ", this.seen)
         });
     }
 
     learn() {
         const inputs = Array.from(document.querySelectorAll("input, textarea"));
         const params = this.buildDetectRequestBody(inputs);
-        detectFieldsMean(params).then((titles) => {
+        this.linkTitles(params).then((titles) => {
             inputs.filter(input => { return input.value.trim() !== ""; }).forEach((input) => {
                 const f_id = field_id(input);
                 if (!f_id || this.learned.has(f_id)) {
                     return;
                 }
-                if (!this.seen.has(f_id)) {
-                    const title = titles.get(f_id) || f_id;
-                    this.seen.set(f_id, title);
-                }
-                const title = this.seen.get(f_id) || f_id;
+                const title = this.titleFromSeen(f_id, titles);
                 const value = input.value;
                 if (this.memoryStates.has(title)) {
                     const existing = this.memoryStates.get(title);
@@ -180,21 +207,6 @@ class FormBot {
 }
 
 bot = new FormBot();
-
-// convert hump word to normal word
-function splitHumpWord(word) {
-    if (!word) {
-        return "";
-    }
-    const parts = word.split(/(?=[A-Z])/g); // split before uppercase letters
-    return parts.join(' ');
-}
-
-function normalize(text) {
-    text = splitHumpWord(text);
-    // convert to lowercase and remove non-alphanumeric characters for better matching
-    return text.toLowerCase().replace(/[^a-z0-9]/g, " ").trim();
-}
 
 function field_id(input) {
     if (input.id == "" && input.name == "") {
@@ -286,6 +298,21 @@ function collectLabels(input) {
     return labels;
 }
 
+// convert hump word to normal word
+function splitHumpWord(word) {
+    if (!word) {
+        return "";
+    }
+    const parts = word.split(/(?=[A-Z])/g); // split before uppercase letters
+    return parts.join(' ');
+}
+
+function normalize(text) {
+    text = splitHumpWord(text);
+    // convert to lowercase and remove non-alphanumeric characters for better matching
+    return text.toLowerCase().replace(/[^a-z0-9]/g, " ").trim();
+}
+
 async function extensionApiFetch(path, options = {}) {
     return new Promise((resolve, reject) => {
         chrome.runtime.sendMessage(
@@ -309,30 +336,6 @@ async function extensionApiFetch(path, options = {}) {
             }
         );
     });
-}
-
-/**
- * Detect the meaning of form fields by sending their labels to the API
- * @param {array} fields_labels An array of field labels to be detected
- * @returns {object} A mapping of field labels to their detected meanings
- */
-async function detectFieldsMean(fields_labels) {
-    if (!Array.isArray(fields_labels) || fields_labels.length === 0) {
-        return new Map();
-    }
-    const detected = await extensionApiFetch(
-        `/detect_fields`,
-        {
-            method: 'POST',
-            body: JSON.stringify({ "fields": fields_labels })
-        }
-    );
-
-    if (!detected || !detected.result) {
-        throw new Error("Invalid response from detect_fields API");
-    }
-
-    return new Map(Object.entries(detected.result));
 }
 
 chrome.runtime.onMessage.addListener((msg) => {
