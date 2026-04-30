@@ -237,65 +237,85 @@ function field_id(input) {
 function collectLabels(input) {
 
     const labels = [];
+    const seen = new Set();
 
-    const placeholder = normalize(input.placeholder);
-    if (placeholder) {
-        labels.push(placeholder);
-    }
+    const pushLabel = (text) => {
+        const value = normalize(text);
+        if (!value || seen.has(value)) {
+            return;
+        }
+        seen.add(value);
+        labels.push(value);
+    };
 
-    const name = normalize(input.name);
-    if (name) {
-        labels.push(name);
-    }
+    pushLabel(input.placeholder);
+    pushLabel(input.name);
 
     // 1. Standard label
     if (input.id) {
         const label = document.querySelector(`label[for="${input.id}"]`);
-        const labelValue = normalize(label?.innerText);
-        if (labelValue) {
-            labels.push(labelValue);
-        }
+        pushLabel(label?.innerText);
     }
 
     // 2. aria-label
-    const aria = normalize(input.getAttribute("aria-label"));
-    if (aria) labels.push(aria);
+    pushLabel(input.getAttribute("aria-label"));
 
-    // 3. Walk up DOM and find nearby text
-    let el = input;
-    for (let i = 0; i < 3; i++) {
+    // 3. aria-labelledby
+    const labelledBy = input.getAttribute("aria-labelledby");
+    if (labelledBy) {
+        labelledBy.split(/\s+/).forEach((id) => {
+            pushLabel(document.getElementById(id)?.innerText);
+        });
+    }
+
+    // 4. Fieldset legend is common for textarea / radio / checkbox groups
+    const fieldset = input.closest("fieldset");
+    if (fieldset) {
+        pushLabel(fieldset.querySelector("legend")?.innerText);
+    }
+
+    const nearbySelector = [
+        "legend",
+        "label",
+        "[role='heading']",
+        "h1",
+        "h2",
+        "h3",
+        "h4",
+        "h5",
+        "h6",
+        ".label",
+        ".title",
+        "[class*='heading' i]",
+        "[class*='title' i]"
+    ].join(", ");
+
+    // 5. Walk up DOM and find nearby text
+    let el = input.parentElement;
+    for (let i = 0; i < 4; i++) {
         if (!el) break;
 
-        // Check for text nodes directly under the parent element
-        // This is important for modern UIs where labels are often siblings rather than parents
-        const textNodes = Array.from(el.parentElement?.childNodes || [])
+        const directHeading = el.querySelector?.(`:scope > ${nearbySelector.replace(/, /g, ", :scope > ")}`);
+        pushLabel(directHeading?.innerText);
+
+        const textNodes = Array.from(el.childNodes || [])
             .filter(n => n.nodeType === Node.TEXT_NODE)
             .map(n => n.textContent.trim())
             .join(" ");
+        pushLabel(textNodes);
 
-        if (textNodes.length > 0 && textNodes.length < 100) {
-            labels.push(normalize(textNodes));
+        let prev = el.previousElementSibling;
+        let steps = 0;
+        while (prev && steps < 3) {
+            pushLabel(prev.querySelector?.(nearbySelector)?.innerText);
+            if (!prev.querySelector?.("input, textarea, select")) {
+                pushLabel(prev.innerText);
+            }
+            prev = prev.previousElementSibling;
+            steps++;
         }
 
         el = el.parentElement;
-    }
-
-    // 4. Look for preceding sibling text
-    let prev = input.previousElementSibling;
-    while (prev) {
-        if (prev.innerText && prev.innerText.length < 100) {
-            labels.push(normalize(prev.innerText));
-        }
-        prev = prev.previousElementSibling;
-    }
-
-    // 5. nearby text (very important for modern UIs)
-    const parent = input.parentElement;
-    if (parent) {
-        const text = parent.innerText;
-        if (text && text.length < 100) {
-            labels.push(normalize(text));
-        }
     }
 
     return labels;
