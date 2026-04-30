@@ -100,6 +100,9 @@ class FormBot {
     }
 
     async linkTitles(fieldsLabels) {
+        if (fieldsLabels.length === 0) {
+            return new Map();
+        }
         const targetTitles = Array.from(this.memoryStates.keys());
         const linked = await extensionApiFetch(
             `/link_titles`,
