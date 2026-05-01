@@ -22,6 +22,8 @@ class FormBot {
         this.learned = new Set();
         // to track which fields have been filled on the current page
         this.fillStates = new Map();
+        this.reviewOverlayId = "formbot-review-overlay";
+        this.reviewStyleId = "formbot-review-style";
 
         this.init();
     }
@@ -74,6 +76,79 @@ class FormBot {
             // This will overwrite the existing memory with the new one provided
             chrome.storage.local.set({ memory }, resolve);
         });
+    }
+
+    snapshotMemory() {
+        const entries = [];
+
+        this.memoryStates.forEach((fields, title) => {
+            if (!Array.isArray(fields)) {
+                return;
+            }
+
+            fields.forEach((field, index) => {
+                entries.push({
+                    id: `${title}::${field.rank}::${index}`,
+                    title,
+                    value: field.value,
+                    rank: Number.isFinite(field.rank) ? field.rank : index
+                });
+            });
+        });
+
+        return entries.sort((a, b) => {
+            if (a.rank !== b.rank) {
+                return a.rank - b.rank;
+            }
+            return a.title.localeCompare(b.title);
+        });
+    }
+
+    rehydrateMemory(memory) {
+        this.memoryStates = new Map();
+        this.fillStates = new Map();
+
+        memory.forEach((field) => {
+            if (!field?.title || !field?.value) {
+                return;
+            }
+
+            const normalizedField = new Field(
+                field.title,
+                field.value,
+                Number.isFinite(field.rank) ? field.rank : 0
+            );
+
+            if (!this.memoryStates.has(normalizedField.title)) {
+                this.memoryStates.set(normalizedField.title, []);
+                this.fillStates.set(normalizedField.title, 0);
+            }
+
+            this.memoryStates.get(normalizedField.title).push(normalizedField);
+        });
+
+        this.memoryStates.forEach((fields) => {
+            fields.sort((a, b) => a.rank - b.rank);
+        });
+    }
+
+    async persistMemoryEntries(entries) {
+        const sanitized = entries
+            .map((entry, index) => ({
+                title: (entry.title || "").trim(),
+                value: (entry.value || "").trim(),
+                rank: Number.isFinite(entry.rank) ? entry.rank : index
+            }))
+            .filter((entry) => entry.title && entry.value)
+            .sort((a, b) => {
+                if (a.rank !== b.rank) {
+                    return a.rank - b.rank;
+                }
+                return a.title.localeCompare(b.title);
+            });
+
+        this.rehydrateMemory(sanitized);
+        await this.saveMemory(sanitized);
     }
 
     buildDetectRequestBody(inputs) {
@@ -163,7 +238,7 @@ class FormBot {
                 this.fillStates.set(title, fillIndex + 1); // move to next value for next time
             });
         }).catch((error) => {
-            console.error("Failed to detect field:", error);
+            console.error("Failed to autofill:", error);
         }).then(()=>{
             console.log("seen inputs: ", this.seen)
         });
@@ -194,7 +269,7 @@ class FormBot {
                 this.learned.add(f_id);
             });
         }).catch((error) => {
-            console.error("Failed to detect field:", error);
+            console.error("Failed to learn:", error);
         }).then(async () => {
 
             console.log("Memory states before saving:", this.memoryStates.keys());
@@ -206,6 +281,410 @@ class FormBot {
             await this.saveMemory(memoryObjs);
             console.log("Memory states after learning:", memoryObjs);
         });
+    }
+
+    review() {
+        const existingOverlay = document.getElementById(this.reviewOverlayId);
+        if (existingOverlay) {
+            existingOverlay.remove();
+        }
+
+        this.injectReviewStyles();
+
+        const overlay = document.createElement("div");
+        overlay.id = this.reviewOverlayId;
+        overlay.className = "formbot-review-overlay";
+
+        const modal = document.createElement("section");
+        modal.className = "formbot-review-modal";
+        overlay.appendChild(modal);
+
+        const searchWrap = document.createElement("div");
+        searchWrap.className = "formbot-review-search";
+        const searchInput = document.createElement("input");
+        searchInput.type = "search";
+        searchInput.placeholder = "Search...";
+        searchInput.className = "formbot-review-search-input";
+        searchWrap.appendChild(searchInput);
+        modal.appendChild(searchWrap);
+
+        const body = document.createElement("div");
+        body.className = "formbot-review-body";
+        modal.appendChild(body);
+
+        const rows = document.createElement("div");
+        rows.className = "formbot-review-rows";
+        body.appendChild(rows);
+
+        const footer = document.createElement("div");
+        footer.className = "formbot-review-footer";
+        const saveButton = document.createElement("button");
+        saveButton.type = "button";
+        saveButton.className = "formbot-review-save";
+        saveButton.textContent = "Save";
+        const nextButton = document.createElement("button");
+        nextButton.type = "button";
+        nextButton.className = "formbot-review-next";
+        nextButton.textContent = "Next Rank";
+        footer.appendChild(saveButton);
+        footer.appendChild(nextButton);
+        modal.appendChild(footer);
+
+        document.body.appendChild(overlay);
+
+        let page = 0;
+        const pageSize = 20;
+        const entries = this.snapshotMemory();
+        let filteredEntries = entries.slice();
+        let closed = false;
+        const markedForDeletion = new Set();
+
+        const scheduleSave = () => {
+            const nextEntries = entries.filter((entry) => !markedForDeletion.has(entry.id));
+            return this.persistMemoryEntries(nextEntries);
+        };
+
+        const refreshPageBounds = () => {
+            const totalPages = Math.max(1, Math.ceil(filteredEntries.length / pageSize));
+            if (page >= totalPages) {
+                page = totalPages - 1;
+            }
+            nextButton.disabled = filteredEntries.length <= pageSize;
+            nextButton.textContent = totalPages > 1
+                ? `Next Page (${page + 1}/${totalPages})`
+                : "Next Page";
+        };
+
+        const createTrashButton = (entryId, row) => {
+            const button = document.createElement("button");
+            button.type = "button";
+            button.className = "formbot-review-delete";
+            button.setAttribute("aria-label", "Delete memory row");
+            button.innerHTML = `
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M9 3h6l1 2h4v2H4V5h4l1-2zm-2 6h2v8H7V9zm4 0h2v8h-2V9zm4 0h2v8h-2V9zM6 7h12v12a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V7z"/>
+                </svg>
+            `;
+            button.addEventListener("click", () => {
+                if (markedForDeletion.has(entryId)) {
+                    markedForDeletion.delete(entryId);
+                    row.classList.remove("formbot-review-row--pending-delete");
+                    button.classList.remove("formbot-review-delete--active");
+                } else {
+                    markedForDeletion.add(entryId);
+                    row.classList.add("formbot-review-row--pending-delete");
+                    button.classList.add("formbot-review-delete--active");
+                }
+            });
+            return button;
+        };
+
+        const renderRows = () => {
+            refreshPageBounds();
+            rows.replaceChildren();
+
+            const start = page * pageSize;
+            const visibleEntries = filteredEntries.slice(start, start + pageSize);
+
+            if (visibleEntries.length === 0) {
+                const emptyState = document.createElement("div");
+                emptyState.className = "formbot-review-empty";
+                emptyState.textContent = "No memory entries match this search.";
+                rows.appendChild(emptyState);
+                return;
+            }
+
+            visibleEntries.forEach((entry) => {
+                const row = document.createElement("div");
+                row.className = "formbot-review-row";
+
+                const keyInput = document.createElement("input");
+                keyInput.type = "text";
+                keyInput.className = "formbot-review-field";
+                keyInput.placeholder = "Key";
+                keyInput.value = entry.title;
+                keyInput.addEventListener("input", (event) => {
+                    entry.title = event.target.value;
+                });
+
+                const valueInput = document.createElement("input");
+                valueInput.type = "text";
+                valueInput.className = "formbot-review-field";
+                valueInput.placeholder = "Value";
+                valueInput.value = entry.value;
+                valueInput.addEventListener("input", (event) => {
+                    entry.value = event.target.value;
+                });
+
+                if (markedForDeletion.has(entry.id)) {
+                    row.classList.add("formbot-review-row--pending-delete");
+                }
+
+                row.appendChild(keyInput);
+                row.appendChild(valueInput);
+                row.appendChild(createTrashButton(entry.id, row));
+                rows.appendChild(row);
+            });
+        };
+
+        const applyFilter = () => {
+            const needle = normalize(searchInput.value || "");
+            filteredEntries = entries.filter((entry) => {
+                if (!needle) {
+                    return true;
+                }
+                return normalize(`${entry.title} ${entry.value}`).includes(needle);
+            });
+            page = 0;
+            renderRows();
+        };
+
+        searchInput.addEventListener("input", applyFilter);
+        saveButton.addEventListener("click", async () => {
+            saveButton.disabled = true;
+            saveButton.textContent = "Saving...";
+            try {
+                await scheduleSave();
+                const remainingEntries = entries.filter((entry) => !markedForDeletion.has(entry.id));
+                entries.splice(0, entries.length, ...remainingEntries);
+                markedForDeletion.clear();
+                applyFilter();
+            } catch (error) {
+                console.error("Failed to save reviewed memory:", error);
+            } finally {
+                saveButton.disabled = false;
+                saveButton.textContent = "Save";
+            }
+        });
+        nextButton.addEventListener("click", () => {
+            const totalPages = Math.max(1, Math.ceil(filteredEntries.length / pageSize));
+            page = (page + 1) % totalPages;
+            renderRows();
+        });
+
+        const closeOnEscape = (event) => {
+            if (event.key === "Escape") {
+                closeReview();
+            }
+        };
+
+        const closeReview = async () => {
+            if (closed) {
+                return;
+            }
+            closed = true;
+            document.removeEventListener("keydown", closeOnEscape);
+            overlay.remove();
+        };
+
+        overlay.addEventListener("click", (event) => {
+            if (event.target === overlay) {
+                void closeReview();
+            }
+        });
+
+        document.addEventListener("keydown", closeOnEscape);
+        applyFilter();
+        searchInput.focus();
+    }
+
+    injectReviewStyles() {
+        if (document.getElementById(this.reviewStyleId)) {
+            return;
+        }
+
+        const style = document.createElement("style");
+        style.id = this.reviewStyleId;
+        style.textContent = `
+            .formbot-review-overlay {
+                position: fixed;
+                inset: 0;
+                z-index: 2147483647;
+                padding: 44px 32px 24px;
+                background: rgba(191, 191, 191, 0.55);
+                backdrop-filter: blur(2px);
+                box-sizing: border-box;
+            }
+
+            .formbot-review-modal {
+                height: 100%;
+                border-radius: 22px;
+                background: #ffffff;
+                box-shadow: 0 24px 60px rgba(15, 23, 42, 0.16);
+                overflow: hidden;
+                display: flex;
+                flex-direction: column;
+                font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+            }
+
+            .formbot-review-search {
+                padding: 32px 32px 22px;
+                border-bottom: 1px solid #e4e8f0;
+            }
+
+            .formbot-review-search-input,
+            .formbot-review-field {
+                width: 100%;
+                box-sizing: border-box;
+                border: 2px solid #d5dce8;
+                border-radius: 18px;
+                background: #ffffff;
+                color: #505050;
+                font-size: 24px;
+                line-height: 1.2;
+                outline: none;
+            }
+
+            .formbot-review-search-input {
+                height: 82px;
+                padding: 0 32px;
+            }
+
+            .formbot-review-search-input::placeholder,
+            .formbot-review-field::placeholder {
+                color: #8d8d8d;
+            }
+
+            .formbot-review-body {
+                flex: 1;
+                overflow: hidden;
+                padding: 34px 20px 24px 24px;
+            }
+
+            .formbot-review-rows {
+                height: 100%;
+                overflow-y: auto;
+                overflow-x: hidden;
+                direction: rtl;
+                padding-left: 8px;
+                scrollbar-width: thin;
+                scrollbar-color: #c8cfda transparent;
+            }
+
+            .formbot-review-rows::-webkit-scrollbar {
+                width: 12px;
+            }
+
+            .formbot-review-rows::-webkit-scrollbar-track {
+                background: transparent;
+            }
+
+            .formbot-review-rows::-webkit-scrollbar-thumb {
+                background: #c8cfda;
+                border-radius: 999px;
+            }
+
+            .formbot-review-row,
+            .formbot-review-empty {
+                direction: ltr;
+            }
+
+            .formbot-review-row {
+                display: grid;
+                grid-template-columns: minmax(220px, 1fr) minmax(220px, 1fr) 50px;
+                gap: 22px;
+                align-items: center;
+                margin-bottom: 24px;
+            }
+
+            .formbot-review-row--pending-delete .formbot-review-field {
+                border-color: #ffbaba;
+                background: #fff6f6;
+                color: #b44545;
+            }
+
+            .formbot-review-field {
+                height: 84px;
+                padding: 0 26px;
+            }
+
+            .formbot-review-field:focus,
+            .formbot-review-search-input:focus {
+                border-color: #9eb4ff;
+                box-shadow: 0 0 0 4px rgba(84, 112, 255, 0.12);
+            }
+
+            .formbot-review-delete {
+                width: 44px;
+                height: 44px;
+                border: none;
+                background: transparent;
+                color: #959191ff;
+                cursor: pointer;
+                padding: 0;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .formbot-review-delete svg {
+                width: 34px;
+                height: 34px;
+                fill: currentColor;
+            }
+
+            .formbot-review-delete:hover {
+                color: #dd2020;
+            }
+
+            .formbot-review-delete--active {
+                color: #ff3434;
+            }
+
+            .formbot-review-empty {
+                height: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: #8d8d8d;
+                font-size: 22px;
+            }
+
+            .formbot-review-footer {
+                padding: 0 32px 28px;
+                display: flex;
+                gap: 14px;
+                justify-content: flex-end;
+            }
+
+            .formbot-review-save,
+            .formbot-review-next {
+                min-width: 200px;
+                height: 56px;
+                padding: 0 28px;
+                border: 2px solid #d5dce8;
+                border-radius: 999px;
+                background: #ffffff;
+                color: #4b5563;
+                font-size: 18px;
+                font-weight: 600;
+                cursor: pointer;
+            }
+
+            .formbot-review-save {
+                border-color: #9eb4ff;
+                background: #5470ff;
+                color: #ffffff;
+            }
+
+            .formbot-review-save:hover:not(:disabled) {
+                background: #4360f0;
+                border-color: #4360f0;
+            }
+
+            .formbot-review-next:hover:not(:disabled) {
+                border-color: #9eb4ff;
+                color: #1f3dab;
+            }
+
+            .formbot-review-save:disabled,
+            .formbot-review-next:disabled {
+                opacity: 0.55;
+                cursor: default;
+            }
+        `;
+
+        document.head.appendChild(style);
     }
 }
 
@@ -367,5 +846,9 @@ chrome.runtime.onMessage.addListener((msg) => {
     }
     if (msg.action === "LEARN") {
         bot.learn();
+    }
+    if (msg.action === "REVIEW") {
+        // Popup a window with the current memory for review and editing
+        bot.review();
     }
 });

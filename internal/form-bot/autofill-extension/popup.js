@@ -49,18 +49,5 @@ document.getElementById("learn")?.addEventListener("click", async () => {
 });
 
 document.getElementById("review")?.addEventListener("click", async () => {
-    const reviewButton = document.getElementById("review");
-
-    if (!reviewButton) {
-        return;
-    }
-
-    const originalLabel = reviewButton.textContent;
-    reviewButton.textContent = "Coming Soon";
-    reviewButton.disabled = true;
-
-    window.setTimeout(() => {
-        reviewButton.textContent = originalLabel;
-        reviewButton.disabled = false;
-    }, 1200);
+    await withLoading("review", () => sendAction("REVIEW"));
 });
