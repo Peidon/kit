@@ -729,6 +729,7 @@ function collectLabels(input) {
 
     pushLabel(input.placeholder);
     pushLabel(input.name);
+    pushLabel(input.id);
 
     // 1. Standard label
     if (input.id) {
@@ -800,17 +801,13 @@ function collectLabels(input) {
     return labels;
 }
 
-// convert hump word to normal word
-function splitHumpWord(word) {
-    if (!word) {
+function normalize(text) {
+    if (!text) {
         return "";
     }
-    const parts = word.split(/(?=[A-Z])/g); // split before uppercase letters
-    return parts.join(' ');
-}
-
-function normalize(text) {
-    text = splitHumpWord(text);
+    // for CaptalizedWords, like "URLAddress", we want to split into "URL Address" to improve matching, but we want to keep all uppercase words together, so we use a regex that splits before uppercase letters but not between consecutive uppercase letters, so "URLAddress" becomes "URL Address" but "MyURLAddress" becomes "My URL Address"
+    text = text.replace(/([a-z])([A-Z])/g, '$1 $2'); // split camelCase and PascalCase
+    text = text.replace(/([A-Z]+)([A-Z][a-z])/g, '$1 $2'); // split before uppercase followed by lowercase, but keep consecutive uppercase together
     // convert to lowercase and remove non-alphanumeric characters for better matching
     return text.toLowerCase().replace(/[^a-z0-9]/g, " ").trim();
 }
