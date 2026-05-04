@@ -713,18 +713,27 @@ function field_id(input) {
     return parts.join("_").trim();
 }
 
+function splitIntoPhrases(text) {
+    if (!text) {
+        return [];
+    }
+    text = text.replace(/[^a-zA-Z]+/g, " ").trim();
+    return text.split(/\s+/).map((part) => {
+        part = part.replace(/([a-z])([A-Z])/g, '$1 $2');
+        part = part.replace(/([A-Z]+)([A-Z][a-z])/g, '$1 $2');
+        return part.toLowerCase();
+    });
+}
+
 function collectLabels(input) {
 
     const labels = [];
     const seen = new Set();
 
     const pushLabel = (text) => {
-        const value = normalize(text);
-        if (!value || seen.has(value)) {
-            return;
-        }
-        seen.add(value);
-        labels.push(value);
+        const parts = splitIntoPhrases(text).filter((part) => !seen.has(part) && part.length > 0);
+        seen.add(...parts);
+        labels.push(...parts);
     };
 
     pushLabel(input.placeholder);

@@ -42,6 +42,42 @@ this.normalize = normalize;
     return context.normalize;
 }
 
+function loadSplitIntoPhrases() {
+    const source = fs.readFileSync(path.join(__dirname, "content.js"), "utf8");
+    const splitSource = extractFunctionSource(source, "splitIntoPhrases");
+    const context = {};
+
+    vm.createContext(context);
+    vm.runInContext(`
+${splitSource}
+this.splitIntoPhrases = splitIntoPhrases;
+`, context);
+
+    return context.splitIntoPhrases;
+}
+
+const splitIntoPhrases = loadSplitIntoPhrases();
+
+test("splitIntoPhrases splits camelCase words into separate tokens", () => {
+    assert.equal(splitIntoPhrases("workExperience").join(" "), "work experience");
+});
+
+test("splitIntoPhrases splits PascalCase words into separate tokens", () => {
+    assert.equal(splitIntoPhrases("WorkExperience").join(" "), "work experience");
+});
+
+test("splitIntoPhrases keeps consecutive uppercase letters together", () => {
+    assert.equal(splitIntoPhrases("URLAddress").join(" "), "url address");
+    assert.equal(splitIntoPhrases("MyURLAddress").join(" "), "my url address");
+});
+
+test("splitIntoPhrases lowercases text and replaces symbols with spaces", () => {
+    assert.equal(
+        splitIntoPhrases("workExperience-6--endDate-dateSectionYear-input").join(","),
+        "work experience,end date,date section year,input"
+    );
+});
+
 const normalize = loadNormalize();
 
 test("normalize splits camelCase words into separate tokens", () => {
