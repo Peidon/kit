@@ -4,11 +4,13 @@ class Field {
      * @param {string} title The title of the field, e.g. "first name", "email", "company"
      * @param {string} value The value of the field, e.g. "John", "Acme Inc."
      * @param {number} rank The importance rank of the field, used for prioritization when filling forms. Lower is more important. Default is 0.
+     * @param {number} create_at The create_at when the field was created.
      */
-    constructor(title, value, rank = 0) {
+    constructor(title, value, rank = 0, create_time = Date.now()) {
         this.title = title;
         this.value = value;
         this.rank = rank;
+        this.create_at = create_time;
     }
 }
 
@@ -33,7 +35,6 @@ class FormBot {
         this.getMemory().then((memory) => {
 
             if (!memory || !Array.isArray(memory)) {
-                console.warn("No valid memory found in storage, starting with empty memory.");
                 return;
             }
             memory.forEach((field) => {
@@ -43,9 +44,9 @@ class FormBot {
                         this.fillStates.set(field.title, 0);
                     }
                     if (this.memoryStates.has(field.title)) {
-                        this.memoryStates.get(field.title).push(new Field(field.title, field.value, field.rank));
+                        this.memoryStates.get(field.title).push(field);
                     } else {
-                        this.memoryStates.set(field.title, [new Field(field.title, field.value, field.rank)]);
+                        this.memoryStates.set(field.title, [field]);
                     }
                 }
             });
@@ -57,8 +58,6 @@ class FormBot {
                     console.warn("Invalid field entry in memory states:", fields);
                 }
             });
-
-            console.log("Memory states initialized:", this.memoryStates);
 
         });
     }
@@ -80,6 +79,7 @@ class FormBot {
 
     snapshotMemory() {
         const entries = [];
+        const default_time = Date.now();
 
         this.memoryStates.forEach((fields, title) => {
             if (!Array.isArray(fields)) {
@@ -91,12 +91,16 @@ class FormBot {
                     id: `${title}::${field.rank}::${index}`,
                     title,
                     value: field.value,
-                    rank: Number.isFinite(field.rank) ? field.rank : index
+                    rank: Number.isFinite(field.rank) ? field.rank : index,
+                    create_at: field.create_at || default_time
                 });
             });
         });
 
         return entries.sort((a, b) => {
+            if (a.create_at !== b.create_at) {
+                return b.create_at - a.create_at;
+            }
             if (a.rank !== b.rank) {
                 return a.rank - b.rank;
             }
@@ -107,7 +111,7 @@ class FormBot {
     rehydrateMemory(memory) {
         this.memoryStates = new Map();
         this.fillStates = new Map();
-
+        const create_at = Date.now();
         memory.forEach((field) => {
             if (!field?.title || !field?.value) {
                 return;
@@ -116,7 +120,8 @@ class FormBot {
             const normalizedField = new Field(
                 field.title,
                 field.value,
-                Number.isFinite(field.rank) ? field.rank : 0
+                Number.isFinite(field.rank) ? field.rank : 0,
+                create_at
             );
 
             if (!this.memoryStates.has(normalizedField.title)) {
@@ -153,6 +158,7 @@ class FormBot {
 
     buildDetectRequestBody(inputs) {
         const params = [];
+        const seen = new Set();
         inputs.forEach((input) => {
 
             const f_id = field_id(input);
@@ -160,7 +166,7 @@ class FormBot {
                 return;
             }
 
-            const labels = collectLabels(input);
+            const labels = collectLabels(input, seen);
             if (labels.length === 0) {
                 return;
             }
@@ -215,8 +221,18 @@ class FormBot {
     fill() {
         const inputs = Array.from(document.querySelectorAll("input, textarea"));
         const params = this.buildDetectRequestBody(inputs);
+        const inputsToFill = inputs.filter(input => { return input.value.trim() == ""; }).filter(input => {
+            const f_id = field_id(input);
+            return f_id;
+        });
+
+        if (inputsToFill.length === 0) {
+            alert("I already have filled all available fields.", "OK");
+            return;
+        }
+        const filled = new Set();
         this.linkTitles(params).then((titles) => {
-            inputs.filter(input => { return input.value.trim() == ""; }).forEach((input) => {
+            inputsToFill.forEach((input) => {
                 const f_id = field_id(input);
                 if (!f_id) {
                     return;
@@ -236,19 +252,33 @@ class FormBot {
                 const fieldToFill = fields[fillIndex];
                 this.fillText(input, fieldToFill.value);
                 this.fillStates.set(title, fillIndex + 1); // move to next value for next time
+                filled.add(f_id);
             });
         }).catch((error) => {
             console.error("Failed to autofill:", error);
         }).then(()=>{
             console.log("seen inputs: ", this.seen)
+            if (filled.size == 0) {
+                alert("No matching memory entries found to auto fill. Please fill manually and click the [Learn] button.", "OK");
+            }
         });
     }
 
     learn() {
         const inputs = Array.from(document.querySelectorAll("input, textarea"));
         const params = this.buildDetectRequestBody(inputs);
+        const create_time = Date.now();
+        const inputsToLearn = inputs.filter(input => { return input.value.trim() !== ""; }).filter(input => {
+            const f_id = field_id(input);
+            return f_id && !this.learned.has(f_id);
+        });
+
+        if (inputsToLearn.length === 0) {
+            alert("No new inputs to learn from. Please input some information first.", "OK");
+            return;
+        }
         this.linkTitles(params).then((titles) => {
-            inputs.filter(input => { return input.value.trim() !== ""; }).forEach((input) => {
+            inputsToLearn.forEach((input) => {
                 const f_id = field_id(input);
                 if (!f_id || this.learned.has(f_id)) {
                     return;
@@ -260,10 +290,10 @@ class FormBot {
                     if (existing.some(field => field.value === value)) {
                         return; // already have this value for the title, skip
                     }
-                    const newField = new Field(title, value, existing[existing.length - 1].rank + 1)
+                    const newField = new Field(title, value, existing[existing.length - 1].rank + 1, create_time);
                     existing.push(newField);
                 } else {
-                    const newField = new Field(title, value);
+                    const newField = new Field(title, value, 0, create_time);
                     this.memoryStates.set(title, [newField]);
                 }
                 this.learned.add(f_id);
@@ -725,13 +755,17 @@ function splitIntoPhrases(text) {
     });
 }
 
-function collectLabels(input) {
+function collectLabels(input, text_seen = new Set()) {
 
     const labels = [];
     const seen = new Set();
 
     const pushLabel = (text) => {
-        const parts = splitIntoPhrases(text).filter((part) => !seen.has(part) && part.length > 0);
+        if (!text || text.trim() === "" || text_seen.has(text)) {
+            return;
+        }
+        text_seen.add(text);
+        const parts = splitIntoPhrases(text).filter((part) => !seen.has(part) && part.length > 1);
         seen.add(...parts);
         labels.push(...parts);
     };
