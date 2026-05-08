@@ -78,6 +78,10 @@ test("splitIntoPhrases lowercases text and replaces symbols with spaces", () => 
     );
 });
 
+test("splitIntoPhrases tackles normal text", () => {
+    assert.equal(splitIntoPhrases("Type to Add Skills").join(","),"type to add skills");
+});
+
 const normalize = loadNormalize();
 
 test("normalize splits camelCase words into separate tokens", () => {

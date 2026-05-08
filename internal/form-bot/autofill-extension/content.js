@@ -717,8 +717,8 @@ function splitIntoPhrases(text) {
     if (!text) {
         return [];
     }
-    text = text.replace(/[^a-zA-Z]+/g, " ").trim();
-    return text.split(/\s+/).map((part) => {
+    text = text.replace(/[^a-zA-Z\s]+/g, "#").trim();
+    return text.split(/#/).map((part) => {
         part = part.replace(/([a-z])([A-Z])/g, '$1 $2');
         part = part.replace(/([A-Z]+)([A-Z][a-z])/g, '$1 $2');
         return part.toLowerCase();
