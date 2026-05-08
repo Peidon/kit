@@ -158,7 +158,6 @@ class FormBot {
 
     buildDetectRequestBody(inputs) {
         const params = [];
-        const seen = new Set();
         inputs.forEach((input) => {
 
             const f_id = field_id(input);
@@ -166,7 +165,7 @@ class FormBot {
                 return;
             }
 
-            const labels = collectLabels(input, seen);
+            const labels = collectLabels(input);
             if (labels.length === 0) {
                 return;
             }
@@ -759,16 +758,17 @@ function splitIntoPhrases(text) {
     });
 }
 
-function collectLabels(input, text_seen = new Set()) {
+function collectLabels(input) {
 
     const labels = [];
     const seen = new Set();
 
     const pushLabel = (text) => {
-        if (!text || text.trim() === "" || text_seen.has(text)) {
+        text = text?.replace(/\s+/g, " ").trim();
+        if (!text || seen.has(text)) {
             return;
         }
-        text_seen.add(text);
+        seen.add(text);
         const parts = splitIntoPhrases(text).filter((part) => !seen.has(part) && part.length > 1);
         seen.add(...parts);
         labels.push(...parts);
@@ -824,19 +824,31 @@ function collectLabels(input, text_seen = new Set()) {
 
         const directHeading = el.querySelector?.(`:scope > ${nearbySelector.replace(/, /g, ", :scope > ")}`);
         pushLabel(directHeading?.innerText);
+        if (directHeading?.innerText) {
+            break;
+        }
 
         const textNodes = Array.from(el.childNodes || [])
             .filter(n => n.nodeType === Node.TEXT_NODE)
             .map(n => n.textContent.trim())
             .join(" ");
         pushLabel(textNodes);
+        if (textNodes) {
+            break;
+        }
 
         let prev = el.previousElementSibling;
         let steps = 0;
         while (prev && steps < 3) {
             pushLabel(prev.querySelector?.(nearbySelector)?.innerText);
+            if (prev.querySelector?.(nearbySelector)?.innerText) {
+                break;
+            }
             if (!prev.querySelector?.("input, textarea, select")) {
                 pushLabel(prev.innerText);
+                if (prev.innerText) {
+                    break;
+                }
             }
             prev = prev.previousElementSibling;
             steps++;
