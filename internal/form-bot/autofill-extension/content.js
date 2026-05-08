@@ -221,7 +221,10 @@ class FormBot {
     fill() {
         const inputs = Array.from(document.querySelectorAll("input, textarea"));
         const params = this.buildDetectRequestBody(inputs);
-        const inputsToFill = inputs.filter(input => { return input.value.trim() == ""; }).filter(input => {
+        const inputsToFill = inputs.filter(input => {
+            if (input.type === "file" || input.disabled || input.readOnly || input.value.trim() !== "") {
+                return false;
+            }
             const f_id = field_id(input);
             return f_id;
         });
