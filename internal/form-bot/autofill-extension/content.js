@@ -288,6 +288,7 @@ class FormBot {
                 if (this.memoryStates.has(title)) {
                     const existing = this.memoryStates.get(title);
                     if (existing.some(field => field.value === value)) {
+                        this.learned.add(f_id);
                         return; // already have this value for the title, skip
                     }
                     const newField = new Field(title, value, existing[existing.length - 1].rank + 1, create_time);
