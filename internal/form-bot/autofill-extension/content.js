@@ -219,7 +219,6 @@ class FormBot {
 
     fill() {
         const inputs = Array.from(document.querySelectorAll("input, textarea"));
-        const params = this.buildDetectRequestBody(inputs);
         const inputsToFill = inputs.filter(input => {
             if (input.type === "file" || input.disabled || input.readOnly || input.value.trim() !== "") {
                 return false;
@@ -233,6 +232,7 @@ class FormBot {
             return;
         }
         const filled = new Set();
+        const params = this.buildDetectRequestBody(inputsToFill);
         this.linkTitles(params).then((titles) => {
             inputsToFill.forEach((input) => {
                 const f_id = field_id(input);
@@ -268,17 +268,22 @@ class FormBot {
 
     learn() {
         const inputs = Array.from(document.querySelectorAll("input, textarea"));
-        const params = this.buildDetectRequestBody(inputs);
-        const create_time = Date.now();
-        const inputsToLearn = inputs.filter(input => { return input.value.trim() !== ""; }).filter(input => {
+        const inputsToLearn = inputs.filter(input => {
+            if (input.value.trim() === "" || input.disabled || input.readOnly || 
+                input.type === "file" || input.type === "checkbox" || input.type === "radio" || 
+                this.learned.has(field_id(input))) {
+                return false;
+            }
             const f_id = field_id(input);
-            return f_id && !this.learned.has(f_id);
+            return f_id;
         });
 
         if (inputsToLearn.length === 0) {
             alert("No new inputs to learn from. Please input some information first.", "OK");
             return;
         }
+        const params = this.buildDetectRequestBody(inputs);
+        const create_time = Date.now();
         this.linkTitles(params).then((titles) => {
             inputsToLearn.forEach((input) => {
                 const f_id = field_id(input);
@@ -305,14 +310,23 @@ class FormBot {
             console.error("Failed to learn:", error);
         }).then(async () => {
 
-            console.log("Memory states before saving:", this.memoryStates.keys());
             const memoryObjs = [];
+            const deduped = new Set();
             this.memoryStates.forEach((fields) => {
-                memoryObjs.push(...fields);
+                if (!Array.isArray(fields)) {
+                    return;
+                }
+                fields.forEach((field) => {
+                    const key = `${field.title}::${field.value}`;
+                    if (deduped.has(key)) {
+                        return;
+                    }
+                    deduped.add(key);
+                    memoryObjs.push(field);
+                });
             });
 
             await this.saveMemory(memoryObjs);
-            console.log("Memory states after learning:", memoryObjs);
         });
     }
 
@@ -774,10 +788,6 @@ function collectLabels(input) {
         labels.push(...parts);
     };
 
-    pushLabel(input.placeholder);
-    pushLabel(input.name);
-    pushLabel(input.id);
-
     // 1. Standard label
     if (input.id) {
         const label = document.querySelector(`label[for="${input.id}"]`);
@@ -856,6 +866,9 @@ function collectLabels(input) {
 
         el = el.parentElement;
     }
+
+    pushLabel(input.name);
+    pushLabel(input.id);
 
     return labels;
 }
