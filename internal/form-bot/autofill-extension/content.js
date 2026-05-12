@@ -6,11 +6,11 @@ class Field {
      * @param {number} rank The importance rank of the field, used for prioritization when filling forms. Lower is more important. Default is 0.
      * @param {number} create_at The create_at when the field was created.
      */
-    constructor(title, value, rank = 0, create_time = Date.now()) {
+    constructor(title, value, rank = 0, create_at = Date.now()) {
         this.title = title;
         this.value = value;
         this.rank = rank;
-        this.create_at = create_time;
+        this.create_at = create_at;
     }
 }
 
@@ -121,7 +121,7 @@ class FormBot {
                 field.title,
                 field.value,
                 Number.isFinite(field.rank) ? field.rank : 0,
-                create_at
+                field.create_at || create_at
             );
 
             if (!this.memoryStates.has(normalizedField.title)) {
@@ -259,7 +259,6 @@ class FormBot {
         }).catch((error) => {
             console.error("Failed to autofill:", error);
         }).then(()=>{
-            console.log("seen inputs: ", this.seen)
             if (filled.size == 0) {
                 alert("No matching memory entries found to auto fill. Please fill manually and click the [Learn] button.", "OK");
             }
