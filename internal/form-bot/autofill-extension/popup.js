@@ -1,8 +1,33 @@
 const versionElement = document.getElementById("version");
 const manifest = chrome.runtime.getManifest();
+const brandIcon = document.getElementById("brand-icon");
 
 if (versionElement && manifest?.version) {
     versionElement.textContent = manifest.version;
+}
+
+if (brandIcon) {
+    const staticSrc = brandIcon.dataset.staticSrc || brandIcon.getAttribute("src");
+    const animatedSrc = brandIcon.dataset.animatedSrc;
+
+    const showStaticIcon = () => {
+        if (staticSrc) {
+            brandIcon.setAttribute("src", staticSrc);
+        }
+    };
+
+    const playAnimatedIcon = () => {
+        if (!animatedSrc) {
+            return;
+        }
+
+        brandIcon.setAttribute("src", `${animatedSrc}?t=${Date.now()}`);
+    };
+
+    brandIcon.addEventListener("mouseenter", playAnimatedIcon);
+    brandIcon.addEventListener("mouseleave", showStaticIcon);
+    brandIcon.addEventListener("focus", playAnimatedIcon);
+    brandIcon.addEventListener("blur", showStaticIcon);
 }
 
 async function withLoading(buttonId, action) {
