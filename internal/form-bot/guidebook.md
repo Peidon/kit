@@ -15,6 +15,6 @@ How to use it ?
 Open your browser’s extensions page, click `Load unpacked`, and select the `autofill-extension` directory. After that, you’ll see the extension icon in the toolbar. Click the icon, and a panel will pop up.   
 
 There are just three buttons on the panel.   
-<span style="color:blue">[ Autofill ]</span> : Autofill all the inputs at current web page.  
-<span style="color:#ffd54a">[ Learn ]</span> : At first time, Form Bot need to learn what you have input. When you finished sort of forms, just click <span style="color:#ffd54a">[ Learn ]</span>, then they could be autofilled next time.  
-<span style="color:red">[ Review ]</span> : Sometimes, you may be going to update value of a field, or delete some fields.
+<span style="color:blue">[ Autofill ]</span> : Autofill the forms in any web page.  
+<span style="color:#ffd54a">[ Learn ]</span> : The first time you use Form Bot, it needs to learn the information you enter. After you complete a form, simply click **[ Learn ]**, and the same fields can be autofilled automatically next time.  
+<span style="color:red">[ Review ]</span> : Sometimes, you may want to update or delete a field value. You can organize and refine the information you’ve entered — keeping it clean and precise will make the autofill more accurate.
