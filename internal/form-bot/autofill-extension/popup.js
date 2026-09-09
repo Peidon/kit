@@ -62,17 +62,18 @@ async function sendAction(actionName) {
         return;
     }
 
-    await chrome.tabs.sendMessage(tab.id, { action: actionName });
+    const response = await chrome.tabs.sendMessage(tab.id, { action: actionName });
+    return response
 }
 
 document.getElementById("fill")?.addEventListener("click", async () => {
-    await withLoading("fill", () => sendAction("FILL_FORM"));
+    await withLoading("fill", async () => await sendAction("FILL_FORM"));
 });
 
 document.getElementById("learn")?.addEventListener("click", async () => {
-    await withLoading("learn", () => sendAction("LEARN"));
+    await withLoading("learn", async () => await sendAction("LEARN"));
 });
 
 document.getElementById("review")?.addEventListener("click", async () => {
-    await withLoading("review", () => sendAction("REVIEW"));
+    await withLoading("review", async() => await sendAction("REVIEW"));
 });

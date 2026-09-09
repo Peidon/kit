@@ -37,7 +37,8 @@
         }
     ],
     "host_permissions": [
+        "http://*/*",
         "http://localhost:8000/*",
-        "https://aubot-api-622142662818.us-central1.run.app/*"
+        "https://*/*"
     ]
 }

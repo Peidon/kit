@@ -217,7 +217,7 @@ class FormBot {
         input.blur();
     }
 
-    fill() {
+    async fill() {
         const inputs = Array.from(document.querySelectorAll("input, textarea"));
         const inputsToFill = inputs.filter(input => {
             if (input.type === "file" || input.disabled || input.readOnly || input.value.trim() !== "") {
@@ -233,7 +233,7 @@ class FormBot {
         }
         const filled = new Set();
         const params = this.buildDetectRequestBody(inputsToFill);
-        this.linkTitles(params).then((titles) => {
+        await this.linkTitles(params).then((titles) => {
             inputsToFill.forEach((input) => {
                 const f_id = field_id(input);
                 if (!f_id) {
@@ -265,15 +265,15 @@ class FormBot {
         });
     }
 
-    learn() {
+    async learn() {
         const inputs = Array.from(document.querySelectorAll("input, textarea"));
         const inputsToLearn = inputs.filter(input => {
+            const f_id = field_id(input);
             if (input.value.trim() === "" || input.disabled || input.readOnly || 
                 input.type === "file" || input.type === "checkbox" || input.type === "radio" || 
-                this.learned.has(field_id(input))) {
+                this.learned.has(f_id)) {
                 return false;
             }
-            const f_id = field_id(input);
             return f_id;
         });
 
@@ -283,7 +283,7 @@ class FormBot {
         }
         const params = this.buildDetectRequestBody(inputs);
         const create_time = Date.now();
-        this.linkTitles(params).then((titles) => {
+        await this.linkTitles(params).then((titles) => {
             inputsToLearn.forEach((input) => {
                 const f_id = field_id(input);
                 if (!f_id || this.learned.has(f_id)) {
@@ -908,12 +908,42 @@ async function extensionApiFetch(path, options = {}) {
     });
 }
 
-chrome.runtime.onMessage.addListener((msg) => {
+chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+
     if (msg.action === "FILL_FORM") {
-        bot.fill();
+        
+        // Execute the async operation
+        (async () => {
+           try {
+            if (msg.action === "FILL_FORM") {
+                // 1. Wait for bot.fill() to complete (which awaits get_data())
+                await bot.fill(); 
+            }
+            // 2. Send a success response back to the popup
+            sendResponse({ status: "fill success" });
+        } catch (error) {
+            console.error(error, ". sender id:", sender.id);
+            sendResponse({ status: "fill error", error: error.message });
+        }
+        })();
+
+        return true; // 3. CRUCIAL! Keeps the channel open so sendResponse can fire later
     }
+
     if (msg.action === "LEARN") {
-        bot.learn();
+        (async () => {
+           try {
+            if (msg.action === "LEARN") {
+                await bot.learn();
+            }
+            sendResponse({ status: "learn success" });
+        } catch (error) {
+            console.error(error, ". sender id:", sender.id);
+            sendResponse({ status: "error", error: error.message });
+        }
+        })();
+
+        return true; // 3. CRUCIAL! Keeps the channel open so sendResponse can fire later
     }
     if (msg.action === "REVIEW") {
         // Popup a window with the current memory for review and editing
