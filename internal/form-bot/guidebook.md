@@ -1,6 +1,6 @@
-<p align="center">
+<!-- <p align="center">
 <img src="autofill-extension/icons/Aubot.gif" width="200" height="200" />
-</p>
+</p> -->
 
 Form Bot
 ======
