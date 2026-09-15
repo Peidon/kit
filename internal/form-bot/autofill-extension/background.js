@@ -1,4 +1,4 @@
-// const API_BASE_URL = 'https://aubot-api-622142662818.us-central1.run.app';
+// const API_BASE_URL = 'http://192.168.0.49:8000';
 const API_BASE_URL = 'http://localhost:8000';
 const CSRF_COOKIE_NAME = 'csrftoken';
 const CSRF_SAFE_METHODS = new Set(['GET', 'HEAD', 'OPTIONS']);

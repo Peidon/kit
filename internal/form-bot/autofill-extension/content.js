@@ -203,7 +203,7 @@ class FormBot {
         if (this.seen.has(fieldId)) {
             return this.seen.get(fieldId);
         }
-        const title = titles.get(fieldId) || fieldId;
+        const title = titles.get(fieldId) || "";
         this.seen.set(fieldId, title);
         return title;
     }
@@ -290,6 +290,9 @@ class FormBot {
                     return;
                 }
                 const title = this.titleFromSeen(f_id, titles);
+                if(title==""){
+                    return;
+                }
                 const value = input.value;
                 if (this.memoryStates.has(title)) {
                     const existing = this.memoryStates.get(title);
