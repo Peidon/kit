@@ -220,7 +220,8 @@ class FormBot {
     async fill() {
         const inputs = Array.from(document.querySelectorAll("input, textarea"));
         const inputsToFill = inputs.filter(input => {
-            if (input.type === "file" || input.disabled || input.readOnly || input.value.trim() !== "") {
+            if (input.disabled || input.readOnly || input.value.trim() !== "" || 
+            input.type === "file" || input.type === "checkbox" || input.type === "radio") {
                 return false;
             }
             const f_id = field_id(input);
