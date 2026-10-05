@@ -1,4 +1,3 @@
-// const API_BASE_URL = 'http://192.168.0.49:8000';
 const API_BASE_URL = 'http://localhost:8000';
 const CSRF_COOKIE_NAME = 'csrftoken';
 const CSRF_SAFE_METHODS = new Set(['GET', 'HEAD', 'OPTIONS']);
@@ -33,7 +32,7 @@ async function apiFetch(path, options = {}) {
         method,
         credentials: 'include',
         headers,
-    });
+    }).catch((error)=> console.error(error.message));
 
     const contentType = response.headers.get('content-type') || '';
     const responseBody = contentType.includes('application/json')
