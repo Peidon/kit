@@ -31,9 +31,8 @@
             "matches": [
                 "<all_urls>"
             ],
-            "js": [
-                "content.js"
-            ]
+            "js": ["content.js", "bot.js"],
+            "css": ["content.css"]
         }
     ],
     "host_permissions": [
