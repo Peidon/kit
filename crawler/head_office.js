@@ -4,21 +4,23 @@ import { load } from 'cheerio';
 const browser = await puppeteer.launch();
 const page = await browser.newPage();
 
-const bc8Url = "https://www.asx.com.au/markets/company/VAL";
+const bc8Url = "https://www.asx.com.au/markets/company/BC8";
 
 export class OfficeProfile {
   company_name;
   address;
   telephone;
   web_link;
-  coordinates;
+  longitude;
+  latitude;
 
-  constructor(company_name, address, telephone, web_link, coordinates) {
+  constructor(company_name, address, telephone, web_link, location) {
     this.company_name = company_name;
     this.address = address;
     this.telephone = telephone;
     this.web_link = web_link;
-    this.coordinates = coordinates;
+    this.longitude = Number(location.lon);
+    this.latitude = Number(location.lat);
   }
 }
 
@@ -60,16 +62,37 @@ export async function scrapeData(url = bc8Url) {
     throw new Error("Company Name was not found");
   }
 
-  const location = await fetch(
-    `https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&q=${encodeURIComponent(address)}`,
+  const response = await fetch(
+    `https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&q=${encode(address)}`,
+    {
+      headers: {
+        Accept: "application/json",
+        // Replace with your app URL or a contact email address.
+        "User-Agent": "xupedon@qq.com",
+      },
+    }
   );
 
-  const [result] = await location.json();
+  const body = await response.text();
 
-  const coordinates = [
-    Number(result.lon),
-    Number(result.lat),
-  ];
+  if (!response.ok) {
+    throw new Error(
+      `Nominatim request failed: ${response.status} ${response.statusText}. ${body}`,
+    );
+  }
 
-  return new OfficeProfile(company_name, address, telephone, webLink, coordinates);
+  const results = JSON.parse(body);
+  if (results.length === 0) {
+    throw new Error(`No coordinates found for: ${address}`);
+  }
+  return new OfficeProfile(company_name, address, telephone, webLink, results[0]);
+}
+
+
+export function encode(address) {
+  const phrases = address.split(",");
+  if (phrases.length > 5) {
+    address = phrases.slice(phrases.length - 5, phrases.length).join(",").trim();
+  }
+  return encodeURIComponent(address);
 }
