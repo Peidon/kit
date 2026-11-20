@@ -12,6 +12,7 @@
   "type": "module",
   "dependencies": {
     "cheerio": "^1.2.0",
+    "pg": "^8.23.1",
     "puppeteer": "^25.18.1"
   }
 }

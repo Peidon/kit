@@ -1,10 +1,8 @@
-import puppeteer from 'puppeteer';
-import { load } from 'cheerio';
+import puppeteer from "puppeteer";
+import { load } from "cheerio";
 
 const browser = await puppeteer.launch();
 const page = await browser.newPage();
-
-const bc8Url = "https://www.asx.com.au/markets/company/BC8";
 
 export class OfficeProfile {
   company_name;
@@ -24,24 +22,25 @@ export class OfficeProfile {
   }
 }
 
-export async function scrapeData(url = bc8Url) {
+export async function scrapeData(url) {
   // Navigate to the ASX company page and wait for network requests to settle
   await page.goto(url, {
-    waitUntil: 'networkidle2',
+    waitUntil: "networkidle2",
   });
 
   // Wait specifically for the dynamic contact table to appear
-  await page.waitForSelector('table.table-contact');
+  await page.waitForSelector("table.table-contact");
 
   const renderedHtml = await page.content();
   await browser.close();
 
   const $ = load(renderedHtml);
-  const table = $("table.table-contact").filter(
-    (_index, element) =>
-      $(element).find("caption").text().trim() ===
-      "Head office contact information",
-  )
+  const table = $("table.table-contact")
+    .filter(
+      (_index, element) =>
+        $(element).find("caption").text().trim() ===
+        "Head office contact information",
+    )
     .first();
 
   if (table.length === 0) {
@@ -70,7 +69,7 @@ export async function scrapeData(url = bc8Url) {
         // Replace with your app URL or a contact email address.
         "User-Agent": "xupedon@qq.com",
       },
-    }
+    },
   );
 
   const body = await response.text();
@@ -85,14 +84,22 @@ export async function scrapeData(url = bc8Url) {
   if (results.length === 0) {
     throw new Error(`No coordinates found for: ${address}`);
   }
-  return new OfficeProfile(company_name, address, telephone, webLink, results[0]);
+  return new OfficeProfile(
+    company_name,
+    address,
+    telephone,
+    webLink,
+    results[0],
+  );
 }
-
 
 export function encode(address) {
   const phrases = address.split(",");
   if (phrases.length > 5) {
-    address = phrases.slice(phrases.length - 5, phrases.length).join(",").trim();
+    address = phrases
+      .slice(phrases.length - 5, phrases.length)
+      .join(",")
+      .trim();
   }
   return encodeURIComponent(address);
 }
