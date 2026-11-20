@@ -1,20 +1,24 @@
 import puppeteer from 'puppeteer';
-import {load} from 'cheerio';
+import { load } from 'cheerio';
 
 const browser = await puppeteer.launch();
 const page = await browser.newPage();
 
-const bc8Url = "https://www.asx.com.au/markets/company/BC8";
+const bc8Url = "https://www.asx.com.au/markets/company/VAL";
 
 export class OfficeProfile {
+  company_name;
   address;
   telephone;
   web_link;
+  coordinates;
 
-  constructor(address, telephone, web_link) {
+  constructor(company_name, address, telephone, web_link, coordinates) {
+    this.company_name = company_name;
     this.address = address;
     this.telephone = telephone;
     this.web_link = web_link;
+    this.coordinates = coordinates;
   }
 }
 
@@ -30,14 +34,12 @@ export async function scrapeData(url = bc8Url) {
   const renderedHtml = await page.content();
   await browser.close();
 
-  // const response = await axios.get(url);
   const $ = load(renderedHtml);
-  const tables = $("table");
-  const table = tables.filter(
-      (_index, element) =>
-        $(element).find("caption").text().trim() ===
-        "Head office contact information",
-    )
+  const table = $("table.table-contact").filter(
+    (_index, element) =>
+      $(element).find("caption").text().trim() ===
+      "Head office contact information",
+  )
     .first();
 
   if (table.length === 0) {
@@ -53,5 +55,21 @@ export async function scrapeData(url = bc8Url) {
       .attr("href")
       ?.trim() ?? "";
 
-  return new OfficeProfile(address, telephone, webLink);
+  const company_name = $("h1.panel-title")?.find("span")?.first().text().trim();
+  if (company_name.length === 0) {
+    throw new Error("Company Name was not found");
+  }
+
+  const location = await fetch(
+    `https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&q=${encodeURIComponent(address)}`,
+  );
+
+  const [result] = await location.json();
+
+  const coordinates = [
+    Number(result.lon),
+    Number(result.lat),
+  ];
+
+  return new OfficeProfile(company_name, address, telephone, webLink, coordinates);
 }
