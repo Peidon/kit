@@ -46,8 +46,17 @@ export async function saveProfile(stockCode) {
     data.latitude,
   ];
 
-  const result = await pool.query(query, values);
-  return result.rows[0];
+  try {
+    const result = await pool.query(query, values);
+    return result.rows[0];
+  } catch (error) {
+    if (error.code === "23505") {
+      throw new Error(
+        `Profile for stock code ${stockCode} already exists in the database`,
+      );
+    }
+    throw error;
+  }
 }
 
 export async function closeStorage() {

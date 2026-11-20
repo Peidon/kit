@@ -4,7 +4,8 @@ import { readFile } from "node:fs/promises";
 async function main() {
   const asx_code = await readFile("./mining_code.out", "utf8");
   const code_list = asx_code.split(",").filter((code) => code.trim() !== "");
-  code_list.forEach(async (code) => {
+  // Process each code in sequence, waiting for each to complete before starting the next
+  for (const code of code_list) {
     try {
       const result = await saveProfile(code.trim());
       console.log(
@@ -13,7 +14,7 @@ async function main() {
     } catch (error) {
       console.error(`Error saving profile for ${code.trim()}:`, error.message);
     }
-  });
+  }
 }
 
 main();
