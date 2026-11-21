@@ -61,12 +61,17 @@ export async function scrapeData(url) {
     throw new Error("Company Name was not found");
   }
 
+  const location = await fetchCoordinates(address);
+
+  return new OfficeProfile(company_name, address, telephone, webLink, location);
+}
+
+export async function fetchCoordinates(address) {
   const response = await fetch(
     `https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&q=${encode(address)}`,
     {
       headers: {
         Accept: "application/json",
-        // Replace with your app URL or a contact email address.
         "User-Agent": "xupedon@qq.com",
       },
     },
@@ -84,13 +89,7 @@ export async function scrapeData(url) {
   if (results.length === 0) {
     throw new Error(`No coordinates found for: ${address}`);
   }
-  return new OfficeProfile(
-    company_name,
-    address,
-    telephone,
-    webLink,
-    results[0],
-  );
+  return results[0];
 }
 
 export function encode(address) {
