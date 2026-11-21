@@ -1,9 +1,6 @@
 import puppeteer from "puppeteer";
 import { load } from "cheerio";
 
-const browser = await puppeteer.launch();
-const page = await browser.newPage();
-
 export class OfficeProfile {
   company_name;
   address;
@@ -23,16 +20,19 @@ export class OfficeProfile {
 }
 
 export async function scrapeData(url) {
-  // Navigate to the ASX company page and wait for network requests to settle
-  await page.goto(url, {
-    waitUntil: "networkidle2",
-  });
-
-  // Wait specifically for the dynamic contact table to appear
-  await page.waitForSelector("table.table-contact");
-
-  const renderedHtml = await page.content();
-  await browser.close();
+  const browser = await puppeteer.launch();
+  let renderedHtml;
+  try {
+    const page = await browser.newPage();
+    await page.goto(url, {
+      waitUntil: "networkidle2",
+      timeout: 60_000,
+    });
+    await page.waitForSelector("table.table-contact", { timeout: 30_000 });
+    renderedHtml = await page.content();
+  } finally {
+    await browser.close();
+  }
 
   const $ = load(renderedHtml);
   const table = $("table.table-contact")
