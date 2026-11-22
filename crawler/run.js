@@ -14,7 +14,7 @@ async function main() {
       continue;
     }
     try {
-      stockCode = code.trim().toUpperCase();
+      const stockCode = code.trim().toUpperCase();
       const url = `https://www.asx.com.au/markets/company/${stockCode}`;
       const data = await scrapeData(url, true);
       const result = await saveProfile(data);
