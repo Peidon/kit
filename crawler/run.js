@@ -1,5 +1,4 @@
 import { closeStorage, saveProfile, allStockCodes} from "./storage.js";
-import { scrapeData } from "./head_office.js";
 import { readFile } from "node:fs/promises";
 
 async function main() {
@@ -15,9 +14,7 @@ async function main() {
     }
     try {
       const stockCode = code.trim().toUpperCase();
-      const url = `https://www.asx.com.au/markets/company/${stockCode}`;
-      const data = await scrapeData(url, true);
-      const result = await saveProfile(data);
+      const result = await saveProfile(stockCode);
       console.log(
         `Saved profile for ${result.company_name} (${result.stock_code})`,
       );

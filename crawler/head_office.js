@@ -19,7 +19,7 @@ export class OfficeProfile {
   }
 }
 
-export async function scrapeData(url, rough = false) {
+export async function scrapeData(url, cutoff = 4) {
   const browser = await puppeteer.launch();
   let renderedHtml;
   try {
@@ -61,14 +61,15 @@ export async function scrapeData(url, rough = false) {
     throw new Error("Company Name was not found");
   }
 
-  const location = await fetchCoordinates(address, rough);
+  const location = await fetchCoordinates(address, cutoff);
 
   return new OfficeProfile(company_name, address, telephone, webLink, location);
 }
 
-export async function fetchCoordinates(address, rough = false) {
+export async function fetchCoordinates(address, maxPhrases = 5) {
+  const cutoffAddress = cutoff(address, maxPhrases);
   const response = await fetch(
-    `https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&q=${encode(address, rough)}`,
+    `https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&q=${encodeURIComponent(cutoffAddress)}`,
     {
       headers: {
         Accept: "application/json",
@@ -92,20 +93,13 @@ export async function fetchCoordinates(address, rough = false) {
   return results[0];
 }
 
-export function encode(address, rough = false) {
+export function cutoff(address, maxPhrases = 5) {
   const phrases = address.split(",");
-  if (phrases.length > 5) {
+  if (phrases.length > maxPhrases) {
     address = phrases
-      .slice(phrases.length - 5, phrases.length)
+      .slice(phrases.length - maxPhrases, phrases.length)
       .join(",")
       .trim();
   }
-  if (rough) {
-    // remove the number of fist phrase, e.g. "123 Main St" becomes "Main St"
-    address = phrases
-      .map((phrase, index) => (index === 0 ? phrase.replace(/^\d+\s+/, "") : phrase))
-      .join(",")
-      .trim();
-  }
-  return encodeURIComponent(address);
+  return address;
 }
