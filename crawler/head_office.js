@@ -19,7 +19,7 @@ export class OfficeProfile {
   }
 }
 
-export async function scrapeData(url) {
+export async function scrapeData(url, rough = false) {
   const browser = await puppeteer.launch();
   let renderedHtml;
   try {
@@ -61,14 +61,14 @@ export async function scrapeData(url) {
     throw new Error("Company Name was not found");
   }
 
-  const location = await fetchCoordinates(address);
+  const location = await fetchCoordinates(address, rough);
 
   return new OfficeProfile(company_name, address, telephone, webLink, location);
 }
 
-export async function fetchCoordinates(address) {
+export async function fetchCoordinates(address, rough = false) {
   const response = await fetch(
-    `https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&q=${encode(address)}`,
+    `https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&q=${encode(address, rough)}`,
     {
       headers: {
         Accept: "application/json",
@@ -92,11 +92,18 @@ export async function fetchCoordinates(address) {
   return results[0];
 }
 
-export function encode(address) {
+export function encode(address, rough = false) {
   const phrases = address.split(",");
   if (phrases.length > 5) {
     address = phrases
       .slice(phrases.length - 5, phrases.length)
+      .join(",")
+      .trim();
+  }
+  if (rough) {
+    // remove the number of fist phrase, e.g. "123 Main St" becomes "Main St"
+    address = phrases
+      .map((phrase, index) => (index === 0 ? phrase.replace(/^\d+\s+/, "") : phrase))
       .join(",")
       .trim();
   }

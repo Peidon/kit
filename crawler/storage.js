@@ -1,16 +1,12 @@
 import pg from "pg";
-import { scrapeData } from "./head_office.js";
 
 const { Pool } = pg;
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
 });
 
-/** Scrape a company profile and insert it into company_profile. */
-export async function saveProfile(stockCode) {
-  const url = `https://www.asx.com.au/markets/company/${stockCode}`;
-  const data = await scrapeData(url);
-
+/** insert company profile into company_profile. */
+export async function saveProfile(data) {
   if (
     !data.company_name ||
     !data.address ||
@@ -57,6 +53,12 @@ export async function saveProfile(stockCode) {
     }
     throw error;
   }
+}
+
+export async function allStockCodes() {
+  const query = "SELECT stock_code FROM company_profile";
+  const result = await pool.query(query);
+  return result.rows.map((row) => row.stock_code);
 }
 
 export async function closeStorage() {
